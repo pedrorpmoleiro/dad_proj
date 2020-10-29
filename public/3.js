@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[3],{202:function(n,t,e){"use strict";e.r(t);var a={},i=e(25),r=e(26),s=e.n(r),c=e(129),l=Object(i.a)(a,(function(){var n=this.$createElement,t=this._self._c||n;return t("v-container",[t("h1",[this._v("MASTER!!!")])])}),[],!1,null,null,null);t.default=l.exports;s()(l,{VContainer:c.a})}}]);
