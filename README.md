@@ -37,7 +37,7 @@ TBD
 * [Vue](https://vuejs.org/v2/guide/) - JavaScript Framework
 * [Vuetify](https://vuetifyjs.com/en/) - Material Design Framework, a Vue UI Library.
 * [Laravel](https://laravel.com/docs/6.x) - PHP Framework
-* [WebStorm](hhttps://www.jetbrains.com/webstorm/) - PHP IDE from Jetbrains
+* [WebStorm](https://www.jetbrains.com/webstorm/) - PHP IDE from Jetbrains
 * [Visual Studio Code](https://code.visualstudio.com/) - Source-code editor made by Microsoft.
 * [Laragon](https://laragon.org/docs/) - Development environment for PHP, Node.js, Python, Java, Go, Ruby.
 
