@@ -5,22 +5,28 @@ require("bootstrap");
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 
 import Vue from "vue";
-import Vuetify from "vuetify/lib";
-
 import VueRouter from "vue-router";
 
-Vue.use(Vuetify);
+import Vuetify from "vuetify/lib";
+
+import Vuesax from 'vuesax'
+import 'vuesax/dist/vuesax.css' //Vuesax styles
+
 Vue.use(VueRouter);
 
-import App from "./components/App.vue";
+Vue.use(Vuetify);
 
-//import Home from "./components/pages/home";
-//import Master from "./components/pages/master";
+Vue.use(Vuesax)
 
+import app from "./components/App.vue";
+
+// import home from "./components/pages/home.vue";
 const home = () => ({
     component: import("./components/pages/home.vue"),
     loading: master
 });
+
+// import master from './components/pages/master.vue'
 const master = () => import("./components/pages/master.vue");
 
 let vuetify = new Vuetify();
@@ -45,5 +51,5 @@ let router = new VueRouter({ routes });
 new Vue({
     vuetify,
     router,
-    render: h => h(App)
+    render: h => h(app)
 }).$mount("#app");
