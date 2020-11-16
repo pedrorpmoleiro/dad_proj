@@ -9,25 +9,22 @@ import VueRouter from "vue-router";
 
 import Vuetify from "vuetify/lib";
 
-import Vuesax from 'vuesax'
-import 'vuesax/dist/vuesax.css' //Vuesax styles
-
 Vue.use(VueRouter);
 
 Vue.use(Vuetify);
 
-Vue.use(Vuesax)
 
 import app from "./components/App.vue";
+import loading from "./components/loading.vue";
 
-// import home from "./components/pages/home.vue";
-const home = () => ({
-    component: import("./components/pages/home.vue"),
-    loading: master
-});
+import home from "./components/pages/home.vue";
+// const home = () => ({
+//     component: import("./components/pages/home.vue"),
+//     loading: loading
+// });
 
-// import master from './components/pages/master.vue'
-const master = () => import("./components/pages/master.vue");
+import master from './components/pages/master.vue'
+// const master = () => import("./components/pages/master.vue");
 
 let vuetify = new Vuetify();
 
