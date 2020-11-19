@@ -1,8 +1,8 @@
 <template>
-    <v-app>
-        <v-app-bar app color="white">
+    <v-app class="overflow-hidden">
+        <v-app-bar color="white" app>
             <v-container class="py-0 fill-height">
-                <v-btn text v-on:click.prevent="$router.push('/home')">
+                <v-btn text v-on:click.prevent="goHome">
                     <h3>Food@Home</h3>
                 </v-btn>
 
@@ -10,14 +10,14 @@
                     v-for="link in links"
                     :key="link.name"
                     v-on:click.prevent="$router.push(link.location)"
+                    :disabled="$router.currentRoute.path == link.location"
                     text
                 >
                     {{ link.name }}
                 </v-btn>
             </v-container>
 
-            <v-spacer/>
-
+            <v-spacer />
         </v-app-bar>
         <v-main class="grey lighten-3">
             <router-view />
@@ -38,8 +38,14 @@ export default {
                 name: "Master",
                 location: "/master"
             }
-        ],
-        collapseOnScroll: true
-    })
+        ]
+    }),
+    methods: {
+        goHome() {
+            if (this.$router.currentRoute.path != "/home") {
+                this.$router.push("/home");
+            }
+        }
+    }
 };
 </script>

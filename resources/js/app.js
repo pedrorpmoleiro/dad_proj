@@ -13,9 +13,7 @@ Vue.use(VueRouter);
 
 Vue.use(Vuetify);
 
-
 import app from "./components/App.vue";
-import loading from "./components/loading.vue";
 
 import home from "./components/pages/home.vue";
 // const home = () => ({
