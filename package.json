@@ -10,7 +10,7 @@
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
     },
     "devDependencies": {
-        "axios": "^0.19.2",
+        "axios": "^0.21.0",
         "bootstrap": "^4.5.3",
         "cross-env": "^7.0",
         "deepmerge": "^4.2.2",
@@ -28,7 +28,7 @@
         "vue-template-compiler": "^2.6.12",
         "vuetify": "^2.3.18",
         "vuetify-loader": "^1.6.0",
-        "vuetifyjs-mix-extension": "0.0.14"
+        "vuetifyjs-mix-extension": "0.0.17"
     },
     "dependencies": {}
 }
