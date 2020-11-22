@@ -24,6 +24,8 @@ import home from "./components/pages/home.vue";
 import master from './components/pages/master.vue'
 // const master = () => import("./components/pages/master.vue");
 
+import menu from './components/pages/menu.vue'
+
 let vuetify = new Vuetify();
 
 const routes = [
@@ -36,7 +38,11 @@ const routes = [
         component: home
     },
     {
-        path: "/master",
+        path: "/menu",
+        component: menu
+    },
+    {
+        path: "/foo/bar/master",
         component: master
     }
 ];
