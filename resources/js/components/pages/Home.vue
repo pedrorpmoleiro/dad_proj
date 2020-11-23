@@ -17,7 +17,7 @@
 <script>
 export default {
     data: () => ({
-        height: window.innerHeight - 110
+        height: window.innerHeight - 115
     })
 };
 </script>

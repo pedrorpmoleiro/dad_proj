@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import TestDialog from "../dialogs/testDialog";
+import TestDialog from "../dialogs/TestDialog";
 
 export default {
     components: {

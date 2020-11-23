@@ -1,32 +1,20 @@
 require("./bootstrap");
 
-require("bootstrap");
-
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 
 import Vue from "vue";
 import VueRouter from "vue-router";
-
 import Vuetify from "vuetify/lib";
 
 Vue.use(VueRouter);
-
 Vue.use(Vuetify);
 
-import app from "./components/App.vue";
+import App from "./components/App.vue";
+import Home from "./components/pages/Home.vue";
+import Master from './components/pages/Master.vue'
+import Menu from './components/pages/Menu.vue'
 
-import home from "./components/pages/home.vue";
-// const home = () => ({
-//     component: import("./components/pages/home.vue"),
-//     loading: loading
-// });
-
-import master from './components/pages/master.vue'
-// const master = () => import("./components/pages/master.vue");
-
-import menu from './components/pages/menu.vue'
-
-let vuetify = new Vuetify();
+const vuetify = new Vuetify();
 
 const routes = [
     {
@@ -35,22 +23,22 @@ const routes = [
     },
     {
         path: "/home",
-        component: home
+        component: Home
     },
     {
         path: "/menu",
-        component: menu
+        component: Menu
     },
     {
         path: "/foo/bar/master",
-        component: master
+        component: Master
     }
 ];
 
-let router = new VueRouter({ routes });
+const router = new VueRouter({routes});
 
 new Vue({
     vuetify,
     router,
-    render: h => h(app)
+    render: h => h(App)
 }).$mount("#app");
