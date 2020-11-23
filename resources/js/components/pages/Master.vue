@@ -9,16 +9,18 @@
                             elevation="2"
                             dark
                             @click="startLoading"
-                            >Start Loading</v-btn
                         >
+                            Start Loading
+                        </v-btn>
                         <v-btn
                             color="pink"
                             elevation="2"
                             dark
                             @click="stopLoading"
-                            >Stop Loading</v-btn
                         >
-                        <test-dialog />
+                            Stop Loading
+                        </v-btn>
+                        <test-dialog/>
                     </v-container>
                     <v-container>
                         <v-btn
@@ -39,7 +41,8 @@
                     type="table"
                     :loading="loading"
                     transition="fade-transition"
-                    ><v-data-table
+                >
+                    <v-data-table
                         :headers="headers"
                         :items="desserts"
                         :items-per-page="5"
@@ -47,7 +50,8 @@
                         loading-text="A carregar"
                         class="elevation-1"
                     ></v-data-table
-                ></v-skeleton-loader>
+                    >
+                </v-skeleton-loader>
             </v-col>
         </v-row>
         <v-row>
@@ -82,11 +86,11 @@ export default {
                 sortable: false,
                 value: "name"
             },
-            { text: "Calories", value: "calories" },
-            { text: "Fat (g)", value: "fat" },
-            { text: "Carbs (g)", value: "carbs" },
-            { text: "Protein (g)", value: "protein" },
-            { text: "Iron (%)", value: "iron" }
+            {text: "Calories", value: "calories"},
+            {text: "Fat (g)", value: "fat"},
+            {text: "Carbs (g)", value: "carbs"},
+            {text: "Protein (g)", value: "protein"},
+            {text: "Iron (%)", value: "iron"}
         ],
         desserts: [],
         loading: true

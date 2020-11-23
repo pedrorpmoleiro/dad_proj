@@ -51,7 +51,6 @@
 
 <script>
 export default {
-    props: ["authToken"],
     data: () => ({
         dialog: false,
         loading: false,

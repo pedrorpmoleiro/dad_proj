@@ -20,13 +20,12 @@
 
                 <div v-if="!isLoggedIn">
                     <login-dialog
-                        v-bind:auth-token="authToken"
                         v-on:set-token="setToken"
                         v-on:logged-in="onLoggedIn"
                         v-on:invalid-login="onInvalidLogin"
                     ></login-dialog>
                     <register-dialog
-                        v-bind:auth-token="authToken"
+                        v-on:set-token="setToken"
                     ></register-dialog>
                 </div>
                 <div v-else>
@@ -40,7 +39,7 @@
             </v-container>
         </v-app-bar>
         <v-main class="grey lighten-3">
-            <router-view></router-view>
+            <router-view v-on:show-notification="openNotification"></router-view>
         </v-main>
         <v-container>
             <v-snackbar
@@ -113,6 +112,11 @@ export default {
         setToken(token) {
             if (!this.authToken)
                 this.authToken = token;
+        },
+        openNotification(color, message) {
+            this.notification.color = color;
+            this.notification.text = message;
+            this.notification.showing = true;
         },
         onLoggedIn() {
             if (this.authToken != null)

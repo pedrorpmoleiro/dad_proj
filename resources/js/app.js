@@ -14,7 +14,11 @@ import Home from "./components/pages/Home.vue";
 import Master from './components/pages/Master.vue'
 import Menu from './components/pages/Menu.vue'
 
-const vuetify = new Vuetify();
+const vuetify = new Vuetify({
+    icons: {
+        iconfont: 'md',
+    },
+});
 
 const routes = [
     {
