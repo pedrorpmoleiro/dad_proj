@@ -1,6 +1,6 @@
 <template>
     <v-card flat outlined class="ma-6">
-        <v-img :height="height" src="../storage/background_home.jpg">
+        <v-img :height="imageHeight" src="../storage/background_home.jpg">
             <v-container fill-height class="justify-center">
                 <v-layout align-center justify-center>
                     <v-card class="d-flex justify-center">
@@ -17,7 +17,7 @@
 <script>
 export default {
     data: () => ({
-        height: window.innerHeight - 115
+        imageHeight: window.innerHeight - 115
     })
 };
 </script>

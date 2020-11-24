@@ -1,6 +1,26 @@
 <template>
-    <v-app class="overflow-hidden">
-        <v-app-bar color="white" app>
+    <v-app>
+        <v-snackbar
+            v-model="notification.showing"
+            timeout="-1"
+            rounded
+            :color="notification.color"
+        >
+            {{ notification.text }}
+
+            <v-spacer></v-spacer>
+
+            <template v-slot:action="{ attrs }">
+                <v-btn
+                    icon
+                    v-bind="attrs"
+                    v-on:click.prevent="closeNotification"
+                >
+                    <v-icon>cancel</v-icon>
+                </v-btn>
+            </template>
+        </v-snackbar>
+        <v-app-bar color="white" app style="z-index: 99">
             <v-container class="py-0 fill-height">
                 <v-btn text v-on:click.prevent="goHome">
                     <h3>Food@Home</h3>
@@ -39,30 +59,10 @@
             </v-container>
         </v-app-bar>
         <v-main class="grey lighten-3">
-            <router-view v-on:show-notification="openNotification"></router-view>
+            <router-view
+                v-on:show-notification="openNotification"
+            ></router-view>
         </v-main>
-        <v-container>
-            <v-snackbar
-                v-model="notification.showing"
-                timeout="-1"
-                rounded
-                :color="notification.color"
-            >
-                {{ notification.text }}
-
-                <v-spacer></v-spacer>
-
-                <template v-slot:action="{ attrs }">
-                    <v-btn
-                        icon
-                        v-bind="attrs"
-                        v-on:click.prevent="closeNotification"
-                    >
-                        <v-icon>cancel</v-icon>
-                    </v-btn>
-                </template>
-            </v-snackbar>
-        </v-container>
         <!-- <v-footer app absolute>
             <v-card-text class="text-center"
                 >GET 10% OFF SQUARESPACE WITH THIS LINK!!</v-card-text
@@ -110,8 +110,7 @@ export default {
             this.notification.text = "";
         },
         setToken(token) {
-            if (!this.authToken)
-                this.authToken = token;
+            if (!this.authToken) this.authToken = token;
         },
         openNotification(color, message) {
             this.notification.color = color;

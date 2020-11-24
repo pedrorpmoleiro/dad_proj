@@ -91,7 +91,6 @@ export default {
                 this.$emit("invalid-login", e.response.data.msg)
             })
         }
-    },
-    mounted() {}
+    }
 };
 </script>
