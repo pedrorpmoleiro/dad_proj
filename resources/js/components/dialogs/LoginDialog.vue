@@ -16,7 +16,7 @@
                                 label="Email*"
                                 clearable
                                 required
-                            />
+                            ></v-text-field>
                         </v-row>
                         <v-row>
                             <v-text-field
@@ -29,11 +29,12 @@
                                 counter
                                 clearable
                                 required
-                                @click:append="showPass = !showPass"
-                            />
+                                v-on:click:append="showPass = !showPass"
+                            ></v-text-field>
                         </v-row>
                     </v-container>
                 </v-form>
+                <small>* indicates required field</small>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
