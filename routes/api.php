@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\LoginControllerAPI;
-use App\Http\Controllers\ProductControllerAPI;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,11 +17,20 @@ use App\Http\Controllers\ProductControllerAPI;
 |
 */
 
-Route::post('login', [LoginControllerAPI::class, 'login'])->name("login");
-Route::middleware('auth:api')->post('logout', [LoginControllerAPI::class, 'logout'])->name("logout");
+// Login Route
+Route::post('login', [AuthController::class, 'login'])->name("login");
 
-Route::get('products', [ProductControllerAPI::class, 'getProducts'])->name("getProducts");
+// SANCTUM Protected Routes
+Route::middleware('auth:sanctum')->group(function () {
+    // Logout Route
+    Route::post('logout', [AuthController::class, 'logout'])->name("logout");
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+    // User Routes
+    Route::prefix('users')->group(function () {
+        // Get current user data
+        Route::get('me', [UserController::class, 'me'])->name("getCurrentUser");
+    });
 });
+
+Route::get('products', [ProductController::class, 'getProducts'])->name("getProducts");
+

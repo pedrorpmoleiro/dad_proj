@@ -51,6 +51,8 @@
 </template>
 
 <script>
+import {mapActions} from "vuex";
+
 export default {
     data: () => ({
         dialog: false,
@@ -73,6 +75,9 @@ export default {
         },
     }),
     methods: {
+        ...mapActions([
+            "setUser"
+        ]),
         submit() {
             let user = {
                 email: this.input.email,
@@ -80,17 +85,20 @@ export default {
             };
 
             this.loading = true;
-            axios.post("api/login", user).then(response => {
-                this.loading = false;
-                let token = response.data.access_token
-                localStorage.setItem("access-token", token)
-                this.$emit("set-token", token)
-                this.$emit("logged-in");
-                this.dialog = false;
-            }).catch(e => {
-                this.loading = false;
-                this.$emit("invalid-login", e.response.data.msg)
-            })
+
+            axios.get("sanctum/csrf-cookie").then(() => {
+                axios.post("api/login", user).then(response => {
+                    this.loading = false;
+                    // console.log(e);
+                    this.setUser(response.data);
+                    axios.defaults.withCredentials = true;
+                    this.dialog = false;
+                }).catch(e => {
+                    this.loading = false;
+                    // console.log(e);
+                    this.$emit("show-notification", "error", e.response.data.msg)
+                });
+            });
         }
     }
 };

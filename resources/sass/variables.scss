@@ -4,3 +4,8 @@
 $body-font-family: 'Ubuntu', 'Roboto', sans-serif;
 
 $border-radius-root: 10px;
+
+.toasted {
+    font-family: $body-font-family;
+    border-radius: $border-radius-root;
+}

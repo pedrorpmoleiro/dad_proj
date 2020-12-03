@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
 
-class ProductControllerAPI extends Controller
+use App\Http\Controllers\Controller;
+
+class ProductController extends Controller
 {
     public function getProducts()
     {
