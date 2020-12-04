@@ -21,7 +21,9 @@
                         <v-row>
                             <v-text-field
                                 v-model="input.password"
-                                :append-icon="'visibility' + (showPass ? '' : '_off')"
+                                :append-icon="
+                                    'visibility' + (showPass ? '' : '_off')
+                                "
                                 :rules="[rules.required, rules.min]"
                                 :type="showPass ? 'text' : 'password'"
                                 hint="At least 3 characters"
@@ -39,7 +41,12 @@
             <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text color="green" v-on:click.prevent="submit" :disabled="!isFormValid">
+                <v-btn
+                    text
+                    color="green"
+                    v-on:click.prevent="submit"
+                    :disabled="!isFormValid"
+                >
                     Login
                 </v-btn>
                 <v-btn text color="red" v-on:click.prevent="dialog = false">
@@ -51,7 +58,7 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import { mapActions } from "vuex";
 
 export default {
     data: () => ({
@@ -67,17 +74,13 @@ export default {
             required: value => !!value || "Required",
             min: value => value.length >= 3 || "Min of 3 Characters",
             email: value => {
-                const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return (
-                    pattern.test(value) || "Invalid E-mail format!!"
-                );
+                const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
+                return pattern.test(value) || "Invalid E-mail format!!";
             }
-        },
+        }
     }),
     methods: {
-        ...mapActions([
-            "setUser"
-        ]),
+        ...mapActions(["setUser"]),
         submit() {
             let user = {
                 email: this.input.email,
@@ -87,17 +90,24 @@ export default {
             this.loading = true;
 
             axios.get("sanctum/csrf-cookie").then(() => {
-                axios.post("api/login", user).then(response => {
-                    this.loading = false;
-                    // console.log(e);
-                    this.setUser(response.data);
-                    axios.defaults.withCredentials = true;
-                    this.dialog = false;
-                }).catch(e => {
-                    this.loading = false;
-                    // console.log(e);
-                    this.$emit("show-notification", "error", e.response.data.msg)
-                });
+                axios
+                    .post("api/login", user)
+                    .then(response => {
+                        this.loading = false;
+                        // console.log(e);
+                        this.setUser(response.data);
+                        axios.defaults.withCredentials = true;
+                        this.dialog = false;
+                    })
+                    .catch(e => {
+                        this.loading = false;
+                        // console.log(e);
+                        this.$emit(
+                            "show-notification",
+                            "error",
+                            e.response.data.msg
+                        );
+                    });
             });
         }
     }

@@ -8,7 +8,8 @@
 
         <v-card :loading="loading">
             <v-card-title dark class="headline red lighten-1">
-                WIP <!-- ! TODO -->
+                WIP
+                <!-- ! TODO -->
             </v-card-title>
 
             <v-card-text>
@@ -18,7 +19,7 @@
                             <v-col>
                                 <v-text-field
                                     v-model="input.name"
-                                    :rules="[rules.required, rules.name]"
+                                    :rules="[rules.required, rules.name, rules.max]"
                                     label="Full Name*"
                                     clearable
                                     required
@@ -38,7 +39,7 @@
                             <v-col>
                                 <v-text-field
                                     v-model="input.email"
-                                    :rules="[rules.required, rules.email]"
+                                    :rules="[rules.required, rules.email, rules.max]"
                                     label="Email*"
                                     clearable
                                     required
@@ -52,7 +53,7 @@
                                     :append-icon="
                                         'visibility' + (showPass ? '' : '_off')
                                     "
-                                    :rules="[rules.required, rules.min]"
+                                    :rules="[rules.required, rules.min, rules.max]"
                                     :type="showPass ? 'text' : 'password'"
                                     hint="At least 3 characters"
                                     label="Password*"
@@ -69,7 +70,7 @@
                                         'visibility' +
                                             (showPassConfirm ? '' : '_off')
                                     "
-                                    :rules="[rules.required, rules.min]"
+                                    :rules="[rules.required, rules.min, rules.max]"
                                     :type="
                                         showPassConfirm ? 'text' : 'password'
                                     "
@@ -163,20 +164,24 @@ export default {
         rules: {
             required: value => !!value || "Required",
             min: value => value.length >= 3 || "Min of 3 Characters",
+            max: value => value.length < 255 || "Max of 255 Characters",
             email: value => {
-                const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return pattern.test(value) || "Invalid E-mail format!!";
+                const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
+                return ( pattern.test(value) || "Invalid E-mail format!!" );
             },
-            nif: value =>
+            nif: value => {
+                const pattern = /^\d{0,8}[1-9]$/;
+                
+            }
                 (value > 1 && value < 999999999) ||
                 "NIF: Positive number, smaller then 999999999",
             name: value => {
-                // TODO
-                return true;
+                const pattern = /^[a-zA-Z\s]*$/;
+                return pattern.test(value) || "Only letters and spaces allowed";
             },
             phone: value => {
-                // TODO
-                return true;
+                const pattern = /^([\+]|[0]{2})?[1-9]\d{1,14}$/;
+                return pattern.test(value) || "Phone number format is invalid";
             }
         }
     }),
