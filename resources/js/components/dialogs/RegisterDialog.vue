@@ -113,8 +113,9 @@
                                     accept="image/jpeg, image/png"
                                     prepend-icon="add_a_photo"
                                     label="Profile Picture"
-                                    v-model="input.photo"
+                                    v-model="input.photo_url"
                                 ></v-file-input>
+                               <!-- ! TODO -->
                             </v-col>
                         </v-row>
                     </v-container>
@@ -159,7 +160,7 @@ export default {
             address: "",
             phone: "",
             nif: "",
-            photo: null
+            photo_url: null
         },
         rules: {
             required: value => !!value || "Required",
@@ -167,21 +168,19 @@ export default {
             max: value => value.length < 255 || "Max of 255 Characters",
             email: value => {
                 const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
-                return ( pattern.test(value) || "Invalid E-mail format!!" );
+                return (pattern.test(value) || "Invalid E-mail format!!");
             },
             nif: value => {
                 const pattern = /^\d{0,8}[1-9]$/;
-                
-            }
-                (value > 1 && value < 999999999) ||
-                "NIF: Positive number, smaller then 999999999",
+                return (pattern.test(value) || "NIF: Positive number, smaller then 999999999")
+            },
             name: value => {
                 const pattern = /^[a-zA-Z\s]*$/;
-                return pattern.test(value) || "Only letters and spaces allowed";
+                return (pattern.test(value) || "Only letters and spaces allowed");
             },
             phone: value => {
-                const pattern = /^([\+]|[0]{2})?[1-9]\d{1,14}$/;
-                return pattern.test(value) || "Phone number format is invalid";
+                const pattern = /^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,7}$/;
+                return (pattern.test(value) || "Phone number format is invalid");
             }
         }
     }),

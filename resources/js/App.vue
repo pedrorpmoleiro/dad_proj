@@ -164,10 +164,11 @@ export default {
             // Logged in
             // console.dir(response);
             this.setUser(response.data);
-        }).catch(error => {
-            // Not Logged in
-            // console.log(error);
         });
+        /* .catch(error => {
+            // Not Logged in
+            console.log(error);
+        }); */
     }
 };
 </script>

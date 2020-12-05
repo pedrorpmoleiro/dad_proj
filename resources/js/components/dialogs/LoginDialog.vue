@@ -12,7 +12,7 @@
                         <v-row>
                             <v-text-field
                                 v-model="input.email"
-                                :rules="[rules.required, rules.email]"
+                                :rules="[rules.required, rules.email, rules.max]"
                                 label="Email*"
                                 clearable
                                 required
@@ -24,7 +24,7 @@
                                 :append-icon="
                                     'visibility' + (showPass ? '' : '_off')
                                 "
-                                :rules="[rules.required, rules.min]"
+                                :rules="[rules.required, rules.min, rules.max]"
                                 :type="showPass ? 'text' : 'password'"
                                 hint="At least 3 characters"
                                 label="Password*"
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import {mapActions} from "vuex";
 
 export default {
     data: () => ({
@@ -73,9 +73,10 @@ export default {
         rules: {
             required: value => !!value || "Required",
             min: value => value.length >= 3 || "Min of 3 Characters",
+            max: value => value.length < 255 || "Max of 255 Characters",
             email: value => {
                 const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
-                return pattern.test(value) || "Invalid E-mail format!!";
+                return (pattern.test(value) || "Invalid E-mail format!!");
             }
         }
     }),
