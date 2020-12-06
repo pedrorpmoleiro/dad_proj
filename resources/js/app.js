@@ -61,8 +61,10 @@ import VueRouter from "vue-router";
 Vue.use(VueRouter);
 
 import Home from "./components/pages/Home.vue";
-import Master from './components/pages/Master.vue'
-import Menu from './components/pages/Menu.vue'
+import Master from './components/pages/Master.vue';
+import Menu from './components/pages/Menu.vue';
+import UpdateProfile from "./components/pages/UpdateProfile.vue";
+
 
 const routes = [
     {
@@ -76,6 +78,10 @@ const routes = [
     {
         path: "/menu",
         component: Menu
+    },
+    {
+      path: "/profile",
+      component: UpdateProfile
     },
     {
         path: "/foo/bar/master",
