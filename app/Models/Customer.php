@@ -10,17 +10,19 @@ class Customer extends Model
 {
     use HasFactory, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    public $incrementing = false;
+
     protected $fillable = [
         'id',
         'address',
         'phone',
         'nif',
     ];
+
+    public function orders()
+    {
+        return $this->hasMany('App\Models\Order', 'customer_id');
+    }
 
     public function toStdClass(): \stdClass {
         $customer = new \stdClass();

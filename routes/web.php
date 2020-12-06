@@ -15,8 +15,4 @@ use App\Http\Controllers\VueController;
 |
 */
 
-Route::get('/welcome', function () {
-    return view('welcome');
-});
-
 Route::get('/', [VueController::class, 'index']);

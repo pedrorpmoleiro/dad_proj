@@ -99,6 +99,7 @@ export default {
                         this.setUser(response.data);
                         axios.defaults.withCredentials = true;
                         this.dialog = false;
+                        this.$emit("show-notification", "success", "Login Successful")
                     })
                     .catch(e => {
                         this.loading = false;
