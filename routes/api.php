@@ -30,22 +30,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Logout Route
     Route::post('logout', [AuthController::class, 'logout'])->name("user.logout");
 
-    // User Routes
+    /* *** User Routes *** */
     Route::prefix('users')->group(function () {
         // Get current user data
-        Route::get('me', [UserController::class, 'me'])->name("user.get_info");
+        Route::get('me', [UserController::class, 'me'])->name("user.get_auth_user_info");
     });
 });
 
 /* *** Unprotected Routes *** */
 // User Login Route
 Route::post('login', [AuthController::class, 'login'])->name("user.login");
-// Login Route
-Route::post('register', [AuthController::class, 'registerCustomer'])->name("customer.register");
-
+// Customer Register Route
+Route::post('customers/register', [AuthController::class, 'registerCustomer'])->name("customer.register");
 // Get all products Route
 Route::get('products', [ProductController::class, 'getProducts'])->name("product.get_all");
-
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {

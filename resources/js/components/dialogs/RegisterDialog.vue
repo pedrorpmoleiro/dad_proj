@@ -115,7 +115,7 @@
                                     label="Profile Picture"
                                     v-model="input.photo_url"
                                 ></v-file-input>
-                               <!-- ! TODO -->
+                                <!-- ! TODO -->
                             </v-col>
                         </v-row>
                     </v-container>
@@ -186,7 +186,17 @@ export default {
     }),
     methods: {
         submit() {
-            // TODO
+            // TODO Validate Password
+            let user = {
+                name: this.input.name,
+                email: this.input.email,
+                password: this.input.password,
+                address: this.input.address,
+                phone: this.input.phone,
+                nif: this.input.nif
+            }
+
+            // TODO Submit
         }
     }
 };

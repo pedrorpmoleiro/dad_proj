@@ -1,5 +1,6 @@
 <template>
     <v-container>
+        <!-- TODO Show Menu in card grid with pages -->
         <v-card>
             <v-card-title>
                 <v-text-field
@@ -19,7 +20,8 @@
                           loading-text="Loading available products" :search="search" light>
                 <template v-slot:item.photo_url="{ item }">
                     <v-edit-dialog>
-                        <v-img class="my-2" max-width="75" max-height="75" :src="'../storage/products/' + item.photo_url"></v-img>
+                        <v-img class="my-2" max-width="75" max-height="75"
+                               :src="'../storage/products/' + item.photo_url"></v-img>
                         <template v-slot:input>
                             <v-img class="my-3" :max-width="maxHeight" :max-height="maxHeight"
                                    :src="'../storage/products/' + item.photo_url"></v-img>

@@ -24,6 +24,7 @@
             </template>
         </v-snackbar>
 
+        <!-- TODO Mobile Hamburger Menu & 'Auth' Menu -->
         <v-app-bar color="white" app style="z-index: 99">
             <v-container class="py-0 fill-height">
                 <v-btn text v-on:click.prevent="goHome">
