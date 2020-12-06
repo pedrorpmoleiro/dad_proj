@@ -63,6 +63,7 @@ Vue.use(VueRouter);
 import Home from "./components/pages/Home.vue";
 import Master from './components/pages/Master.vue'
 import Menu from './components/pages/Menu.vue'
+import NewMenu from './components/pages/NewMenu.vue'
 
 const routes = [
     {
@@ -76,6 +77,10 @@ const routes = [
     {
         path: "/menu",
         component: Menu
+    },
+    {
+        path: "/menu/new",
+        component: NewMenu
     },
     {
         path: "/foo/bar/master",

@@ -90,6 +90,10 @@ export default {
                 location: "/menu"
             },
             {
+                name: "New Menu",
+                location: "/menu/new"
+            },
+            {
                 name: "Master",
                 location: "/foo/bar/master"
             }

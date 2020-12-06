@@ -1,6 +1,5 @@
 <template>
     <v-container>
-        <!-- TODO Show Menu in card grid with pages -->
         <v-card>
             <v-card-title>
                 <v-text-field
