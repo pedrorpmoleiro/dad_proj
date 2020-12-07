@@ -82,27 +82,31 @@
                             </v-card-title>
 
                             <v-card-text>
-                                <div class="subtitle-1">
+                                <p class="subtitle-1 font-italic">
                                     {{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}
-                                </div>
-                                <div>
+                                </p>
+                                <p class="text-justify">
                                     {{ item.description }}
-                                </div>
-                                <div class="font-weight-bold">
+                                </p>
+                                <p class="font-weight-bold orange--text">
                                     {{ "€" + item.price }}
-                                </div>
+                                </p>
                             </v-card-text>
-
-                            <v-card-actions>
-                                <!-- TODO -->
-                                <v-btn
-                                    color="deep-purple lighten-2"
-                                    text
-                                    @click="reserve"
-                                >
-                                    Reserve
-                                </v-btn>
-                            </v-card-actions>
+                            <div v-if="isLoggedIn">
+                                <v-divider></v-divider>
+                                <v-card-actions>
+                                    <v-text-field rounded label="Quantity" placeholder="1"
+                                                  v-model="orderAmount[item.id]"></v-text-field>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        text
+                                        color="orange lighten-1"
+                                        v-on:click.prevent="addToCart(item.id)"
+                                    >
+                                        <v-icon>add_shopping_cart</v-icon>
+                                    </v-btn>
+                                </v-card-actions>
+                            </div>
                         </v-card>
                     </v-col>
                 </v-row>
@@ -166,6 +170,8 @@
 </template>
 
 <script>
+import {mapActions, mapGetters} from "vuex";
+
 export default {
     data() {
         return {
@@ -181,19 +187,22 @@ export default {
                 'Price',
                 'Type'
             ],
+            productTypes: [
+                // TODO
+            ],
             products: [],
-            loading: false
+            loading: false,
+            orderAmount: []
         }
     },
     computed: {
+        ...mapGetters(["isLoggedIn"]),
         numberOfPages() {
             return Math.ceil(this.products.length / this.productsPerPage)
-        },
-        filteredKeys() {
-            return this.keys.filter(key => key !== 'Name')
-        },
+        }
     },
     methods: {
+        ...mapActions(["addItemToCart"]),
         nextPage() {
             if (this.page + 1 <= this.numberOfPages) this.page += 1
         },
@@ -202,6 +211,19 @@ export default {
         },
         updateProductsPerPage(number) {
             this.productsPerPage = number
+        },
+        customSearchFilter(items, search) {
+            if (search === "" || search == null || typeof search === typeof undefined)
+                return items;
+
+            let matchingProducts = [];
+
+            for (let itemsKey in items) {
+                let item = items[itemsKey];
+                if (item.type.toString().toUpperCase()) {}
+            }
+
+            return matchingProducts;
         },
         getProducts() {
             this.loading = true;
@@ -215,6 +237,11 @@ export default {
                 this.loading = false;
                 this.$emit("show-notification", "error", "Unable to load products");
             })
+        },
+        addToCart(itemId) {
+            let itemAmount = this.orderAmount[itemId] || 1;
+            // TODO
+            this.$emit("show-notification", "orange", "Item: " + itemId + ", has quantity: " + itemAmount);
         }
     },
     mounted() {

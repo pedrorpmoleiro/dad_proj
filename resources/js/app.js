@@ -29,7 +29,8 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        auth_user: null
+        auth_user: null,
+        shopping_cart: [],
     },
     getters: {
         isLoggedIn(state) {
@@ -37,6 +38,9 @@ const store = new Vuex.Store({
         },
         getUser(state) {
             return state.auth_user;
+        },
+        getShoppingCart(state) {
+            return state.shopping_cart;
         }
     },
     mutations: {
@@ -45,6 +49,18 @@ const store = new Vuex.Store({
         },
         SET_AUTH_USER(state, user) {
             state.auth_user = user;
+        },
+        REMOVE_ITEM_FROM_CART(state, itemId) {
+            // TODO
+        },
+        ADD_ITEM_TO_CART(state, itemId, itemAmount) {
+            // TODO
+        },
+        ALTER_ITEM_IN_CART(state, itemId, itemAmount) {
+            // TODO
+        },
+        CLEAR_CART(state) {
+            state.shopping_cart = [];
         }
     },
     actions: {
@@ -53,6 +69,18 @@ const store = new Vuex.Store({
         },
         logOut(context) {
             context.commit("REMOVE_AUTH");
+        },
+        removeItemFromCart(context, itemId) {
+            // TODO
+        },
+        addItemToCart(context, itemId, itemAmount) {
+            // TODO
+        },
+        updateItemInCart(context, itemId, itemAmount) {
+            // TODO
+        },
+        clearShoppingCart(context) {
+            context.commit("CLEAR_CART");
         }
     }
 });
@@ -65,7 +93,6 @@ import Master from './components/pages/Master.vue';
 import Menu from './components/pages/Menu.vue';
 import NewMenu from './components/pages/NewMenu.vue'
 import UpdateProfile from "./components/pages/UpdateProfile.vue";
-
 
 const routes = [
     {

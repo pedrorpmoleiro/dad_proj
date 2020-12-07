@@ -58,7 +58,7 @@
                                 v-on="on"
                             >
                                 <v-icon class="mr-1">account_circle</v-icon>
-                                <div>{{ getUser.name }}</div>
+                                <div>{{ getUserFirstAndLastName(getUser.name) }}</div>
                             </v-btn>
                         </template>
                         <v-list>
@@ -79,14 +79,13 @@
                             </v-list-item>
                         </v-list>
                     </v-menu>
+                    <shopping-cart-menu v-on:show-notification="openNotification"></shopping-cart-menu>
                 </div>
             </v-container>
         </v-app-bar>
 
         <v-main class="grey lighten-3">
-            <router-view
-                v-on:show-notification="openNotification"
-            ></router-view>
+            <router-view v-on:show-notification="openNotification"></router-view>
         </v-main>
 
         <!-- <v-footer app absolute>
@@ -100,13 +99,15 @@
 <script>
 import LoginDialog from "./components/dialogs/LoginDialog.vue";
 import RegisterDialog from "./components/dialogs/RegisterDialog.vue";
+import ShoppingCartMenu from "./components/menus/ShoppingCartMenu.vue";
 
 import {mapActions, mapGetters} from "vuex";
 
 export default {
     components: {
         "login-dialog": LoginDialog,
-        "register-dialog": RegisterDialog
+        "register-dialog": RegisterDialog,
+        "shopping-cart-menu": ShoppingCartMenu
     },
     data: () => ({
         pubLinks: [
@@ -140,30 +141,6 @@ export default {
             if (this.$router.currentRoute.path !== "/home")
                 this.$router.push("/home");
         },
-        closeNotification() {
-            this.notification.showing = false;
-            this.notification.color = "";
-            this.notification.text = "";
-            this.notification.time = this.notification.timeout;
-        },
-        openNotification(color, message) {
-            this.notification.color = color;
-            this.notification.text = message;
-            this.notification.time = 0;
-            this.notification.showing = true;
-            this.notificationProgress();
-        },
-        async notificationProgress() {
-            let old = Date.now();
-            while (this.notification.time < 6000) {
-                let aux = Date.now();
-                this.notification.time += (aux - old);
-                old = aux;
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            await new Promise(resolve => setTimeout(resolve, 250));
-            this.closeNotification();
-        },
         logoutUser() {
             if (!this.isLoggedIn) return;
 
@@ -181,9 +158,33 @@ export default {
                     this.openNotification("error", "Logout Error");
                 });
         },
-        editProfile() {
-            if (!this.isLoggedIn) return;
-
+        getUserFirstAndLastName(userFullName) {
+            let aux = userFullName.split(" ");
+            return aux[0] + " " + aux[aux.length - 1];
+        },
+        closeNotification() {
+            this.notification.showing = false;
+            this.notification.color = "";
+            this.notification.text = "";
+            this.notification.time = this.notification.timeout;
+        },
+        openNotification(color, message, timeout=6000) {
+            this.notification.color = color;
+            this.notification.text = message;
+            this.notification.time = 0;
+            this.notification.showing = true;
+            this.notificationProgress();
+        },
+        async notificationProgress() {
+            let old = Date.now();
+            while (this.notification.time < this.notification.timeout) {
+                let aux = Date.now();
+                this.notification.time += (aux - old);
+                old = aux;
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            await new Promise(resolve => setTimeout(resolve, 250));
+            this.closeNotification();
         }
     },
     computed: {
