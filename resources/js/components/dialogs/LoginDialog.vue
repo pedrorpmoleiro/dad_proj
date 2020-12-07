@@ -13,7 +13,7 @@
                             <v-text-field
                                 v-model="input.email"
                                 :rules="[rules.required, rules.email, rules.max]"
-                                label="Email*"
+                                label="Email *"
                                 clearable
                                 required
                             ></v-text-field>
@@ -27,7 +27,7 @@
                                 :rules="[rules.required, rules.min, rules.max]"
                                 :type="showPass ? 'text' : 'password'"
                                 hint="At least 3 characters"
-                                label="Password*"
+                                label="Password *"
                                 counter
                                 clearable
                                 required
@@ -36,7 +36,7 @@
                         </v-row>
                     </v-container>
                 </v-form>
-                <small>* indicates required field</small>
+                <small class="red--text">* indicates required field</small>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>

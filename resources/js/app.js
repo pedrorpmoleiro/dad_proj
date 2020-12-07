@@ -5,6 +5,7 @@ import "material-design-icons-iconfont/dist/material-design-icons.css";
 window.Vue = require('vue');
 
 import Vuetify from "vuetify/lib";
+
 Vue.use(Vuetify);
 
 const vuetify = new Vuetify({
@@ -13,24 +14,14 @@ const vuetify = new Vuetify({
     },
 });
 
-import Toasted from "vue-toasted";
-Vue.use(Toasted, {
-    position: "bottom-center",
-    duration: 5000,
-    keepOnHover: true,
-    type: "info",
-    theme: "bubble",
-    // theme: "toasted-primary",
-    className: ["toasted",]
-});
-
 import Vuex from "vuex";
+
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
         auth_user: null,
-        shopping_cart: [],
+        shopping_cart: []
     },
     getters: {
         isLoggedIn(state) {
@@ -39,7 +30,7 @@ const store = new Vuex.Store({
         getUser(state) {
             return state.auth_user;
         },
-        getShoppingCart(state) {
+        getShoppingCartItems(state) {
             return state.shopping_cart;
         }
     },
@@ -51,13 +42,21 @@ const store = new Vuex.Store({
             state.auth_user = user;
         },
         REMOVE_ITEM_FROM_CART(state, itemId) {
-            // TODO
+            state.shopping_cart.splice(itemId, 1);
         },
-        ADD_ITEM_TO_CART(state, itemId, itemAmount) {
-            // TODO
-        },
-        ALTER_ITEM_IN_CART(state, itemId, itemAmount) {
-            // TODO
+        ADD_UPDATE_ITEM_TO_CART(state, item) {
+            if (state.shopping_cart.length > 0)
+                for (let i in state.shopping_cart)
+                    if (state.shopping_cart[i].product.id === item.product.id) {
+                        console.log("IN")
+                        console.log(item)
+                        console.log(state.shopping_cart[i])
+                        state.shopping_cart[i].amount += item.amount;
+                        // state.shopping_cart.splice(i, 1);
+                        return;
+                    }
+
+            state.shopping_cart.push({product: item.product, amount: item.amount});
         },
         CLEAR_CART(state) {
             state.shopping_cart = [];
@@ -71,13 +70,10 @@ const store = new Vuex.Store({
             context.commit("REMOVE_AUTH");
         },
         removeItemFromCart(context, itemId) {
-            // TODO
+            context.commit("REMOVE_ITEM_FROM_CART", itemId);
         },
-        addItemToCart(context, itemId, itemAmount) {
-            // TODO
-        },
-        updateItemInCart(context, itemId, itemAmount) {
-            // TODO
+        addUpdateItemToCart(context, item) {
+            context.commit("ADD_UPDATE_ITEM_TO_CART", item);
         },
         clearShoppingCart(context) {
             context.commit("CLEAR_CART");
@@ -86,12 +82,13 @@ const store = new Vuex.Store({
 });
 
 import VueRouter from "vue-router";
+
 Vue.use(VueRouter);
 
+import Tests from './components/pages/Tests.vue';
+
 import Home from "./components/pages/Home.vue";
-import Master from './components/pages/Master.vue';
 import Menu from './components/pages/Menu.vue';
-import NewMenu from './components/pages/NewMenu.vue'
 import UpdateProfile from "./components/pages/UpdateProfile.vue";
 
 const routes = [
@@ -108,16 +105,12 @@ const routes = [
         component: Menu
     },
     {
-        path: "/menu/new",
-        component: NewMenu
+        path: "/profile",
+        component: UpdateProfile
     },
     {
-      path: "/profile",
-      component: UpdateProfile
-    },
-    {
-        path: "/foo/bar/master",
-        component: Master
+        path: "/foo/bar/tests",
+        component: Tests
     }
 ];
 

@@ -20,7 +20,7 @@
                                 <v-text-field
                                     v-model="input.name"
                                     :rules="[rules.required, rules.name, rules.max]"
-                                    label="Full Name*"
+                                    label="Full Name *"
                                     clearable
                                     required
                                 ></v-text-field>
@@ -29,7 +29,7 @@
                                 <v-text-field
                                     v-model="input.phone"
                                     :rules="[rules.required, rules.phone]"
-                                    label="Phone Number*"
+                                    label="Phone Number *"
                                     clearable
                                     required
                                 ></v-text-field>
@@ -40,7 +40,7 @@
                                 <v-text-field
                                     v-model="input.email"
                                     :rules="[rules.required, rules.email, rules.max]"
-                                    label="Email*"
+                                    label="Email *"
                                     clearable
                                     required
                                 ></v-text-field>
@@ -56,7 +56,7 @@
                                     :rules="[rules.required, rules.min, rules.max]"
                                     :type="showPass ? 'text' : 'password'"
                                     hint="At least 3 characters"
-                                    label="Password*"
+                                    label="Password *"
                                     counter
                                     clearable
                                     required
@@ -75,7 +75,7 @@
                                         showPassConfirm ? 'text' : 'password'
                                     "
                                     hint="At least 3 characters"
-                                    label="Password Confirmation*"
+                                    label="Password Confirmation *"
                                     counter
                                     clearable
                                     required
@@ -90,7 +90,7 @@
                                 <v-text-field
                                     v-model="input.address"
                                     :rules="[rules.required]"
-                                    label="Address*"
+                                    label="Address *"
                                     clearable
                                     required
                                 ></v-text-field>
@@ -105,22 +105,10 @@
                                     clearable
                                 ></v-text-field>
                             </v-col>
-                            <v-col>
-                                <v-file-input
-                                    chips
-                                    show-size
-                                    clearable
-                                    accept="image/jpeg, image/png"
-                                    prepend-icon="add_a_photo"
-                                    label="Profile Picture"
-                                    v-model="input.photo_url"
-                                ></v-file-input>
-                                <!-- ! TODO -->
-                            </v-col>
                         </v-row>
                     </v-container>
                 </v-form>
-                <small>* indicates required field</small>
+                <small class="red--text">* indicates required field</small>
             </v-card-text>
 
             <v-divider></v-divider>
@@ -133,7 +121,7 @@
                     v-on:click.prevent="submit"
                     :disabled="!isFormValid"
                 >
-                    Login
+                    Register
                 </v-btn>
                 <v-btn text color="red" v-on:click.prevent="dialog = false">
                     Close
@@ -145,7 +133,6 @@
 
 <script>
 export default {
-    props: ["authToken"],
     data: () => ({
         dialog: false,
         isFormValid: false,
@@ -159,8 +146,7 @@ export default {
             passwordConfirm: "",
             address: "",
             phone: "",
-            nif: "",
-            photo_url: null
+            nif: ""
         },
         rules: {
             required: value => !!value || "Required",
@@ -186,7 +172,7 @@ export default {
     }),
     methods: {
         submit() {
-            // TODO Validate Password
+            // TODO Validate Password Confirm
             let user = {
                 name: this.input.name,
                 email: this.input.email,

@@ -11,16 +11,16 @@
             <v-spacer></v-spacer>
 
             <template v-slot:action="{ attrs }">
-                <v-progress-circular :value="notification.time * ( 1 / (notification.timeout / 100))" :rotate="-90"
-                                     color="white">
-                    <v-btn
-                        icon
-                        v-bind="attrs"
-                        v-on:click.prevent="closeNotification"
-                    >
+                <v-btn
+                    icon
+                    v-bind="attrs"
+                    v-on:click.prevent="closeNotification"
+                >
+                    <v-progress-circular :value="notification.time * ( 1 / (notification.timeout / 100))" :rotate="-90"
+                                         color="white">
                         <v-icon>cancel</v-icon>
-                    </v-btn>
-                </v-progress-circular>
+                    </v-progress-circular>
+                </v-btn>
             </template>
         </v-snackbar>
 
@@ -41,45 +41,51 @@
                     {{ link.name }}
                 </v-btn>
 
-                <register-dialog v-on:show-notification="openNotification"></register-dialog>
-
                 <v-spacer></v-spacer>
 
-                <div v-if="!isLoggedIn">
-                    <login-dialog v-on:show-notification="openNotification"></login-dialog>
-                    <register-dialog v-on:show-notification="openNotification"></register-dialog>
+                <div v-if="loadingAuth">
+                    <v-progress-circular
+                        indeterminate
+                        color="primary"
+                    ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <v-menu offset-y>
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                text
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                                <v-icon class="mr-1">account_circle</v-icon>
-                                <div>{{ getUserFirstAndLastName(getUser.name) }}</div>
-                            </v-btn>
-                        </template>
-                        <v-list>
-                            <v-list-item>
+                    <div v-if="!isLoggedIn">
+                        <login-dialog v-on:show-notification="openNotification"></login-dialog>
+                        <register-dialog v-on:show-notification="openNotification"></register-dialog>
+                    </div>
+                    <div v-else>
+                        <v-menu offset-y>
+                            <template v-slot:activator="{ on, attrs }">
                                 <v-btn
                                     text
-                                    v-on:click.prevent="$router.push('/profile'); on=!on"
-                                    :disabled="$router.currentRoute.path === '/profile'"
+                                    v-bind="attrs"
+                                    v-on="on"
                                 >
-                                    Update Profile
+                                    <v-icon class="mr-1">account_circle</v-icon>
+                                    <div>{{ getUserFirstAndLastName(getUser.name) }}</div>
                                 </v-btn>
-                            </v-list-item>
-                            <v-divider></v-divider>
-                            <v-list-item>
-                                <v-btn text color="red" v-on:click.prevent="logoutUser">
-                                    Logout
-                                </v-btn>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                    <shopping-cart-menu v-on:show-notification="openNotification"></shopping-cart-menu>
+                            </template>
+                            <v-list>
+                                <v-list-item>
+                                    <v-btn
+                                        text
+                                        v-on:click.prevent="$router.push('/profile'); on=!on"
+                                        :disabled="$router.currentRoute.path === '/profile'"
+                                    >
+                                        Update Profile
+                                    </v-btn>
+                                </v-list-item>
+                                <v-divider></v-divider>
+                                <v-list-item>
+                                    <v-btn text color="red" v-on:click.prevent="logoutUser">
+                                        Logout
+                                    </v-btn>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                        <shopping-cart-menu v-on:show-notification="openNotification"></shopping-cart-menu>
+                    </div>
                 </div>
             </v-container>
         </v-app-bar>
@@ -97,9 +103,9 @@
 </template>
 
 <script>
-import LoginDialog from "./components/dialogs/LoginDialog.vue";
-import RegisterDialog from "./components/dialogs/RegisterDialog.vue";
-import ShoppingCartMenu from "./components/menus/ShoppingCartMenu.vue";
+import LoginDialog from "./components/dialogs/LoginDialog";
+import RegisterDialog from "./components/dialogs/RegisterDialog";
+import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
 import {mapActions, mapGetters} from "vuex";
 
@@ -116,12 +122,8 @@ export default {
                 location: "/menu"
             },
             {
-                name: "New Menu",
-                location: "/menu/new"
-            },
-            {
-                name: "Master",
-                location: "/foo/bar/master"
+                name: "Tests",
+                location: "/foo/bar/tests"
             }
         ],
         notification: {
@@ -130,7 +132,8 @@ export default {
             text: "",
             time: 0,
             timeout: 6000
-        }
+        },
+        loadingAuth: false
     }),
     methods: {
         ...mapActions([
@@ -168,10 +171,12 @@ export default {
             this.notification.text = "";
             this.notification.time = this.notification.timeout;
         },
-        openNotification(color, message, timeout=6000) {
+        openNotification(color, message, timeout = 6000) {
+            this.closeNotification();
             this.notification.color = color;
             this.notification.text = message;
             this.notification.time = 0;
+            this.notification.timeout = timeout;
             this.notification.showing = true;
             this.notificationProgress();
         },
@@ -195,6 +200,7 @@ export default {
     },
     mounted() {
         // ? A way to check if user is logged in -- Investigate more
+        this.loadingAuth = true;
         axios.get('/api/users/me').then(response => {
             // Logged in
             // console.dir(response);
@@ -204,6 +210,7 @@ export default {
             // Not Logged in
             console.log(error);
         }); */
+        this.loadingAuth = false;
     }
 };
 </script>
