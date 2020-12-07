@@ -41,6 +41,8 @@
                     {{ link.name }}
                 </v-btn>
 
+                <register-dialog v-on:show-notification="openNotification"></register-dialog>
+
                 <v-spacer></v-spacer>
 
                 <div v-if="!isLoggedIn">
@@ -48,12 +50,35 @@
                     <register-dialog v-on:show-notification="openNotification"></register-dialog>
                 </div>
                 <div v-else>
-                    <v-btn text>
-                        Profile - FOO BAR
-                    </v-btn>
-                    <v-btn text color="red" v-on:click.prevent="logoutUser">
-                        Logout
-                    </v-btn>
+                    <v-menu offset-y>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                text
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                                <v-icon class="mr-1">account_circle</v-icon>
+                                <div>{{ getUser.name }}</div>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item>
+                                <v-btn
+                                    text
+                                    v-on:click.prevent="$router.push('/profile'); on=!on"
+                                    :disabled="$router.currentRoute.path === '/profile'"
+                                >
+                                    Update Profile
+                                </v-btn>
+                            </v-list-item>
+                            <v-divider></v-divider>
+                            <v-list-item>
+                                <v-btn text color="red" v-on:click.prevent="logoutUser">
+                                    Logout
+                                </v-btn>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
                 </div>
             </v-container>
         </v-app-bar>
@@ -155,6 +180,10 @@ export default {
                     console.log(e);
                     this.openNotification("error", "Logout Error");
                 });
+        },
+        editProfile() {
+            if (!this.isLoggedIn) return;
+
         }
     },
     computed: {
