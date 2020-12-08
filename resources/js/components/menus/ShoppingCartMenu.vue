@@ -18,6 +18,7 @@
         </template>
         <v-card>
             <v-list>
+                <!-- TODO SCROLLABLE -->
                 <v-list-item>
                     Shopping Cart
                 </v-list-item>

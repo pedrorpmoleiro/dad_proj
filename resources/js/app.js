@@ -18,6 +18,7 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
+// TODO Max Amount
 const store = new Vuex.Store({
     state: {
         auth_user: null,
