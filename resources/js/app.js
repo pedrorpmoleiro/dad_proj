@@ -42,18 +42,17 @@ const store = new Vuex.Store({
             state.auth_user = user;
         },
         REMOVE_ITEM_FROM_CART(state, itemId) {
-            state.shopping_cart.splice(itemId, 1);
+            if (state.shopping_cart.length > 0)
+                for (let i in state.shopping_cart)
+                    if (state.shopping_cart[i].product.id === itemId)
+                        state.shopping_cart.splice(i, 1);
         },
         ADD_UPDATE_ITEM_TO_CART(state, item) {
             if (state.shopping_cart.length > 0)
                 for (let i in state.shopping_cart)
                     if (state.shopping_cart[i].product.id === item.product.id) {
-                        console.log("IN")
-                        console.log(item)
-                        console.log(state.shopping_cart[i])
-                        state.shopping_cart[i].amount += item.amount;
-                        // state.shopping_cart.splice(i, 1);
-                        return;
+                        state.shopping_cart.splice(i, 1);
+                        // return;
                     }
 
             state.shopping_cart.push({product: item.product, amount: item.amount});

@@ -10,7 +10,7 @@
             loading-text="Loading Menu"
         >
             <template v-slot:header>
-                <v-card>
+                <v-card flat>
                     <v-container>
                         <v-col>
                             <v-row>
@@ -79,11 +79,11 @@
                                 <p class="text-justify">
                                     {{ item.description }}
                                 </p>
-                                <p class="font-weight-bold orange--text">
+                                <p class="font-weight-bold text--primary">
                                     {{ "€" + item.price }}
                                 </p>
                             </v-card-text>
-                            <div v-if="isLoggedIn">
+                            <div v-if="isLoggedIn && getUser.type === 'C'">
                                 <v-divider></v-divider>
                                 <v-card-actions>
                                     <v-text-field rounded label="Quantity"
@@ -93,7 +93,7 @@
                                     <v-spacer></v-spacer>
                                     <v-btn
                                         text
-                                        color="orange lighten-1"
+                                        color="primary lighten-1"
                                         v-on:click.prevent="addToCart(item)"
                                     >
                                         <v-icon>add_shopping_cart</v-icon>
@@ -141,7 +141,11 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["isLoggedIn"])
+        ...mapGetters([
+            "isLoggedIn",
+            "getShoppingCartItems",
+            "getUser"
+        ])
     },
     methods: {
         ...mapActions(["addUpdateItemToCart"]),
@@ -151,8 +155,8 @@ export default {
 
             let matchingProducts = [];
 
-            for (let itemsKey in items) {
-                let item = items[itemsKey];
+            for (let k in items) {
+                let item = items[k];
                 if (item.type.toString().toUpperCase() === search.toString().toUpperCase())
                     matchingProducts.push(item);
             }
@@ -174,6 +178,12 @@ export default {
         },
         addToCart(product) {
             let amount = this.orderAmount[product.id] || 1;
+
+            if (this.getShoppingCartItems.length > 0)
+                for (let i in this.getShoppingCartItems)
+                    if (this.getShoppingCartItems[i].product.id === product.id)
+                        amount += this.getShoppingCartItems[i].amount;
+
             this.addUpdateItemToCart({product, amount});
             this.$emit("show-notification", "success", "Item was added to cart");
         }

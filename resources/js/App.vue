@@ -41,6 +41,42 @@
                     {{ link.name }}
                 </v-btn>
 
+                <div v-if="isLoggedIn">
+                    <div v-if="getUser.type === 'EM'">
+                        <v-btn
+                            v-for="link in managerLinks"
+                            :key="link.name"
+                            v-on:click.prevent="$router.push(link.location)"
+                            :disabled="$router.currentRoute.path === link.location"
+                            text
+                        >
+                            {{ link.name }}
+                        </v-btn>
+                    </div>
+                    <div v-if="getUser.type === 'EC'">
+                        <v-btn
+                            v-for="link in cookLinks"
+                            :key="link.name"
+                            v-on:click.prevent="$router.push(link.location)"
+                            :disabled="$router.currentRoute.path === link.location"
+                            text
+                        >
+                            {{ link.name }}
+                        </v-btn>
+                    </div>
+                    <div v-if="getUser.type === 'ED'">
+                        <v-btn
+                            v-for="link in deliveryManLinks"
+                            :key="link.name"
+                            v-on:click.prevent="$router.push(link.location)"
+                            :disabled="$router.currentRoute.path === link.location"
+                            text
+                        >
+                            {{ link.name }}
+                        </v-btn>
+                    </div>
+                </div>
+
                 <v-spacer></v-spacer>
 
                 <div v-if="loadingAuth">
@@ -84,7 +120,7 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-                        <shopping-cart-menu v-on:show-notification="openNotification"></shopping-cart-menu>
+                        <shopping-cart-menu v-if="getUser.type === 'C'" v-on:show-notification="openNotification"></shopping-cart-menu>
                     </div>
                 </div>
             </v-container>
@@ -118,14 +154,17 @@ export default {
     data: () => ({
         pubLinks: [
             {
-                name: "Menu",
-                location: "/menu"
-            },
-            {
                 name: "Tests",
                 location: "/foo/bar/tests"
+            },
+            {
+                name: "Menu",
+                location: "/menu"
             }
         ],
+        cookLinks: [],
+        deliveryManLinks: [],
+        managerLinks: [],
         notification: {
             color: "",
             showing: false,

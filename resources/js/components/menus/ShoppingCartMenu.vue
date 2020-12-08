@@ -6,7 +6,14 @@
                 v-bind="attrs"
                 v-on="on"
             >
-                <v-icon>shopping_cart</v-icon>
+                <div v-if="getShoppingCartItems.length">
+                    <v-badge :content="getShoppingCartItems.length">
+                        <v-icon>shopping_cart</v-icon>
+                    </v-badge>
+                </div>
+                <div v-else>
+                    <v-icon>shopping_cart</v-icon>
+                </div>
             </v-btn>
         </template>
         <v-card>
@@ -27,23 +34,47 @@
                                 :src="'../storage/products/' + item.product.photo_url"></v-img>
                         </v-list-item-avatar>
                         <v-list-item-content>
-                            {{ item.product.name }}
+                            {{ item.product.name + " x" + item.amount }}
                         </v-list-item-content>
                         <v-list-item-action>
-                            <v-btn icon v-on:click.prevent="removeFromCart(item.product.id)">
-                                <v-icon>delete</v-icon>
+                            <v-btn icon v-on:click.prevent="editCartItem(item)">
+                                <v-icon>create</v-icon>
+                            </v-btn>
+                            <v-btn icon v-on:click.prevent="removeItemFromCart(item.product.id)">
+                                <v-icon color="red">delete</v-icon>
                             </v-btn>
                         </v-list-item-action>
                     </v-list-item>
                     <v-divider></v-divider>
                     <v-list-item>
+                        <v-list-item-content>
+                            <v-container>
+                                <v-row>
+                                    <v-col>
+                                        <p class="font-weight-bold">
+                                            Total:
+                                        </p>
+                                    </v-col>
+                                    <v-spacer></v-spacer>
+                                    <v-col>
+                                        {{ "€" + getTotal }}
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                        </v-list-item-content>
                         <v-list-item-action>
-                            <v-btn text color="primary" large v-on:click.prevent="checkout">
-                                Checkout
-                            </v-btn>
-                            <v-btn text color="warning" v-on:click.prevent="clearCart">
-                                Clear Cart
-                            </v-btn>
+                            <v-col>
+                                <v-row>
+                                    <v-btn text color="primary" v-on:click.prevent="checkout">
+                                        Checkout
+                                    </v-btn>
+                                </v-row>
+                                <v-row>
+                                    <v-btn text color="red" v-on:click.prevent="clearShoppingCart">
+                                        Clear Cart
+                                    </v-btn>
+                                </v-row>
+                            </v-col>
                         </v-list-item-action>
                     </v-list-item>
                 </div>
@@ -62,6 +93,14 @@ export default {
             "getShoppingCartItems",
 
         ]),
+        getTotal() {
+            let total = 0;
+
+            for (let i in this.getShoppingCartItems)
+                total += (this.getShoppingCartItems[i].product.price * this.getShoppingCartItems[i].amount);
+
+            return total;
+        }
     },
     methods: {
         ...mapActions([
@@ -72,11 +111,8 @@ export default {
         checkout() {
             // TODO
         },
-        removeFromCart(itemId) {
-            this.removeItemFromCart(itemId);
-        },
-        clearCart() {
-            this.clearShoppingCart();
+        editCartItem(item) {
+            // TODO
         }
     },
     mounted() {

@@ -25,15 +25,6 @@
                                     required
                                 ></v-text-field>
                             </v-col>
-                            <v-col>
-                                <v-text-field
-                                    v-model="input.phone"
-                                    :rules="[rules.required, rules.phone]"
-                                    label="Phone Number *"
-                                    clearable
-                                    required
-                                ></v-text-field>
-                            </v-col>
                         </v-row>
                         <v-row>
                             <v-col>
@@ -97,6 +88,15 @@
                             </v-col>
                         </v-row>
                         <v-row>
+                            <v-col>
+                                <v-text-field
+                                    v-model="input.phone"
+                                    :rules="[rules.required, rules.phone]"
+                                    label="Phone Number *"
+                                    clearable
+                                    required
+                                ></v-text-field>
+                            </v-col>
                             <v-col>
                                 <v-text-field
                                     v-model="input.nif"
