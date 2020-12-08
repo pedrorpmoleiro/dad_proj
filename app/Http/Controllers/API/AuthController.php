@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Customer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,23 +14,23 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            return Auth::user();
+            return response()->json(Auth::user());
         } else {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
     }
 
-    public function logout()
+    public function logout(): JsonResponse
     {
         Auth::guard('web')->logout();
         return response()->json(['message' => 'User session closed'], 200);
     }
 
-    public function registerCustomer(Request $request)
+    public function registerCustomer(Request $request): JsonResponse
     {
         // ! TODO
         $data = $request->validate([
