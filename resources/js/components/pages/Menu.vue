@@ -40,13 +40,26 @@
 
                                 <v-spacer></v-spacer>
 
-                                <v-btn large depressed v-on:click.prevent="sortDesc = !sortDesc">
-                                    <v-icon>{{ sortDesc ? 'arrow_downward' : 'arrow_upward' }}</v-icon>
+                                <v-btn
+                                    large
+                                    depressed
+                                    v-on:click.prevent="sortDesc = !sortDesc"
+                                >
+                                    <v-icon>{{
+                                        sortDesc
+                                            ? "arrow_downward"
+                                            : "arrow_upward"
+                                    }}</v-icon>
                                 </v-btn>
 
                                 <v-spacer></v-spacer>
 
-                                <v-btn large depressed :loading="loading" v-on:click.prevent="getProducts">
+                                <v-btn
+                                    large
+                                    depressed
+                                    :loading="loading"
+                                    v-on:click.prevent="getProducts"
+                                >
                                     <v-icon>cached</v-icon>
                                 </v-btn>
                             </v-row>
@@ -66,7 +79,10 @@
                         lg="3"
                     >
                         <v-card flat>
-                            <v-img :src="'../storage/products/' + item.photo_url"></v-img>
+                            <v-img
+                                max-height="300"
+                                :src="'../storage/products/' + item.photo_url"
+                            ></v-img>
 
                             <v-card-title class="subheading font-weight-bold">
                                 {{ item.name }}
@@ -74,7 +90,10 @@
 
                             <v-card-text>
                                 <p class="subtitle-1 font-italic">
-                                    {{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}
+                                    {{
+                                        item.type.charAt(0).toUpperCase() +
+                                            item.type.slice(1)
+                                    }}
                                 </p>
                                 <p class="text-justify">
                                     {{ item.description }}
@@ -86,10 +105,14 @@
                             <div v-if="isLoggedIn && getUser.type === 'C'">
                                 <v-divider></v-divider>
                                 <v-card-actions>
-                                    <v-text-field rounded label="Quantity"
-                                                  placeholder="1"
-                                                  :rules="[rules.amount]"
-                                                  v-model.number="orderAmount[item.id]"></v-text-field>
+                                    <v-text-field
+                                        label="Amount"
+                                        placeholder="1"
+                                        type="number"
+                                        min="1"
+                                        max="99"
+                                        v-model.number="orderAmount[item.id]"
+                                    ></v-text-field>
                                     <v-spacer></v-spacer>
                                     <v-btn
                                         text
@@ -109,55 +132,50 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     data() {
         return {
-            search: '',
+            search: "",
             sortDesc: false,
-            sortBy: 'name',
-            keys: [
-                'Name',
-                'Price',
-                'Type'
-            ],
-            productTypes: [
-                'Drink',
-                'Dessert',
-                'Cold dish',
-                'Hot dish'
-            ],
+            sortBy: "name",
+            keys: ["Name", "Price", "Type"],
+            productTypes: ["Drink", "Dessert", "Cold dish", "Hot dish"],
             rules: {
                 amount: value => {
                     const pattern = /^[1-9][0-9]?$/;
-                    return (pattern.test(value) || "Value must be between 1 and 99");
-                },
-
+                    return (
+                        pattern.test(value) || "Value must be between 1 and 99"
+                    );
+                }
             },
             products: [],
             loading: false,
             orderAmount: []
-        }
+        };
     },
     computed: {
-        ...mapGetters([
-            "isLoggedIn",
-            "getShoppingCartItems",
-            "getUser"
-        ])
+        ...mapGetters(["isLoggedIn", "getShoppingCartItems", "getUser"])
     },
     methods: {
         ...mapActions(["addUpdateItemToCart"]),
         customSearchFilter(items, search) {
-            if (search === "" || search == null || typeof search === typeof undefined)
+            if (
+                search === "" ||
+                search == null ||
+                typeof search === typeof undefined
+            )
                 return items;
 
             let matchingProducts = [];
 
             for (let k in items) {
                 let item = items[k];
-                if (item.type.toString().toUpperCase() === search.toString().toUpperCase())
+                if (
+                    item.type.toString().toUpperCase() ===
+                    search.toString().toUpperCase()
+                )
                     matchingProducts.push(item);
             }
 
@@ -167,14 +185,21 @@ export default {
             this.loading = true;
             this.products = [];
 
-            axios.get("api/products").then(response => {
-                this.products = response.data;
-                this.loading = false;
-            }).catch(e => {
-                console.log(e.response);
-                this.loading = false;
-                this.$emit("show-notification", "error", "Unable to load products");
-            })
+            axios
+                .get("api/products")
+                .then(response => {
+                    this.products = response.data;
+                    this.loading = false;
+                })
+                .catch(e => {
+                    console.log(e.response);
+                    this.loading = false;
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Unable to load products"
+                    );
+                });
         },
         addToCart(product) {
             let amount = this.orderAmount[product.id] || 1;
@@ -184,12 +209,16 @@ export default {
                     if (this.getShoppingCartItems[i].product.id === product.id)
                         amount += this.getShoppingCartItems[i].amount;
 
-            this.addUpdateItemToCart({product, amount});
-            this.$emit("show-notification", "success", "Item was added to cart");
+            this.addUpdateItemToCart({ product, amount });
+            this.$emit(
+                "show-notification",
+                "success",
+                "Item was added to cart"
+            );
         }
     },
     mounted() {
         this.getProducts();
     }
-}
+};
 </script>

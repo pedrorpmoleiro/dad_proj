@@ -19,7 +19,11 @@
                             <v-col>
                                 <v-text-field
                                     v-model="input.name"
-                                    :rules="[rules.required, rules.name, rules.max]"
+                                    :rules="[
+                                        rules.required,
+                                        rules.name,
+                                        rules.max
+                                    ]"
                                     label="Full Name *"
                                     clearable
                                     required
@@ -30,7 +34,11 @@
                             <v-col>
                                 <v-text-field
                                     v-model="input.email"
-                                    :rules="[rules.required, rules.email, rules.max]"
+                                    :rules="[
+                                        rules.required,
+                                        rules.email,
+                                        rules.max
+                                    ]"
                                     label="Email *"
                                     clearable
                                     required
@@ -44,7 +52,11 @@
                                     :append-icon="
                                         'visibility' + (showPass ? '' : '_off')
                                     "
-                                    :rules="[rules.required, rules.min, rules.max]"
+                                    :rules="[
+                                        rules.required,
+                                        rules.min,
+                                        rules.max
+                                    ]"
                                     :type="showPass ? 'text' : 'password'"
                                     hint="At least 3 characters"
                                     label="Password *"
@@ -61,7 +73,11 @@
                                         'visibility' +
                                             (showPassConfirm ? '' : '_off')
                                     "
-                                    :rules="[rules.required, rules.min, rules.max]"
+                                    :rules="[
+                                        rules.required,
+                                        rules.min,
+                                        rules.max
+                                    ]"
                                     :type="
                                         showPassConfirm ? 'text' : 'password'
                                     "
@@ -154,19 +170,22 @@ export default {
             max: value => value.length < 255 || "Max of 255 Characters",
             email: value => {
                 const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
-                return (pattern.test(value) || "Invalid E-mail format!!");
+                return pattern.test(value) || "Invalid E-mail format!!";
             },
             nif: value => {
                 const pattern = /^\d{0,8}[1-9]$/;
-                return (pattern.test(value) || "NIF: Positive number, smaller then 999999999")
+                return (
+                    pattern.test(value) ||
+                    "NIF: Positive number, smaller then 999999999"
+                );
             },
             name: value => {
                 const pattern = /^[a-zA-Z\s]*$/;
-                return (pattern.test(value) || "Only letters and spaces allowed");
+                return pattern.test(value) || "Only letters and spaces allowed";
             },
             phone: value => {
                 const pattern = /^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,7}$/;
-                return (pattern.test(value) || "Phone number format is invalid");
+                return pattern.test(value) || "Phone number format is invalid";
             }
         }
     }),
@@ -180,7 +199,7 @@ export default {
                 address: this.input.address,
                 phone: this.input.phone,
                 nif: this.input.nif
-            }
+            };
 
             // TODO Submit
         }

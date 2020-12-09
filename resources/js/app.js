@@ -2,7 +2,7 @@ require("./bootstrap");
 
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 
-window.Vue = require('vue');
+window.Vue = require("vue");
 
 import Vuetify from "vuetify/lib";
 
@@ -10,15 +10,14 @@ Vue.use(Vuetify);
 
 const vuetify = new Vuetify({
     icons: {
-        iconfont: 'md',
-    },
+        iconfont: "md"
+    }
 });
 
 import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-// TODO Max Amount
 const store = new Vuex.Store({
     state: {
         auth_user: null,
@@ -49,14 +48,20 @@ const store = new Vuex.Store({
                         state.shopping_cart.splice(i, 1);
         },
         ADD_UPDATE_ITEM_TO_CART(state, item) {
+            if (item.amount > 99) {
+                // TODO NOTIFICATION VUEX
+                return;
+            }
+
             if (state.shopping_cart.length > 0)
                 for (let i in state.shopping_cart)
-                    if (state.shopping_cart[i].product.id === item.product.id) {
+                    if (state.shopping_cart[i].product.id === item.product.id)
                         state.shopping_cart.splice(i, 1);
-                        // return;
-                    }
 
-            state.shopping_cart.push({product: item.product, amount: item.amount});
+            state.shopping_cart.push({
+                product: item.product,
+                amount: item.amount
+            });
         },
         CLEAR_CART(state) {
             state.shopping_cart = [];
@@ -85,10 +90,10 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import Tests from './components/pages/Tests.vue';
+import Tests from "./components/pages/Tests.vue";
 
 import Home from "./components/pages/Home.vue";
-import Menu from './components/pages/Menu.vue';
+import Menu from "./components/pages/Menu.vue";
 import UpdateProfile from "./components/pages/UpdateProfile.vue";
 
 const routes = [
@@ -114,7 +119,7 @@ const routes = [
     }
 ];
 
-const router = new VueRouter({routes});
+const router = new VueRouter({ routes });
 
 import App from "./App.vue";
 

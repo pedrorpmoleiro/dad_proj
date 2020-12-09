@@ -12,7 +12,11 @@
                         <v-row>
                             <v-text-field
                                 v-model="input.email"
-                                :rules="[rules.required, rules.email, rules.max]"
+                                :rules="[
+                                    rules.required,
+                                    rules.email,
+                                    rules.max
+                                ]"
                                 label="Email *"
                                 clearable
                                 required
@@ -58,7 +62,7 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import { mapActions } from "vuex";
 
 export default {
     data: () => ({
@@ -76,7 +80,7 @@ export default {
             max: value => value.length < 255 || "Max of 255 Characters",
             email: value => {
                 const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
-                return (pattern.test(value) || "Invalid E-mail format!!");
+                return pattern.test(value) || "Invalid E-mail format!!";
             }
         }
     }),
@@ -99,7 +103,11 @@ export default {
                         this.setUser(response.data);
                         axios.defaults.withCredentials = true;
                         this.dialog = false;
-                        this.$emit("show-notification", "success", "Login Successful")
+                        this.$emit(
+                            "show-notification",
+                            "success",
+                            "Login Successful"
+                        );
                     })
                     .catch(e => {
                         this.loading = false;

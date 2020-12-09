@@ -1,13 +1,13 @@
 <template>
-
+    <div>
+        <!-- TODO -->
+    </div>
 </template>
 
 <script>
 export default {
-name: "LoggedOutMenu"
-}
+    name: "LoggedOutMenu"
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

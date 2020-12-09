@@ -16,8 +16,14 @@
                     v-bind="attrs"
                     v-on:click.prevent="closeNotification"
                 >
-                    <v-progress-circular :value="notification.time * ( 1 / (notification.timeout / 100))" :rotate="-90"
-                                         color="white">
+                    <v-progress-circular
+                        :value="
+                            notification.time *
+                                (1 / (notification.timeout / 100))
+                        "
+                        :rotate="-90"
+                        color="white"
+                    >
                         <v-icon>cancel</v-icon>
                     </v-progress-circular>
                 </v-btn>
@@ -47,7 +53,9 @@
                             v-for="link in managerLinks"
                             :key="link.name"
                             v-on:click.prevent="$router.push(link.location)"
-                            :disabled="$router.currentRoute.path === link.location"
+                            :disabled="
+                                $router.currentRoute.path === link.location
+                            "
                             text
                         >
                             {{ link.name }}
@@ -58,7 +66,9 @@
                             v-for="link in cookLinks"
                             :key="link.name"
                             v-on:click.prevent="$router.push(link.location)"
-                            :disabled="$router.currentRoute.path === link.location"
+                            :disabled="
+                                $router.currentRoute.path === link.location
+                            "
                             text
                         >
                             {{ link.name }}
@@ -69,7 +79,9 @@
                             v-for="link in deliveryManLinks"
                             :key="link.name"
                             v-on:click.prevent="$router.push(link.location)"
-                            :disabled="$router.currentRoute.path === link.location"
+                            :disabled="
+                                $router.currentRoute.path === link.location
+                            "
                             text
                         >
                             {{ link.name }}
@@ -87,47 +99,68 @@
                 </div>
                 <div v-else>
                     <div v-if="!isLoggedIn">
-                        <login-dialog v-on:show-notification="openNotification"></login-dialog>
-                        <register-dialog v-on:show-notification="openNotification"></register-dialog>
+                        <login-dialog
+                            v-on:show-notification="openNotification"
+                        ></login-dialog>
+                        <register-dialog
+                            v-on:show-notification="openNotification"
+                        ></register-dialog>
                     </div>
                     <div v-else>
                         <v-menu offset-y>
                             <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                    text
-                                    v-bind="attrs"
-                                    v-on="on"
-                                >
+                                <v-btn text v-bind="attrs" v-on="on">
                                     <v-icon class="mr-1">account_circle</v-icon>
-                                    <div>{{ getUserFirstAndLastName(getUser.name) }}</div>
+                                    <div>
+                                        {{
+                                            getUserFirstAndLastName(
+                                                getUser.name
+                                            )
+                                        }}
+                                    </div>
                                 </v-btn>
                             </template>
                             <v-list>
                                 <v-list-item>
                                     <v-btn
                                         text
-                                        v-on:click.prevent="$router.push('/profile'); on=!on"
-                                        :disabled="$router.currentRoute.path === '/profile'"
+                                        v-on:click.prevent="
+                                            $router.push('/profile');
+                                            on = !on;
+                                        "
+                                        :disabled="
+                                            $router.currentRoute.path ===
+                                                '/profile'
+                                        "
                                     >
                                         Update Profile
                                     </v-btn>
                                 </v-list-item>
                                 <v-divider></v-divider>
                                 <v-list-item>
-                                    <v-btn text color="red" v-on:click.prevent="logoutUser">
+                                    <v-btn
+                                        text
+                                        color="red"
+                                        v-on:click.prevent="logoutUser"
+                                    >
                                         Logout
                                     </v-btn>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-                        <shopping-cart-menu v-if="getUser.type === 'C'" v-on:show-notification="openNotification"></shopping-cart-menu>
+                        <shopping-cart-menu
+                            v-if="getUser.type === 'C'"
+                            v-on:show-notification="openNotification"
+                        ></shopping-cart-menu>
                     </div>
                 </div>
             </v-container>
         </v-app-bar>
 
         <v-main class="grey lighten-3">
-            <router-view v-on:show-notification="openNotification"></router-view>
+            <router-view
+                v-on:show-notification="openNotification"
+            ></router-view>
         </v-main>
 
         <!-- <v-footer app absolute>
@@ -143,7 +176,7 @@ import LoginDialog from "./components/dialogs/LoginDialog";
 import RegisterDialog from "./components/dialogs/RegisterDialog";
 import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -175,10 +208,7 @@ export default {
         loadingAuth: false
     }),
     methods: {
-        ...mapActions([
-            "logOut",
-            "setUser"
-        ]),
+        ...mapActions(["logOut", "setUser"]),
         goHome() {
             if (this.$router.currentRoute.path !== "/home")
                 this.$router.push("/home");
@@ -223,7 +253,7 @@ export default {
             let old = Date.now();
             while (this.notification.time < this.notification.timeout) {
                 let aux = Date.now();
-                this.notification.time += (aux - old);
+                this.notification.time += aux - old;
                 old = aux;
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
@@ -232,15 +262,12 @@ export default {
         }
     },
     computed: {
-        ...mapGetters([
-            "isLoggedIn",
-            "getUser"
-        ])
+        ...mapGetters(["isLoggedIn", "getUser"])
     },
     mounted() {
         // ? A way to check if user is logged in -- Investigate more
         this.loadingAuth = true;
-        axios.get('/api/users/me').then(response => {
+        axios.get("/api/users/me").then(response => {
             // Logged in
             // console.dir(response);
             this.setUser(response.data);
