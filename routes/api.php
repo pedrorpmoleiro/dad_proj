@@ -58,15 +58,6 @@ Route::get('products', [ProductController::class, 'getProducts'])->name("product
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
     $response = Order::find(1);
-
-    /*foreach ($response->items as $item) {
-        $item->pivot->quantity;
-        $item->pivot->unit_price;
-        $item->pivot->sub_total_price;
-    }*/
     $response->items;
-
-    // $response = Customer::find(22);
-    // $response->orders;
     return response()->json($response);
 })->name("tests");

@@ -14,7 +14,6 @@
         </template>
         <v-card :max-height="height">
             <v-list expand>
-                <!-- TODO SCROLLABLE -->
                 <div v-if="getShoppingCartItems.length === 0">
                     <v-list-item>
                         No Items in Cart

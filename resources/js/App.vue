@@ -271,11 +271,10 @@ export default {
             // Logged in
             // console.dir(response);
             this.setUser(response.data);
-        });
-        /* .catch(error => {
+        }).catch(e => {
             // Not Logged in
-            console.log(error);
-        }); */
+            // console.log(e);
+        });
         this.loadingAuth = false;
     }
 };
