@@ -86,13 +86,7 @@
                         <v-list-item-action>
                             <v-col>
                                 <v-row>
-                                    <v-btn
-                                        text
-                                        color="primary"
-                                        v-on:click.prevent="checkout"
-                                    >
-                                        Checkout
-                                    </v-btn>
+                                    <checkout-dialog></checkout-dialog>
                                 </v-row>
                                 <v-row>
                                     <v-btn
@@ -115,7 +109,12 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 
+import CheckoutDialog from "../dialogs/CheckoutDialog";
+
 export default {
+    components: {
+        'checkout-dialog': CheckoutDialog
+    },
     data: () => ({
         input: [],
         height: window.innerHeight - 115
@@ -139,9 +138,6 @@ export default {
             "removeItemFromCart",
             "addUpdateItemToCart"
         ]),
-        checkout() {
-            // TODO
-        },
         saveCartItem(item) {
             this.addUpdateItemToCart({
                 product: item.product,

@@ -110,7 +110,16 @@
                         <v-menu offset-y>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn text v-bind="attrs" v-on="on">
-                                    <v-icon class="mr-1">account_circle</v-icon>
+                                    <div v-if="getUser.photo_url">
+                                        <v-list-item-avatar>
+                                            <v-img
+                                                :src="'../storage/fotos/' + getUser.photo_url"
+                                            ></v-img>
+                                        </v-list-item-avatar>
+                                    </div>
+                                    <div v-else>
+                                        <v-icon class="mr-1">account_circle</v-icon>
+                                    </div>
                                     <div>
                                         {{
                                             getUserFirstAndLastName(
@@ -176,7 +185,7 @@ import LoginDialog from "./components/dialogs/LoginDialog";
 import RegisterDialog from "./components/dialogs/RegisterDialog";
 import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
     components: {
@@ -205,7 +214,7 @@ export default {
             time: 0,
             timeout: 6000
         },
-        loadingAuth: false
+        loadingAuth: true
     }),
     methods: {
         ...mapActions(["logOut", "setUser"]),
@@ -266,16 +275,16 @@ export default {
     },
     mounted() {
         // ? A way to check if user is logged in -- Investigate more
-        this.loadingAuth = true;
         axios.get("/api/users/me").then(response => {
             // Logged in
             // console.dir(response);
             this.setUser(response.data);
+            this.loadingAuth = false;
         }).catch(e => {
             // Not Logged in
             // console.log(e);
+            this.loadingAuth = false;
         });
-        this.loadingAuth = false;
     }
 };
 </script>

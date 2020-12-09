@@ -42,9 +42,14 @@ Route::middleware('auth:sanctum')->group(function () {
         // Update User Password
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
-    
-    // Update Customer Data
-    Route::middleware('customer')->post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
+
+    Route::middleware('customer')->group(function () {
+        // Update Customer Data
+        Route::post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
+
+        // Create new Order
+        Route::post('orders/new', [OrderController::class, 'create'])->name("order.new");
+    });
 });
 
 /* *** Unprotected Routes *** */
