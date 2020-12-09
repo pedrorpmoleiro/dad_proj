@@ -26,6 +26,7 @@ use App\Models\Customer;
 */
 
 /* *** SANCTUM Protected Routes *** */
+
 Route::middleware('auth:sanctum')->group(function () {
     // Logout Route
     Route::post('logout', [AuthController::class, 'logout'])->name("user.logout");
@@ -34,7 +35,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('users')->group(function () {
         // Get current user data
         Route::get('me', [UserController::class, 'me'])->name("user.get_auth_user_info");
+
+        // Update User Data
+        Route::post('update', [UserController::class, 'updateUserData'])->name("user.update_auth_user_info");
+
+        // Update User Password
+        Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
+    
+    // Update Customer Data
+    Route::middleware('customer')->post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
 });
 
 /* *** Unprotected Routes *** */
