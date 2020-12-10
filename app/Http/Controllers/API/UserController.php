@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use stdClass;
 
 class UserController extends Controller
 {
@@ -26,12 +29,14 @@ class UserController extends Controller
 
     public function updatePassword(Request $request)
     {
+        $user = Auth::user();
+
         $data = $request->validate([
-            'oldPassword' => ['required', 'string', 'min:3'],
+            'passwordOld' => ['required', 'string', 'min:3'],
             'password' => ['required', 'string', 'min:3'],
         ]);
 
-        if (!Hash::check($data['oldPassword'], $user->password)) {
+        if (!Hash::check($data['passwordOld'], $user->password)) {
             return response()->json(null, 400);
         }
 
@@ -65,32 +70,39 @@ class UserController extends Controller
 
     public function updateCustomerData(Request $request)
     {
+        // Authenticate Customer
+        $user = Auth::user();
+
         $data = $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email', 'regex:/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id), 'regex:/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/'],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/'],
             'address' => ['required', 'string'],
-            'phone' => ['required', 'string', 'regex:/^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,7}$/'],
+            'phone' => ['required', 'string', 'regex:/^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/'],
             'nif' => ['min:1', 'max:999999999', 'regex:/^\d{0,8}[1-9]$/']
         ]);
 
-        // Authenticate Customer
-        $user = Auth::user();
+        $response = new stdClass();
+
+        if ($user->type == 'C') {
+            $customer = Customer::findOrFail($user->id);
+
+            $customer->phone = $data['phone'];
+            $customer->nif = $data['nif'];
+            $customer->address = $data['address'];
+
+            $customer->save();
+
+            $response = $customer->addToStdClass($response, false);
+        }
 
         // Update Customer Data
         $user->email = $data['email'];
         $user->name = $data['name'];
-        $user->address = $data['address'];
-        $user->phone = $data['phone'];
-        $user->nif = $data['nif'];
 
         // Commit Update
         $user->save();
 
-        // Return OK & Updated User/Customer Data
-        $response = $user->toStdClass();
-
-        $customer = Customer::find($user->id);
-        $response = $customer->addToStdClass($response, false);
+        $response = $user->addToStdClass($response);
 
 
         return response()->json($response);
