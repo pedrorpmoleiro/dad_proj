@@ -6,7 +6,6 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\OrderController;
-
 /* *** TESTS *** */
 
 use App\Models\Order;
@@ -42,9 +41,20 @@ Route::middleware('auth:sanctum')->group(function () {
         // Update User Password
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
-    
+
     // Update Customer Data
     Route::middleware('customer')->post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
+
+    Route::prefix('products')->middleware('manager')->group(function () {
+        // Create new Product
+        Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
+
+        // Update a Product
+        Route::put('update', [ProductController::class, 'update'])->name("product.update");
+
+        // Delete a Product
+        Route::delete('delete', [ProductController::class, 'delete'])->name("product.delete");
+    });
 });
 
 /* *** Unprotected Routes *** */
@@ -53,7 +63,7 @@ Route::post('login', [AuthController::class, 'login'])->name("user.login");
 // Customer Register Route
 Route::post('customers/register', [AuthController::class, 'registerCustomer'])->name("customer.register");
 // Get all products Route
-Route::get('products', [ProductController::class, 'getProducts'])->name("product.get_all");
+Route::get('products', [ProductController::class, 'all'])->name("product.get_all");
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
