@@ -37,13 +37,9 @@ class OrderController extends Controller
         if ($request->input("notes") != null)
             $data["notes"] = $request->input("notes");
 
-        /*
-        TODO
-
-        $data["date"]
-        $data["opened_at"]
+        $data["date"] = date(env('INPUT_FORMAT_DATE'));
+        $data["opened_at"] = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
         $data["current_status_at"] = $data["opened_at"];
-         */
 
         dd($data);
     }

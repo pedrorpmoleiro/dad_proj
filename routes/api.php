@@ -62,6 +62,7 @@ Route::get('products', [ProductController::class, 'getProducts'])->name("product
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
+    dd(date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS')));
     $response = Order::find(1);
     $response->items;
     return response()->json($response);
