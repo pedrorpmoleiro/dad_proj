@@ -43,6 +43,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
+    Route::prefix('products')->middleware('manager')->group(function () {
+        // Create new Product
+        Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
+
+        // Update a Product
+        Route::put('update', [ProductController::class, 'update'])->name("product.update");
+
+        // Delete a Product
+        Route::delete('delete', [ProductController::class, 'delete'])->name("product.delete");
+    });
+
     Route::middleware('customer')->group(function () {
         // Update Customer Data
         Route::post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
@@ -58,7 +69,7 @@ Route::post('login', [AuthController::class, 'login'])->name("user.login");
 // Customer Register Route
 Route::post('customers/register', [AuthController::class, 'registerCustomer'])->name("customer.register");
 // Get all products Route
-Route::get('products', [ProductController::class, 'getProducts'])->name("product.get_all");
+Route::get('products', [ProductController::class, 'all'])->name("product.get_all");
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {

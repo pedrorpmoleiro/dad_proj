@@ -55,6 +55,25 @@
                                 <v-spacer></v-spacer>
 
                                 <v-btn
+                                    v-if="getUser.type === 'EM'"
+                                    large
+                                    color="green lighten-1"
+                                    depressed
+                                    :loading="loading"
+                                >
+                                    <v-container>
+                                        <v-row>
+                                            <v-icon>add</v-icon>
+                                            <p>Create</p>
+                                        </v-row>
+                                    </v-container>
+                                </v-btn>
+
+                                <v-spacer
+                                    v-if="getUser.type === 'EM'"
+                                ></v-spacer>
+
+                                <v-btn
                                     large
                                     depressed
                                     :loading="loading"
@@ -102,25 +121,43 @@
                                     {{ "€" + item.price }}
                                 </p>
                             </v-card-text>
-                            <div v-if="isLoggedIn && getUser.type === 'C'">
+                            <div v-if="isLoggedIn">
                                 <v-divider></v-divider>
                                 <v-card-actions>
-                                    <v-text-field
-                                        label="Amount"
-                                        placeholder="1"
-                                        type="number"
-                                        min="1"
-                                        max="99"
-                                        v-model.number="orderAmount[item.id]"
-                                    ></v-text-field>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                        text
-                                        color="primary lighten-1"
-                                        v-on:click.prevent="addToCart(item)"
-                                    >
-                                        <v-icon>add_shopping_cart</v-icon>
-                                    </v-btn>
+                                    <div v-if="getUser.type === 'C'">
+                                        <v-text-field
+                                            rounded
+                                            label="Quantity"
+                                            placeholder="1"
+                                            :rules="[rules.amount]"
+                                            v-model.number="
+                                                orderAmount[item.id]
+                                            "
+                                        ></v-text-field>
+                                        <v-spacer></v-spacer>
+                                        <v-btn
+                                            text
+                                            color="primary lighten-1"
+                                            v-on:click.prevent="addToCart(item)"
+                                        >
+                                            <v-icon>add_shopping_cart</v-icon>
+                                        </v-btn>
+                                    </div>
+                                    <div v-if="getUser.type === 'EM'">
+                                        <v-spacer></v-spacer>
+                                        <v-btn text>
+                                            <v-icon>create</v-icon>
+                                        </v-btn>
+                                        <v-btn
+                                            text
+                                            color="red lighten-1"
+                                            v-on:click.prevent="
+                                                deleteProduct(item)
+                                            "
+                                        >
+                                            <v-icon>delete</v-icon>
+                                        </v-btn>
+                                    </div>
                                 </v-card-actions>
                             </div>
                         </v-card>
@@ -215,6 +252,9 @@ export default {
                 "success",
                 "Item was added to cart"
             );
+        },
+        deleteProduct(product) {
+            // TODO
         }
     },
     mounted() {

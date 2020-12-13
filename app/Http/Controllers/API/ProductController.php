@@ -9,8 +9,23 @@ use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
-    public function getProducts()
+    public function all()
     {
         return Product::all();
+    }
+    
+    public function delete(Request $request)
+    {
+        
+    }
+
+    public function update(Request $request)
+    {
+
+    }
+
+    public function create(Request $request)
+    {
+        
     }
 }
