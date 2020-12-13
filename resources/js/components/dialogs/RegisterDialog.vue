@@ -54,8 +54,7 @@
                                     "
                                     :rules="[
                                         rules.required,
-                                        rules.min,
-                                        rules.max
+                                        rules.min
                                     ]"
                                     :type="showPass ? 'text' : 'password'"
                                     hint="At least 3 characters"
@@ -75,8 +74,7 @@
                                     "
                                     :rules="[
                                         rules.required,
-                                        rules.min,
-                                        rules.max
+                                        rules.min
                                     ]"
                                     :type="
                                         showPassConfirm ? 'text' : 'password'
@@ -96,7 +94,7 @@
                             <v-col>
                                 <v-text-field
                                     v-model="input.address"
-                                    :rules="[rules.required]"
+                                    :rules="[rules.required, rules.max]"
                                     label="Address *"
                                     clearable
                                     required
@@ -148,6 +146,8 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex";
+
 export default {
     data: () => ({
         dialog: false,
@@ -173,6 +173,9 @@ export default {
                 return pattern.test(value) || "Invalid E-mail format!!";
             },
             nif: value => {
+                if (typeof value === typeof undefined || value == null || value === "")
+                    return true;
+
                 const pattern = /^\d{0,8}[1-9]$/;
                 return (
                     pattern.test(value) ||
@@ -180,28 +183,65 @@ export default {
                 );
             },
             name: value => {
-                const pattern = /^[a-zA-Z\s]*$/;
+                const pattern = /^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/;
                 return pattern.test(value) || "Only letters and spaces allowed";
             },
             phone: value => {
-                const pattern = /^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,7}$/;
+                const pattern = /^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/;
                 return pattern.test(value) || "Phone number format is invalid";
             }
         }
     }),
+    computed: {
+        ...mapGetters(["isLoggedIn"]),
+    },
     methods: {
         submit() {
-            // TODO Validate Password Confirm
+            if (
+                this.input.password !==
+                this.input.passwordConfirm
+            ) {
+                this.$emit(
+                    "show-notification",
+                    "error",
+                    "Password and password confirmation must match"
+                );
+                return;
+            }
+
+            this.loading = true;
+
             let user = {
                 name: this.input.name,
                 email: this.input.email,
                 password: this.input.password,
                 address: this.input.address,
-                phone: this.input.phone,
-                nif: this.input.nif
+                phone: this.input.phone
             };
 
-            // TODO Submit
+            if (typeof this.input.nif !== typeof undefined && this.input.nif != null &&
+                this.input.nif !== "")
+                user.nif = Number(this.input.nif);
+
+            console.log(user);
+
+            axios.post("api/customers/register", user).then((response) => {
+                this.loading = false;
+                // console.log(response);
+                this.$emit(
+                    "show-notification",
+                    "success",
+                    "Register was successful, please Login"
+                );
+            }).catch((e) => {
+                this.loading = false;
+                // console.log(e);
+                this.$emit(
+                    "show-notification",
+                    "error",
+                    "Failed to register new Customer"
+                );
+            });
         }
     }
 };

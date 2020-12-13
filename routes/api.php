@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
@@ -10,7 +11,6 @@ use App\Http\Controllers\API\OrderController;
 /* *** TESTS *** */
 
 use App\Models\Order;
-use App\Models\Customer;
 
 /* ***  END  *** */
 
@@ -25,8 +25,10 @@ use App\Models\Customer;
 |
 */
 
-/* *** SANCTUM Protected Routes *** */
+/* *** Email Verification *** */
+Auth::routes(['verify' => true]);
 
+/* *** SANCTUM Protected Routes *** */
 Route::middleware('auth:sanctum')->group(function () {
     // Logout Route
     Route::post('logout', [AuthController::class, 'logout'])->name("user.logout");
