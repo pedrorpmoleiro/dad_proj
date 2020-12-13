@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="artisan migrate:fresh (cleans DB and reruns migrations)" type="PhpLocalRunConfigurationType" factoryName="PHP Console" folderName="Artisan" path="$PROJECT_DIR$/artisan" scriptParameters="migrate:fresh">
+    <method v="2" />
+  </configuration>
+</component>

@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'type',
     ];
 
     /**
@@ -30,6 +31,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'blocked',
     ];
 
     /**
@@ -40,4 +42,28 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function toStdClass(): \stdClass {
+        $user = new \stdClass();
+
+        $user->id = $this->id;
+        $user->name = $this->name;
+        $user->email = $this->email;
+        $user->type = $this->type;
+        $user->blocked = $this->blocked;
+        $user->photo_url = $this->photo_url;
+
+        return $user;
+    }
+
+    public function addToStdClass($user): \stdClass {
+        $user->id = $this->id;
+        $user->name = $this->name;
+        $user->email = $this->email;
+        $user->type = $this->type;
+        $user->blocked = $this->blocked;
+        $user->photo_url = $this->photo_url;
+
+        return $user;
+    }
 }
