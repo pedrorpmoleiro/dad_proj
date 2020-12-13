@@ -50,9 +50,11 @@
                                 </v-btn>
                                 <template v-slot:input>
                                     <v-text-field
-                                        v-model="input[item.product.id]"
-                                        type="number"
-                                        label="Amount"
+                                        rounded
+                                        label="Quantity"
+                                        :rules="[rules.amount]"
+                                        v-model.number="input[item.product.id]"
+                                        hint="Press enter to submit the change"
                                     ></v-text-field>
                                 </template>
                             </v-edit-dialog>
@@ -117,7 +119,15 @@ export default {
     },
     data: () => ({
         input: [],
-        height: window.innerHeight - 115
+        height: window.innerHeight - 115,
+        rules: {
+            amount: value => {
+                const pattern = /^[1-9][0-9]?$/;
+                return (
+                    pattern.test(value) || "Value must be between 1 and 99"
+                );
+            }
+        },
     }),
     computed: {
         ...mapGetters(["getShoppingCartItems"]),
