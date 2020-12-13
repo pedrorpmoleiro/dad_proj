@@ -86,7 +86,7 @@
                         <v-list-item-action>
                             <v-col>
                                 <v-row>
-                                    <checkout-dialog></checkout-dialog>
+                                    <checkout-dialog v-on:show-notification="openNotification"></checkout-dialog>
                                 </v-row>
                                 <v-row>
                                     <v-btn
@@ -146,6 +146,9 @@ export default {
         },
         openEditItem(item) {
             this.input[item.product.id] = item.amount;
+        },
+        openNotification(color, message, timeout = 6000) {
+            this.$emit("show-notification", color, message, timeout);
         }
     }
 };

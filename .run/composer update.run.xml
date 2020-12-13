@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="composer update" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/composer.phar" scriptParameters="update">
+  <configuration default="false" name="composer update" type="PhpLocalRunConfigurationType" factoryName="PHP Console" folderName="Composer" path="$PROJECT_DIR$/composer.phar" scriptParameters="update">
     <method v="2" />
   </configuration>
 </component>

@@ -86,7 +86,7 @@ export default {
                         "success",
                         "Order Placed"
                     );
-                    // this.clearShoppingCart();
+                    this.clearShoppingCart();
                 })
                 .catch(e => {
                     this.loading = false;

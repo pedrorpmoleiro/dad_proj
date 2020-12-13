@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -24,10 +27,12 @@ class OrderController extends Controller
             $products[$p->id] = [
                 "quantity" => $item["quantity"],
                 "unit_price" => $p->price,
-                "sub_total_price" => $subTotal
+                "sub_total_price" => round($subTotal, 2)
             ];
             $total += $subTotal;
         }
+
+        $total = round($total, 2);
 
         $data = [];
         $data["customer_id"] = Auth::user()->id;
@@ -41,6 +46,16 @@ class OrderController extends Controller
         $data["opened_at"] = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
         $data["current_status_at"] = $data["opened_at"];
 
-        dd($data);
+        $order = Order::create($data);
+
+        $orderItems = [];
+
+        foreach ($products as $k => $i) {
+            $aux = array_merge($i, ["order_id" => $order->id, "product_id" => $k]);
+            array_push($orderItems, $aux);
+            OrderItem::create($aux);
+        }
+
+        return response()->json($order, 201);
     }
 }
