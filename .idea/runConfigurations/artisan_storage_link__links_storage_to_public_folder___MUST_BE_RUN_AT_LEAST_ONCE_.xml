@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="artisan storage:link (links storage to public folder) (MUST BE RUN AT LEAST ONCE)" type="PhpLocalRunConfigurationType" factoryName="PHP Console" folderName="Artisan" path="$PROJECT_DIR$/artisan" scriptParameters="storage:link">
+    <method v="2" />
+  </configuration>
+</component>

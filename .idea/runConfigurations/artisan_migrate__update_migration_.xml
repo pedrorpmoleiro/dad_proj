@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="artisan migrate (update migration)" type="PhpLocalRunConfigurationType" factoryName="PHP Console" folderName="Artisan" path="$PROJECT_DIR$/artisan" scriptParameters="migrate">
+    <method v="2" />
+  </configuration>
+</component>

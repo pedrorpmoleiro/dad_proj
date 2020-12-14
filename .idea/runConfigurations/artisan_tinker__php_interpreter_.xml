@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="artisan tinker (php interpreter)" type="PhpLocalRunConfigurationType" factoryName="PHP Console" folderName="Artisan" path="$PROJECT_DIR$/artisan" scriptParameters="tinker">
+    <method v="2" />
+  </configuration>
+</component>

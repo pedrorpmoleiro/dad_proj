@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="composer self-update" type="PhpLocalRunConfigurationType" factoryName="PHP Console" folderName="Composer" path="$PROJECT_DIR$/composer.phar" scriptParameters="self-update">
+    <method v="2" />
+  </configuration>
+</component>
