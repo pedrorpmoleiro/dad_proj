@@ -55,7 +55,7 @@
                                 <v-spacer></v-spacer>
 
                                 <v-btn
-                                    v-if="getUser.type === 'EM'"
+                                    v-if="isUserManager"
                                     large
                                     color="green lighten-1"
                                     depressed
@@ -69,9 +69,7 @@
                                     </v-container>
                                 </v-btn>
 
-                                <v-spacer
-                                    v-if="getUser.type === 'EM'"
-                                ></v-spacer>
+                                <v-spacer v-if="isUserManager"></v-spacer>
 
                                 <v-btn
                                     large
@@ -124,7 +122,7 @@
                             <div v-if="isLoggedIn">
                                 <v-divider></v-divider>
                                 <v-card-actions>
-                                    <div v-if="getUser.type === 'C'">
+                                    <div v-if="isUserCustomer">
                                         <v-text-field
                                             rounded
                                             label="Quantity"
@@ -143,7 +141,7 @@
                                             <v-icon>add_shopping_cart</v-icon>
                                         </v-btn>
                                     </div>
-                                    <div v-if="getUser.type === 'EM'">
+                                    <div v-if="isUserManager">
                                         <v-spacer></v-spacer>
                                         <v-btn text>
                                             <v-icon>create</v-icon>
@@ -193,7 +191,13 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["isLoggedIn", "getShoppingCartItems", "getUser"])
+        ...mapGetters([
+            "isLoggedIn",
+            "getShoppingCartItems",
+            "getUser",
+            "isUserCustomer",
+            "isUserManager"
+        ])
     },
     methods: {
         ...mapActions(["addUpdateItemToCart"]),

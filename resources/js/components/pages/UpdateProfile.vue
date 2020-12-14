@@ -26,7 +26,9 @@
                                             accept="image/jpeg, image/png"
                                             prepend-icon="add_a_photo"
                                             label="Profile Picture"
-                                            v-model="updateUserPhoto.input.photo"
+                                            v-model="
+                                                updateUserPhoto.input.photo
+                                            "
                                         ></v-file-input>
                                         <!-- ! TODO -->
                                     </v-col>
@@ -60,70 +62,96 @@
                                 <v-row>
                                     <v-col>
                                         <v-text-field
-                                            v-model="updatePassword.input.passwordOld"
+                                            v-model="
+                                                updatePassword.input.passwordOld
+                                            "
                                             :append-icon="
-                        'visibility' +
-                        (updatePassword.showPassOld ? '' : '_off')
-                      "
+                                                'visibility' +
+                                                    (updatePassword.showPassOld
+                                                        ? ''
+                                                        : '_off')
+                                            "
                                             :rules="[rules.required, rules.min]"
-                                            :type="updatePassword.showPassOld ? 'text' : 'password'"
+                                            :type="
+                                                updatePassword.showPassOld
+                                                    ? 'text'
+                                                    : 'password'
+                                            "
                                             hint="At least 3 characters"
                                             label="Old Password*"
                                             counter
                                             clearable
                                             required
                                             v-on:click:append="
-                        updatePassword.showPassOld = !updatePassword.showPassOld
-                      "
+                                                updatePassword.showPassOld = !updatePassword.showPassOld
+                                            "
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
                                 <v-row>
                                     <v-col>
                                         <v-text-field
-                                            v-model="updatePassword.input.password"
+                                            v-model="
+                                                updatePassword.input.password
+                                            "
                                             :append-icon="
-                        'visibility' + (updatePassword.showPass ? '' : '_off')
-                      "
+                                                'visibility' +
+                                                    (updatePassword.showPass
+                                                        ? ''
+                                                        : '_off')
+                                            "
                                             :rules="[rules.required, rules.min]"
-                                            :type="updatePassword.showPass ? 'text' : 'password'"
+                                            :type="
+                                                updatePassword.showPass
+                                                    ? 'text'
+                                                    : 'password'
+                                            "
                                             hint="At least 3 characters"
                                             label="Password*"
                                             counter
                                             clearable
                                             required
                                             v-on:click:append="
-                        updatePassword.showPass = !updatePassword.showPass
-                      "
+                                                updatePassword.showPass = !updatePassword.showPass
+                                            "
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
                                 <v-row>
                                     <v-col>
                                         <v-text-field
-                                            v-model="updatePassword.input.passwordConfirm"
+                                            v-model="
+                                                updatePassword.input
+                                                    .passwordConfirm
+                                            "
                                             :append-icon="
-                        'visibility' +
-                        (updatePassword.showPassConfirm ? '' : '_off')
-                      "
+                                                'visibility' +
+                                                    (updatePassword.showPassConfirm
+                                                        ? ''
+                                                        : '_off')
+                                            "
                                             :rules="[rules.required, rules.min]"
                                             :type="
-                        updatePassword.showPassConfirm ? 'text' : 'password'
-                      "
+                                                updatePassword.showPassConfirm
+                                                    ? 'text'
+                                                    : 'password'
+                                            "
                                             hint="At least 3 characters"
                                             label="Password Confirmation*"
                                             counter
                                             clearable
                                             required
                                             v-on:click:append="
-                        updatePassword.showPassConfirm = !updatePassword.showPassConfirm
-                      "
+                                                updatePassword.showPassConfirm = !updatePassword.showPassConfirm
+                                            "
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
                             </v-container>
                         </v-form>
-                        <small class="red--text">* indicates required field</small>
+                        <small class="red--text"
+                            >* indicates required field</small
+                        >
                     </v-card-text>
 
                     <v-divider></v-divider>
@@ -153,7 +181,10 @@
                                     <v-col>
                                         <v-text-field
                                             v-model="updateUserData.input.name"
-                                            :rules="[rules.required, rules.name]"
+                                            :rules="[
+                                                rules.required,
+                                                rules.name
+                                            ]"
                                             label="Full Name*"
                                             clearable
                                             required
@@ -162,46 +193,66 @@
                                     <v-col>
                                         <v-text-field
                                             v-model="updateUserData.input.email"
-                                            :rules="[rules.required, rules.email, rules.max]"
+                                            :rules="[
+                                                rules.required,
+                                                rules.email,
+                                                rules.max
+                                            ]"
                                             label="Email*"
                                             clearable
                                             required
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
-                                <v-row>
-                                    <v-col>
-                                        <v-text-field
-                                            v-model="updateUserData.input.address"
-                                            :rules="[rules.required, rules.max]"
-                                            label="Address*"
-                                            clearable
-                                            required
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
-                                <v-row>
-                                    <v-col>
-                                        <v-text-field
-                                            v-model="updateUserData.input.phone"
-                                            :rules="[rules.required, rules.phone]"
-                                            label="Phone Number*"
-                                            clearable
-                                            required
-                                        ></v-text-field>
-                                    </v-col>
-                                    <v-col>
-                                        <v-text-field
-                                            v-model="updateUserData.input.nif"
-                                            :rules="[rules.nif]"
-                                            label="NIF"
-                                            clearable
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
+                                <div v-if="isUserCustomer">
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field
+                                                v-model="
+                                                    updateUserData.input.address
+                                                "
+                                                :rules="[
+                                                    rules.required,
+                                                    rules.max
+                                                ]"
+                                                label="Address*"
+                                                clearable
+                                                required
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field
+                                                v-model="
+                                                    updateUserData.input.phone
+                                                "
+                                                :rules="[
+                                                    rules.required,
+                                                    rules.phone
+                                                ]"
+                                                label="Phone Number*"
+                                                clearable
+                                                required
+                                            ></v-text-field>
+                                        </v-col>
+                                        <v-col>
+                                            <v-text-field
+                                                v-model="
+                                                    updateUserData.input.nif
+                                                "
+                                                :rules="[rules.nif]"
+                                                label="NIF"
+                                                clearable
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </div>
                             </v-container>
                         </v-form>
-                        <small class="red--text">* indicates required field</small>
+                        <small class="red--text"
+                            >* indicates required field</small
+                        >
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions>
@@ -222,7 +273,7 @@
 </template>
 
 <script>
-import {mapGetters, mapActions} from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     data: () => ({
@@ -235,8 +286,8 @@ export default {
             input: {
                 passwordOld: "",
                 password: "",
-                passwordConfirm: "",
-            },
+                passwordConfirm: ""
+            }
         },
         updateUserData: {
             loading: false,
@@ -246,47 +297,51 @@ export default {
                 email: "",
                 address: "",
                 phone: "",
-                nif: "",
-            },
+                nif: ""
+            }
         },
         updateUserPhoto: {
             loading: false,
             isFormValid: false,
             input: {
-                photo: "",
-            },
+                photo: null
+            }
         },
         rules: {
-            required: (value) => !!value || "Required",
-            min: (value) => value.length >= 3 || "Min of 3 Characters",
-            max: (value) => value.length < 255 || "Max of 255 Characters",
-            email: (value) => {
+            required: value => !!value || "Required",
+            min: value => value.length >= 3 || "Min of 3 Characters",
+            max: value => value.length < 255 || "Max of 255 Characters",
+            email: value => {
                 const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
                 return pattern.test(value) || "Invalid E-mail format!!";
             },
-            name: (value) => {
+            name: value => {
                 const pattern = /^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/;
                 return pattern.test(value) || "Only letters and spaces allowed";
             },
-            nif: (value) => {
-                if (typeof value === typeof undefined || value == null || value === "")
+            nif: value => {
+                if (
+                    typeof value === typeof undefined ||
+                    value == null ||
+                    value === ""
+                )
                     return true;
 
                 const pattern = /^\d{0,8}[1-9]$/;
                 return (
-                    pattern.test(value) || "NIF: Positive number, smaller then 999999999"
+                    pattern.test(value) ||
+                    "NIF: Positive number, smaller then 999999999"
                 );
             },
-            phone: (value) => {
+            phone: value => {
                 const pattern = /^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/;
                 return pattern.test(value) || "Phone number format is invalid";
-            },
-        },
+            }
+        }
     }),
     methods: {
         ...mapActions(["setUser"]),
-        submitPhoto() {
-        },
+        submitPhoto() {},
         submitPassword() {
             if (
                 this.updatePassword.input.password !==
@@ -314,14 +369,14 @@ export default {
 
             let data = {
                 passwordOld: this.updatePassword.input.passwordOld,
-                password: this.updatePassword.input.password,
+                password: this.updatePassword.input.password
             };
 
             this.updatePassword.loading = true;
 
             axios
                 .post("api/users/update/password", data)
-                .then((response) => {
+                .then(response => {
                     this.updatePassword.loading = false;
                     // console.log(response);
                     this.$emit(
@@ -330,7 +385,7 @@ export default {
                         "Password updated successfully!"
                     );
                 })
-                .catch((e) => {
+                .catch(e => {
                     // console.log(e);
                     this.updatePassword.loading = false;
                     this.$emit(
@@ -343,20 +398,22 @@ export default {
         submitUserData() {
             let data = {
                 name: this.updateUserData.input.name,
-                email: this.updateUserData.input.email,
+                email: this.updateUserData.input.email
             };
 
             this.updateUserData.loading = true;
 
             let route;
 
-            if (this.getUser.type === "C") {
+            if (this.isUserCustomer) {
                 data.address = this.updateUserData.input.address;
                 data.phone = this.updateUserData.input.phone;
 
-                if (typeof this.updateUserData.input.nif !== typeof undefined &&
+                if (
+                    typeof this.updateUserData.input.nif !== typeof undefined &&
                     this.updateUserData.input.nif != null &&
-                    this.updateUserData.input.nif !== "")
+                    this.updateUserData.input.nif !== ""
+                )
                     data.nif = Number(this.updateUserData.input.nif);
 
                 route = "api/customers/update";
@@ -364,7 +421,7 @@ export default {
 
             axios
                 .post(route, data)
-                .then((response) => {
+                .then(response => {
                     this.updateUserData.loading = false;
                     // console.log(response);
 
@@ -376,15 +433,19 @@ export default {
                         "Updated profile successfully!"
                     );
                 })
-                .catch((e) => {
+                .catch(e => {
                     // console.log(e);
                     this.updateUserData.loading = false;
-                    this.$emit("show-notification", "error", "Failed to update profile!");
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to update profile!"
+                    );
                 });
-        },
+        }
     },
     computed: {
-        ...mapGetters(["isLoggedIn", "getUser"]),
+        ...mapGetters(["isLoggedIn", "getUser", "isUserCustomer"])
     },
     mounted() {
         // TODO: Wait for user (e.g., loading) when entering 'Update Profile' Page
@@ -393,13 +454,14 @@ export default {
         this.updateUserData.input.name = this.getUser.name;
         this.updateUserData.input.email = this.getUser.email;
 
-        if (this.getUser.type === "C") {
+        if (this.isUserCustomer) {
             this.updateUserData.input.address = this.getUser.address;
             this.updateUserData.input.phone = this.getUser.phone;
+
             if (this.getUser.nif != null)
                 this.updateUserData.input.nif = this.getUser.nif;
         }
-    },
+    }
 };
 </script>
 

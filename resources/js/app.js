@@ -27,6 +27,18 @@ const store = new Vuex.Store({
         isLoggedIn(state) {
             return state.auth_user != null;
         },
+        isUserCustomer(state) {
+            return state.auth_user != null && state.auth_user.type === "C";
+        },
+        isUserManager(state) {
+            return state.auth_user != null && state.auth_user.type === "EM";
+        },
+        isUserCook(state) {
+            return state.auth_user != null && state.auth_user.type === "EC";
+        },
+        isUserDeliveryMan(state) {
+            return state.auth_user != null && state.auth_user.type === "ED";
+        },
         getUser(state) {
             return state.auth_user;
         },
