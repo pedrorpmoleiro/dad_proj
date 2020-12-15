@@ -24,4 +24,9 @@ class Order extends Model
         return $this->belongsToMany(Product::class, 'order_items', 'order_id', 'product_id')
             ->using(OrderItem::class)->withPivot(['quantity', 'unit_price', 'sub_total_price']);
     }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
 }

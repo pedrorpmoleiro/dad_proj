@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -57,5 +59,32 @@ class OrderController extends Controller
         }
 
         return response()->json($order, 201);
+    }
+
+    public function getCustomerOrders()
+    {
+        $customer = Customer::findOrFail(Auth::user()->id);
+
+        $orders = $customer->orders;
+
+        return response()->json($orders);
+    }
+
+    public function getCustomerOpenOrders()
+    {
+        $customer = Customer::findOrFail(Auth::user()->id);
+
+        $orders = $customer->orders()->whereNotIn('status', ['C', 'D'])->get();
+
+        return response()->json($orders);
+    }
+
+    public function getCustomerOrderHistory()
+    {
+        $customer = Customer::findOrFail(Auth::user()->id);
+
+        $orders = $customer->orders()->whereIn('status', ['C', 'D'])->get();
+
+        return response()->json($orders);
     }
 }

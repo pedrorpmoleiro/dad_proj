@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Contracts\Auth\CanResetPassword;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, CanResetPassword;
 
     /**
      * The attributes that are mass assignable.
@@ -43,7 +44,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function toStdClass(): \stdClass {
+    public function toStdClass(): \stdClass
+    {
         $user = new \stdClass();
 
         $user->id = $this->id;
@@ -56,7 +58,8 @@ class User extends Authenticatable
         return $user;
     }
 
-    public function addToStdClass($user): \stdClass {
+    public function addToStdClass($user): \stdClass
+    {
         $user->id = $this->id;
         $user->name = $this->name;
         $user->email = $this->email;

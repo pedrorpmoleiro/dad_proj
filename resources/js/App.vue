@@ -192,6 +192,10 @@ import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
 import { mapActions, mapGetters } from "vuex";
 
+// TODO FORGOT PASSWORD LINK!
+// TODO RESEND EMAIL VERIFICATION!
+// TODO SHOW IF EMAIL IS VERIFIED!
+
 export default {
     components: {
         "login-dialog": LoginDialog,
@@ -231,7 +235,7 @@ export default {
             if (!this.isLoggedIn) return;
 
             axios
-                .post("api/logout")
+                .post("api/auth/logout")
                 .then(() => {
                     this.logOut();
                     axios.defaults.withCredentials = false;
