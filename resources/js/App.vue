@@ -87,6 +87,19 @@
                             {{ link.name }}
                         </v-btn>
                     </div>
+                    <div v-if="isUserCustomer">
+                        <v-btn
+                            v-for="link in customerLinks"
+                            :key="link.name"
+                            v-on:click.prevent="$router.push(link.location)"
+                            :disabled="
+                                $router.currentRoute.path === link.location
+                            "
+                            text
+                        >
+                            {{ link.name }}
+                        </v-btn>
+                    </div>
                 </div>
 
                 <v-spacer></v-spacer>
@@ -216,6 +229,12 @@ export default {
         cookLinks: [],
         deliveryManLinks: [],
         managerLinks: [],
+        customerLinks: [
+            {
+                name: "My Orders",
+                location: "/orders/customer"
+            }
+        ],
         notification: {
             color: "",
             showing: false,
