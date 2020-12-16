@@ -29,4 +29,14 @@ class Order extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function cook()
+    {
+        return $this->belongsTo(User::class, 'prepared_by', 'id');
+    }
+
+    public function delivery_man()
+    {
+        return $this->belongsTo(User::class, 'delivered_by', 'id');
+    }
 }

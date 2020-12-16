@@ -101,11 +101,13 @@ Route::get('products', [ProductController::class, 'all'])->name("product.get_all
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
     // dd(date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS')));
-    // $response = Order::find(1);
-    $response = Customer::find(22);
+    $response = Order::find(14);
+    // $response = Customer::find(22);
     // $response->items;
-    // $response->customer;
+    $response->customer;
+    $response->cook;
+    $response->delivery_man;
     // $response = $response->orders()->whereIn('status', ['C', 'D'])->get();
-    $response = $response->orders()->whereNotIn('status', ['C', 'D'])->get();
+    // $response = $response->orders()->whereNotIn('status', ['C', 'D'])->get();
     return response()->json($response);
 })->name("tests");

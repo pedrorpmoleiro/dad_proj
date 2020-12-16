@@ -67,6 +67,11 @@ class OrderController extends Controller
 
         $orders = $customer->orders;
 
+        foreach ($orders as $order) {
+            $order->cook;
+            $order->delivery_man;
+        }
+
         return response()->json($orders);
     }
 
@@ -75,6 +80,11 @@ class OrderController extends Controller
         $customer = Customer::findOrFail(Auth::user()->id);
 
         $orders = $customer->orders()->whereNotIn('status', ['C', 'D'])->get();
+
+        foreach ($orders as $order) {
+            $order->cook;
+            $order->delivery_man;
+        }
 
         return response()->json($orders);
     }
@@ -85,6 +95,13 @@ class OrderController extends Controller
 
         $orders = $customer->orders()->whereIn('status', ['C', 'D'])->get();
 
+        foreach ($orders as $order) {
+            $order->cook;
+            $order->delivery_man;
+        }
+
         return response()->json($orders);
     }
+
+    // TODO GET SINGLE ORDER
 }

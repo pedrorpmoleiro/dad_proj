@@ -169,7 +169,7 @@ export default {
                 )
                     return true;
 
-                const pattern = /^\d{0,8}[1-9]$/;
+                const pattern = /^\d{0,8}[0-9]$/;
                 return (
                     pattern.test(value) ||
                     "NIF: Positive number, smaller then 999999999"
