@@ -87,6 +87,19 @@
                             {{ link.name }}
                         </v-btn>
                     </div>
+                    <div v-if="isUserCustomer">
+                        <v-btn
+                            v-for="link in customerLinks"
+                            :key="link.name"
+                            v-on:click.prevent="$router.push(link.location)"
+                            :disabled="
+                                $router.currentRoute.path === link.location
+                            "
+                            text
+                        >
+                            {{ link.name }}
+                        </v-btn>
+                    </div>
                 </div>
 
                 <v-spacer></v-spacer>
@@ -192,6 +205,10 @@ import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
 import { mapActions, mapGetters } from "vuex";
 
+// TODO FORGOT PASSWORD LINK!
+// TODO RESEND EMAIL VERIFICATION!
+// TODO SHOW IF EMAIL IS VERIFIED!
+
 export default {
     components: {
         "login-dialog": LoginDialog,
@@ -212,6 +229,12 @@ export default {
         cookLinks: [],
         deliveryManLinks: [],
         managerLinks: [],
+        customerLinks: [
+            {
+                name: "My Orders",
+                location: "/orders/customer"
+            }
+        ],
         notification: {
             color: "",
             showing: false,
@@ -231,7 +254,7 @@ export default {
             if (!this.isLoggedIn) return;
 
             axios
-                .post("api/logout")
+                .post("api/auth/logout")
                 .then(() => {
                     this.logOut();
                     axios.defaults.withCredentials = false;

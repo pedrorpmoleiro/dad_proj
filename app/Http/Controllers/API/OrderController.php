@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class OrderController extends Controller
 {
@@ -57,5 +61,69 @@ class OrderController extends Controller
         }
 
         return response()->json($order, 201);
+    }
+
+    public function getCustomerOrders(): JsonResponse
+    {
+        $customer = Customer::findOrFail(Auth::user()->id);
+
+        $orders = $customer->orders;
+
+        foreach ($orders as $order) {
+            $order->cook;
+            $order->delivery_man;
+        }
+
+        return response()->json($orders);
+    }
+
+    public function getCustomerOpenOrders(): JsonResponse
+    {
+        $customer = Customer::findOrFail(Auth::user()->id);
+
+        $orders = $customer->orders()->whereNotIn('status', ['C', 'D'])->get();
+
+        foreach ($orders as $order) {
+            $order->cook;
+            $order->delivery_man;
+        }
+
+        return response()->json($orders);
+    }
+
+    public function getCustomerOrderHistory(): JsonResponse
+    {
+        $customer = Customer::findOrFail(Auth::user()->id);
+
+        $orders = $customer->orders()->whereIn('status', ['C', 'D'])->get();
+
+        foreach ($orders as $order) {
+            $order->cook;
+            $order->delivery_man;
+        }
+
+        return response()->json($orders);
+    }
+
+    public function getOrder($id): JsonResponse
+    {
+        $user = Auth::user();
+
+        $order = Order::findOrFail($id);
+
+        $order->customer;
+        $order->cook;
+        $order->delivery_man;
+
+        switch ($user->type) {
+            case 'C':
+                if ($user->id != $order->customer->id)
+                    throw new AccessDeniedException("Requested Order doesn't belong to this customer");
+                break;
+            // TODO REVIEW
+            // ! Ready for custom checks for other user types
+        }
+
+        return response()->json($order);
     }
 }

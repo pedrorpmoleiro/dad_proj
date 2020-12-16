@@ -3,7 +3,7 @@
         <v-img :height="imageHeight" src="../storage/background_home.jpg">
             <v-container fill-height class="justify-center">
                 <v-layout align-center justify-center>
-                    <v-card class="d-flex justify-center">
+                    <v-card flat class="d-flex justify-center">
                         <v-card-title class="mx-3">
                             <h3>Welcome to Food@Home</h3>
                         </v-card-title>
