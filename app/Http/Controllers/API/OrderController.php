@@ -13,6 +13,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+
 class OrderController extends Controller
 {
     public function create(Request $request): JsonResponse
@@ -61,7 +63,7 @@ class OrderController extends Controller
         return response()->json($order, 201);
     }
 
-    public function getCustomerOrders()
+    public function getCustomerOrders(): JsonResponse
     {
         $customer = Customer::findOrFail(Auth::user()->id);
 
@@ -75,7 +77,7 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
-    public function getCustomerOpenOrders()
+    public function getCustomerOpenOrders(): JsonResponse
     {
         $customer = Customer::findOrFail(Auth::user()->id);
 
@@ -89,7 +91,7 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
-    public function getCustomerOrderHistory()
+    public function getCustomerOrderHistory(): JsonResponse
     {
         $customer = Customer::findOrFail(Auth::user()->id);
 
@@ -103,5 +105,25 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
-    // TODO GET SINGLE ORDER
+    public function getOrder($id): JsonResponse
+    {
+        $user = Auth::user();
+
+        $order = Order::findOrFail($id);
+
+        $order->customer;
+        $order->cook;
+        $order->delivery_man;
+
+        switch ($user->type) {
+            case 'C':
+                if ($user->id != $order->customer->id)
+                    throw new AccessDeniedException("Requested Order doesn't belong to this customer");
+                break;
+            // TODO REVIEW
+            // ! Ready for custom checks for other user types
+        }
+
+        return response()->json($order);
+    }
 }

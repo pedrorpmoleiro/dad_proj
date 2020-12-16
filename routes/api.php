@@ -1,13 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\OrderController;
-use App\Models\Customer;
+
 /* *** TESTS *** */
 
 use App\Models\Order;
@@ -81,6 +80,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('history', [OrderController::class, 'getCustomerOrderHistory'])->name("order.get_history");
         });
     });
+
+    Route::get('orders/{id}', [OrderController::class, 'getOrder'])->name("order.get_order");
 });
 
 /* *** Unprotected Routes *** */

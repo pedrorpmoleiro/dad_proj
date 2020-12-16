@@ -12,10 +12,12 @@
             <v-divider></v-divider>
             <v-card-text>
                 <div v-if="loading">
-                    <v-progress-circular
-                        indeterminate
-                        color="primary"
-                    ></v-progress-circular>
+                    <v-layout align-center justify-center>
+                        <v-progress-circular
+                            indeterminate
+                            color="primary"
+                        ></v-progress-circular>
+                    </v-layout>
                 </div>
                 <div v-else>
                     <v-container>
@@ -38,7 +40,7 @@
                                         </div>
                                         <template v-slot:opposite>
                                         <span class="headline">
-                                            {{ (new Date(order.current_status_at)).toLocaleTimeString() }}
+                                            {{ (new Date(order.closed_at)).toLocaleTimeString() }}
                                         </span>
                                         </template>
                                     </v-timeline-item>
@@ -49,12 +51,12 @@
                                         <div class="py-4">
                                             <h2 class="headline font-weight-light mb-4">Order finished</h2>
                                             <p v-if="order.total_time">
-                                                Order took: {{ parseInt(order.total_time / 60) }} minutes
+                                                Order took {{ parseInt(order.total_time / 60) }} minutes total
                                             </p>
                                         </div>
                                         <template v-slot:opposite>
                                             <span class="headline">
-                                                {{ (new Date(order.current_status_at)).toLocaleTimeString() }}
+                                                {{ (new Date(order.closed_at)).toLocaleTimeString() }}
                                             </span>
                                         </template>
                                     </v-timeline-item>
@@ -62,26 +64,21 @@
                                         <div class="py-4">
                                             <h2 class="headline font-weight-light mb-4">Order was delivered</h2>
                                             <p v-if="order.delivery_man">
-                                                Delivery by: {{ order.delivery_man.name }}
+                                                Delivery by: {{ getUserFirstAndLastName(order.delivery_man.name) }}
                                             </p>
                                             <p v-if="order.delivery_time">
-                                                Took: {{ parseInt(order.delivery_time / 60) }} minutes
+                                                Took {{ parseInt(order.delivery_time / 60) }} minutes to deliver
                                             </p>
                                         </div>
-                                        <template v-slot:opposite>
-                                            <span class="headline">
-                                                {{ (new Date(order.current_status_at)).toLocaleTimeString() }}
-                                            </span>
-                                        </template>
                                     </v-timeline-item>
                                     <v-timeline-item color="primary">
                                         <div class="py-4">
                                             <h2 class="headline font-weight-light mb-4">Order prepared</h2>
                                             <p v-if="order.cook">
-                                                Prepared by: {{ order.cook.name }}
+                                                Prepared by: {{ getUserFirstAndLastName(order.cook.name) }}
                                             </p>
                                             <p v-if="order.preparation_time">
-                                                Took: {{ parseInt(order.preparation_time / 60) }} minutes
+                                                Took {{ parseInt(order.preparation_time / 60) }} minutes to prepare
                                             </p>
                                         </div>
                                     </v-timeline-item>
@@ -92,6 +89,9 @@
                                         <div class="py-4">
                                             <h2 class="headline font-weight-light mb-4">Order is being delivered to
                                                 you</h2>
+                                            <p v-if="order.delivery_man">
+                                                Being delivered by: {{ getUserFirstAndLastName(order.delivery_man.name) }}
+                                            </p>
                                         </div>
                                         <template v-slot:opposite>
                                         <span class="headline">
@@ -103,10 +103,10 @@
                                         <div class="py-4">
                                             <h2 class="headline font-weight-light mb-4">Order prepared</h2>
                                             <p v-if="order.cook">
-                                                Prepared by: {{ order.cook.name }}
+                                                Prepared by: {{ getUserFirstAndLastName(order.cook.name) }}
                                             </p>
                                             <p v-if="order.preparation_time">
-                                                Took: {{ parseInt(order.preparation_time / 60) }} minutes
+                                                Took {{ parseInt(order.preparation_time / 60) }} minutes to prepare
                                             </p>
                                         </div>
                                     </v-timeline-item>
@@ -127,10 +127,10 @@
                                         <div class="py-4">
                                             <h2 class="headline font-weight-light mb-4">Order prepared</h2>
                                             <p v-if="order.cook">
-                                                Prepared by: {{ order.cook.name }}
+                                                Prepared by: {{ getUserFirstAndLastName(order.cook.name) }}
                                             </p>
                                             <p v-if="order.preparation_time">
-                                                Took: {{ parseInt(order.preparation_time / 60) }} minutes
+                                                Took {{ parseInt(order.preparation_time / 60) }} minutes to prepare
                                             </p>
                                         </div>
                                     </v-timeline-item>
@@ -141,7 +141,7 @@
                                         <div class="py-4">
                                             <h2 class="headline font-weight-light mb-4">Order is being prepared</h2>
                                             <p v-if="order.cook">
-                                                Being prepared by: {{ order.cook.name }}
+                                                Being prepared by: {{ getUserFirstAndLastName(order.cook.name) }}
                                             </p>
                                         </div>
                                         <template v-slot:opposite>
@@ -189,15 +189,34 @@
 
 <script>
 export default {
-    props: ["order"],
+    props: ["orderProp"],
     data: () => ({
         dialog: false,
-        loading: false
+        loading: false,
+        order: {}
     }),
     methods: {
         refreshOrderData() {
-            // this.loading = true;
+            this.loading = true;
+
+            axios.get(`api/orders/${this.order.id}`).then(response => {
+                console.log(response);
+                this.order = response.data;
+                this.loading = false;
+            }).catch(error => {
+                console.log(error);
+                this.loading = false;
+            });
         },
+        getUserFirstAndLastName(fullName) {
+            let aux = fullName.split(" ");
+            return aux[0] + " " + aux[aux.length - 1];
+        }
+    },
+    mounted() {
+        this.order = this.orderProp;
+
+        // TODO Thread that refreshes the page every Y seconds
     }
 };
 </script>

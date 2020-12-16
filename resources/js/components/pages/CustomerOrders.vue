@@ -18,7 +18,7 @@
                         <v-data-table :headers="headers" :items="open.orders"
                                       :loading="open.loading">
                             <template v-slot:item.actions="{ item }">
-                                <view-order v-bind:order="item"></view-order>
+                                <view-order v-bind:order-prop="item"></view-order>
                             </template>
                             <template v-slot:item.total_price="{ item }">
                                 {{ "€ " + item.total_price }}
@@ -53,7 +53,7 @@
                         <v-data-table :headers="headers" :items="history.orders"
                                       :loading="history.loading">
                             <template v-slot:item.actions="{ item }">
-                                <view-order v-bind:order="item"></view-order>
+                                <view-order v-bind:order-prop="item"></view-order>
                             </template>
                             <template v-slot:item.total_price="{ item }">
                                 {{ "€ " + item.total_price }}
