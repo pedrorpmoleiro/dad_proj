@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 use App\Http\Controllers\Controller;
+
 use App\Models\User;
+use App\Models\Customer;
 
 class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
+        // if (Auth::attempt(['email' => $email, 'password' => $password, 'active' => 1]))
+
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             return response()->json(Auth::user());
@@ -26,7 +29,31 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         Auth::guard('web')->logout();
-        return response()->json(['message' => 'User session closed'], 200);
+        return response()->json(['msg' => 'User session closed'], 200);
+    }
+
+    public function resendVerificationEmail(): JsonResponse
+    {
+        $user = Auth::user();
+        if ($user->email_verified_at == null)
+            return response()->json(['msg' => 'Email already verified']);
+
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Exception $e) {
+            return response()->json([
+                "msg" => "Unable to send verification email",
+                "error" => $e->getMessage()
+            ]);
+        }
+
+        return response()->json(['msg' => 'Email verification sent']);
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request): JsonResponse
+    {
+        $request->fulfill();
+        return response()->json(['msg' => 'Email verified']);
     }
 
     public function registerCustomer(Request $request): JsonResponse
@@ -54,7 +81,7 @@ class AuthController extends Controller
             $response["errors"] = [
                 "msg" => "Unable to send verification email",
                 "error" => $e->getMessage()
-                ];
+            ];
         }
 
         $data['id'] = $user->id;

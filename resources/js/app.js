@@ -107,6 +107,7 @@ import Tests from "./components/pages/Tests.vue";
 import Home from "./components/pages/Home.vue";
 import Menu from "./components/pages/Menu.vue";
 import UpdateProfile from "./components/pages/UpdateProfile.vue";
+import CustomerOrders from "./components/pages/CustomerOrders.vue";
 
 const routes = [
     {
@@ -124,6 +125,10 @@ const routes = [
     {
         path: "/profile",
         component: UpdateProfile
+    },
+    {
+        path: "/orders/customer",
+        component: CustomerOrders
     },
     {
         path: "/foo/bar/tests",

@@ -7,11 +7,6 @@
         </template>
 
         <v-card :loading="loading">
-            <v-card-title dark class="headline red lighten-1">
-                WIP
-                <!-- ! TODO -->
-            </v-card-title>
-
             <v-card-text>
                 <v-form v-model="isFormValid">
                     <v-container>
@@ -52,10 +47,7 @@
                                     :append-icon="
                                         'visibility' + (showPass ? '' : '_off')
                                     "
-                                    :rules="[
-                                        rules.required,
-                                        rules.min
-                                    ]"
+                                    :rules="[rules.required, rules.min]"
                                     :type="showPass ? 'text' : 'password'"
                                     hint="At least 3 characters"
                                     label="Password *"
@@ -72,10 +64,7 @@
                                         'visibility' +
                                             (showPassConfirm ? '' : '_off')
                                     "
-                                    :rules="[
-                                        rules.required,
-                                        rules.min
-                                    ]"
+                                    :rules="[rules.required, rules.min]"
                                     :type="
                                         showPassConfirm ? 'text' : 'password'
                                     "
@@ -146,7 +135,7 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
     data: () => ({
@@ -173,10 +162,14 @@ export default {
                 return pattern.test(value) || "Invalid E-mail format!!";
             },
             nif: value => {
-                if (typeof value === typeof undefined || value == null || value === "")
+                if (
+                    typeof value === typeof undefined ||
+                    value == null ||
+                    value === ""
+                )
                     return true;
 
-                const pattern = /^\d{0,8}[1-9]$/;
+                const pattern = /^\d{0,8}[0-9]$/;
                 return (
                     pattern.test(value) ||
                     "NIF: Positive number, smaller then 999999999"
@@ -193,14 +186,11 @@ export default {
         }
     }),
     computed: {
-        ...mapGetters(["isLoggedIn"]),
+        ...mapGetters(["isLoggedIn"])
     },
     methods: {
         submit() {
-            if (
-                this.input.password !==
-                this.input.passwordConfirm
-            ) {
+            if (this.input.password !== this.input.passwordConfirm) {
                 this.$emit(
                     "show-notification",
                     "error",
@@ -219,29 +209,35 @@ export default {
                 phone: this.input.phone
             };
 
-            if (typeof this.input.nif !== typeof undefined && this.input.nif != null &&
-                this.input.nif !== "")
+            if (
+                typeof this.input.nif !== typeof undefined &&
+                this.input.nif != null &&
+                this.input.nif !== ""
+            )
                 user.nif = Number(this.input.nif);
 
             console.log(user);
 
-            axios.post("api/customers/register", user).then((response) => {
-                this.loading = false;
-                // console.log(response);
-                this.$emit(
-                    "show-notification",
-                    "success",
-                    "Register was successful, please Login"
-                );
-            }).catch((e) => {
-                this.loading = false;
-                // console.log(e);
-                this.$emit(
-                    "show-notification",
-                    "error",
-                    "Failed to register new Customer"
-                );
-            });
+            axios
+                .post("api/customers/register", user)
+                .then(response => {
+                    this.loading = false;
+                    // console.log(response);
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Register was successful, please Login"
+                    );
+                })
+                .catch(e => {
+                    this.loading = false;
+                    // console.log(e);
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to register new Customer"
+                    );
+                });
         }
     }
 };

@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
@@ -25,13 +24,20 @@ use App\Models\Order;
 |
 */
 
-/* *** Email Verification *** */
-Auth::routes(['verify' => true]);
-
 /* *** SANCTUM Protected Routes *** */
+
 Route::middleware('auth:sanctum')->group(function () {
-    // Logout Route
-    Route::post('logout', [AuthController::class, 'logout'])->name("user.logout");
+    /* *** Auth Routes *** */
+    Route::prefix('auth')->group(function () {
+        // Logout Route
+        Route::post('logout', [AuthController::class, 'logout'])->name("user.logout");
+
+        // Resend Email Verification
+        Route::get('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])->name("verification.send");
+
+        // Verify Email
+        Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->name("verification.verify");
+    });
 
     /* *** User Routes *** */
     Route::prefix('users')->group(function () {
@@ -60,14 +66,34 @@ Route::middleware('auth:sanctum')->group(function () {
         // Update Customer Data
         Route::post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
 
-        // Create new Order
-        Route::post('orders/new', [OrderController::class, 'create'])->name("order.new");
+        Route::prefix('orders')->group(function () {
+            // Create new Order
+            Route::post('new', [OrderController::class, 'create'])->name("order.new");
+
+            // Get Customer Orders
+            Route::get('', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
+
+            // Get Customer Open Orders
+            Route::get('open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");
+
+            // Get Customer Order History
+            Route::get('history', [OrderController::class, 'getCustomerOrderHistory'])->name("order.get_history");
+        });
     });
+
+    Route::get('orders/{id}', [OrderController::class, 'getOrder'])->name("order.get_order");
 });
 
 /* *** Unprotected Routes *** */
-// User Login Route
-Route::post('login', [AuthController::class, 'login'])->name("user.login");
+/* *** Auth Routes *** */
+Route::prefix('auth')->group(function () {
+    // User Login Route
+    Route::post('login', [AuthController::class, 'login'])->name("user.login");
+
+    // TODO Reset Password
+    // https://laravel.com/docs/8.x/passwords#requesting-the-password-reset-link
+});
+
 // Customer Register Route
 Route::post('customers/register', [AuthController::class, 'registerCustomer'])->name("customer.register");
 // Get all products Route
@@ -75,8 +101,14 @@ Route::get('products', [ProductController::class, 'all'])->name("product.get_all
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
-    dd(date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS')));
-    $response = Order::find(1);
-    $response->items;
+    // dd(date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS')));
+    $response = Order::find(14);
+    // $response = Customer::find(22);
+    // $response->items;
+    $response->customer;
+    $response->cook;
+    $response->delivery_man;
+    // $response = $response->orders()->whereIn('status', ['C', 'D'])->get();
+    // $response = $response->orders()->whereNotIn('status', ['C', 'D'])->get();
     return response()->json($response);
 })->name("tests");
