@@ -102,12 +102,13 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import Tests from "./components/pages/Tests.vue";
+import Tests from "./components/pages/Tests";
 
-import Home from "./components/pages/Home.vue";
-import Menu from "./components/pages/Menu.vue";
-import UpdateProfile from "./components/pages/UpdateProfile.vue";
-import CustomerOrders from "./components/pages/CustomerOrders.vue";
+import Home from "./components/pages/Home";
+import Menu from "./components/pages/Menu";
+import UpdateProfile from "./components/pages/UpdateProfile";
+import CustomerOrders from "./components/pages/CustomerOrders";
+import CookDashboard from "./components/pages/CookDashboard";
 
 const routes = [
     {
@@ -129,6 +130,10 @@ const routes = [
     {
         path: "/orders/customer",
         component: CustomerOrders
+    },
+    {
+        path: "/cook/dashboard",
+        component: CookDashboard
     },
     {
         path: "/foo/bar/tests",
