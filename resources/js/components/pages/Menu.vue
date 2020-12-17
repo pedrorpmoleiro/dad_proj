@@ -53,21 +53,9 @@
                                 </v-btn>
 
                                 <v-spacer></v-spacer>
-
-                                <v-btn
-                                    v-if="getUser.type === 'EM'"
-                                    large
-                                    color="green lighten-1"
-                                    depressed
-                                    :loading="loading"
-                                >
-                                    <v-container>
-                                        <v-row>
-                                            <v-icon>add</v-icon>
-                                            <p>Create</p>
-                                        </v-row>
-                                    </v-container>
-                                </v-btn>
+                                <create-product-dialog v-if="getUser.type === 'EM'"
+                                    v-on:show-notification="openNotification"
+                                ></create-product-dialog>
 
                                 <v-spacer
                                     v-if="getUser.type === 'EM'"
@@ -169,8 +157,12 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import CreateProductDialog from "../dialogs/CreateProductDialog";
 
 export default {
+    components: {
+        "create-product-dialog": CreateProductDialog
+    },
     data() {
         return {
             search: "",
@@ -254,6 +246,9 @@ export default {
         },
         deleteProduct(product) {
             // TODO
+        },
+        openNotification(color, message, timeout = 6000) {
+            this.$emit("show-notification", color, message, timeout);
         }
     },
     mounted() {
