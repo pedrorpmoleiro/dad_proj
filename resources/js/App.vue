@@ -226,7 +226,12 @@ export default {
                 location: "/menu"
             }
         ],
-        cookLinks: [],
+        cookLinks: [
+            {
+                name: "Cook Dashboard",
+                location: "/cook/dashboard"
+            }
+        ],
         deliveryManLinks: [],
         managerLinks: [],
         customerLinks: [
