@@ -104,7 +104,7 @@
 
                 <v-spacer></v-spacer>
 
-                <div v-if="loadingAuth">
+                <div v-if="isAuthLoading">
                     <v-progress-circular
                         indeterminate
                         color="primary"
@@ -246,11 +246,10 @@ export default {
             text: "",
             time: 0,
             timeout: 6000
-        },
-        loadingAuth: true
+        }
     }),
     methods: {
-        ...mapActions(["logOut", "setUser"]),
+        ...mapActions(["logOut", "setUser", "setAuthLoading"]),
         goHome() {
             if (this.$router.currentRoute.path !== "/home")
                 this.$router.push("/home");
@@ -310,23 +309,25 @@ export default {
             "isUserManager",
             "isUserCook",
             "isUserDeliveryMan",
-            "isUserCustomer"
+            "isUserCustomer",
+            "isAuthLoading"
         ])
     },
     mounted() {
         // ? A way to check if user is logged in -- Investigate more
+        this.setAuthLoading(true);
         axios
             .get("/api/users/me")
             .then(response => {
                 // Logged in
                 // console.dir(response);
                 this.setUser(response.data);
-                this.loadingAuth = false;
+                this.setAuthLoading(false);
             })
             .catch(e => {
                 // Not Logged in
                 // console.log(e);
-                this.loadingAuth = false;
+                this.setAuthLoading(false);
             });
     }
 };

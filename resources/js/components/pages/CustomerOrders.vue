@@ -137,7 +137,7 @@ export default {
             this.open.orders = [];
 
             axios
-                .get("api/orders")
+                .get("api/orders/customer")
                 .then(response => {
                     response.data.forEach(order => {
                         switch (order.status) {
@@ -182,7 +182,7 @@ export default {
             this.history.orders = [];
 
             axios
-                .get("api/orders/history")
+                .get("api/orders/customer/history")
                 .then(response => {
                     response.data.forEach(order => {
                         switch (order.status) {
@@ -224,7 +224,7 @@ export default {
             this.open.orders = [];
 
             axios
-                .get("api/orders/open")
+                .get("api/orders/customer/open")
                 .then(response => {
                     response.data.forEach(order => {
                         switch (order.status) {
@@ -263,10 +263,12 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["getUser", "isUserCustomer"])
+        ...mapGetters(["getUser", "isUserCustomer", "isAuthLoading"])
     },
-    mounted() {
-        // TODO: Wait for user (e.g., loading)
+    async mounted() {
+        while (this.isAuthLoading)
+            await new Promise(resolve => setTimeout(resolve, 500));
+
         if (!this.isUserCustomer) this.$router.push("/home");
         this.getAllOrders();
     }

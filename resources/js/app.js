@@ -21,9 +21,13 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     state: {
         auth_user: null,
+        auth_loading: true,
         shopping_cart: []
     },
     getters: {
+        isAuthLoading(state) {
+            return state.auth_loading;
+        },
         isLoggedIn(state) {
             return state.auth_user != null;
         },
@@ -47,6 +51,9 @@ const store = new Vuex.Store({
         }
     },
     mutations: {
+        SET_AUTH_LOADING(state, loading) {
+            state.auth_loading = loading;
+        },
         REMOVE_AUTH(state) {
             state.auth_user = null;
         },
@@ -80,6 +87,9 @@ const store = new Vuex.Store({
         }
     },
     actions: {
+        setAuthLoading(context, loading) {
+            context.commit("SET_AUTH_LOADING", loading);
+        },
         setUser(context, user) {
             context.commit("SET_AUTH_USER", user);
         },

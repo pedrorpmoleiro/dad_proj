@@ -71,17 +71,21 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('new', [OrderController::class, 'create'])->name("order.new");
 
             // Get Customer Orders
-            Route::get('', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
+            Route::get('customer/', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
 
             // Get Customer Open Orders
-            Route::get('open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");
+            Route::get('customer/open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");
 
             // Get Customer Order History
-            Route::get('history', [OrderController::class, 'getCustomerOrderHistory'])->name("order.get_history");
+            Route::get('customer/history', [OrderController::class, 'getCustomerOrderHistory'])->name("order.get_history");
         });
     });
 
+    // Get a specific Order
     Route::get('orders/{id}', [OrderController::class, 'getOrder'])->name("order.get_order");
+
+    // Get the current Order for the logged in Cook
+    Route::middleware('cook')->get('orders/cook', [OrderController::class, 'getCurrentCookOrder'])->name("order.get_current_cook_order");
 });
 
 /* *** Unprotected Routes *** */
@@ -101,14 +105,7 @@ Route::get('products', [ProductController::class, 'all'])->name("product.get_all
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
-    // dd(date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS')));
-    $response = Order::find(14);
-    // $response = Customer::find(22);
-    // $response->items;
-    $response->customer;
-    $response->cook;
-    $response->delivery_man;
-    // $response = $response->orders()->whereIn('status', ['C', 'D'])->get();
-    // $response = $response->orders()->whereNotIn('status', ['C', 'D'])->get();
-    return response()->json($response);
+    $order = Order::where('status', 'P')->where('prepared_by', 4)->first();
+
+    return response()->json($order);
 })->name("tests");

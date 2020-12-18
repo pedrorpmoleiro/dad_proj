@@ -108,9 +108,7 @@ class OrderController extends Controller
     public function getCurrentCookOrder(): JsonResponse
     {
         $user = Auth::user();
-        $order = Order::where('status', 'P')->andWhere('prepared_by', $user->id);
-
-        dd($order);
+        $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
 
         return response()->json($order);
     }
@@ -130,8 +128,8 @@ class OrderController extends Controller
                 if ($user->id != $order->customer->id)
                     throw new AccessDeniedException("Requested Order doesn't belong to this customer");
                 break;
-            // TODO REVIEW
-            // ! Ready for custom checks for other user types
+                // TODO REVIEW
+                // ! Ready for custom checks for other user types
         }
 
         return response()->json($order);
