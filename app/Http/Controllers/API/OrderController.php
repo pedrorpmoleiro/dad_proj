@@ -105,6 +105,16 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
+    public function getCurrentCookOrder(): JsonResponse
+    {
+        $user = Auth::user();
+        $order = Order::where('status', 'P')->andWhere('prepared_by', $user->id);
+
+        dd($order);
+
+        return response()->json($order);
+    }
+
     public function getOrder($id): JsonResponse
     {
         $user = Auth::user();
