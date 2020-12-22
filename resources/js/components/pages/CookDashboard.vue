@@ -2,16 +2,22 @@
     <v-container>
         <v-row>
             <v-col>
-                <v-card flat>
+                <v-card flat :loading="cardLoading">
                     <v-card-title>
-                        <h3 class="ml-2">
+                        <h3 class="ml-3">
                             Current Order
                         </h3>
                         <v-spacer></v-spacer>
-                        <v-btn :loading="loading" color="primary" icon v-on:click.prevent="getOrder">
+                        <v-btn v-if="!loading && order != null" class="mr-2" depressed dark color="green lighten-1"
+                               v-on:click.prevent="setOrderPrepared">
+                            Prepared
+                            <v-icon class="ml-1">done_all</v-icon>
+                        </v-btn>
+                        <v-btn :loading="loading" color="primary" text v-on:click.prevent="getOrder">
                             <v-icon>cached</v-icon>
                         </v-btn>
                     </v-card-title>
+                    <v-divider></v-divider>
                     <div v-if="loading">
                         <v-container>
                             <v-layout align-center justify-center>
@@ -38,7 +44,7 @@
                                             Customer
                                         </div>
                                         <div class="mx-1">{{ "Id: " + order.customer.id }}</div>
-                                        <div class="mx-1 mb-2">{{ "Name: " + order.customer_extra.name }}</div>
+                                        <div class="mx-1">{{ "Name: " + order.customer_extra.name }}</div>
                                     </v-col>
                                     <v-col>
                                         <div class="subtitle-1 font-weight-bold mb-1">
@@ -54,13 +60,12 @@
                                         <p class="mx-1">{{ order.notes }}</p>
                                     </v-col>
                                 </v-row>
-                                <div class="subtitle-1 font-weight-bold mb-1 mx-3">
+                                <div class="subtitle-1 font-weight-bold my-1 mx-3">
                                     Order Products
                                 </div>
                                 <v-data-table
                                     :items="order.items"
                                     :headers="headers"
-                                    :search="search"
                                 >
                                     <template v-slot:item.photo_url="{ item }">
                                         <v-img
@@ -89,6 +94,7 @@ import {mapGetters} from "vuex";
 export default {
     data: () => ({
         loading: true,
+        cardLoading: false,
         order: null,
         headers: [
             {
@@ -101,8 +107,7 @@ export default {
             {text: "Description", value: "description", filterable: false},
             {text: "Quantity", value: "pivot.quantity"},
             {text: "Type", value: "type"},
-        ],
-        search: ""
+        ]
     }),
     methods: {
         getOrder() {
@@ -128,6 +133,27 @@ export default {
                         "Failed to get Order information"
                     );
                 });
+        },
+        setOrderPrepared() {
+            this.cardLoading = true;
+            axios.post("api/cook/order/prepared").then(response => {
+                // console.log(response);
+                this.cardLoading = false;
+                this.$emit(
+                    "show-notification",
+                    "success",
+                    "Order Prepared"
+                );
+                this.getOrder();
+            }).catch(error => {
+                // console.log(error);
+                this.cardLoading = false;
+                this.$emit(
+                    "show-notification",
+                    "error",
+                    "Failed to Update order"
+                );
+            });
         }
     },
     computed: {

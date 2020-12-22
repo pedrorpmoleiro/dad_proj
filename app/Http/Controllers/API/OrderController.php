@@ -122,6 +122,21 @@ class OrderController extends Controller
         return response()->json($order);
     }
 
+    public function setOrderPrepared(): JsonResponse
+    {
+        $user = Auth::user();
+        $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
+        $order->status = 'R';
+
+        $order->preparation_time = time() - strtotime($order->current_status_at);
+
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $order->save();
+
+        return response()->json(null);
+    }
+
     public function getOrder($id): JsonResponse
     {
         $user = Auth::user();

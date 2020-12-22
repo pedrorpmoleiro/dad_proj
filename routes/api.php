@@ -85,6 +85,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Get the current Order for the logged in Cook
     Route::middleware('cook')->get('cook/order', [OrderController::class, 'getCurrentCookOrder'])->name("cook.current_order");
+
+    // Set Order Prepared
+    Route::middleware('cook')->post('cook/order/prepared', [OrderController::class, 'setOrderPrepared'])->name("cook.set_current_prepared");
 });
 
 /* *** Unprotected Routes *** */
