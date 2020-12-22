@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\User;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -110,6 +111,14 @@ class OrderController extends Controller
         $user = Auth::user();
         $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
 
+        if ($order != null) {
+            $order->customer;
+            $customerUser = User::findOrFail($order->customer->id)->toStdClass();
+            $order->customer_extra = $customerUser;
+            $order->items;
+        } else
+            $order = ["error" => "No order to prepare"];
+
         return response()->json($order);
     }
 
@@ -128,8 +137,8 @@ class OrderController extends Controller
                 if ($user->id != $order->customer->id)
                     throw new AccessDeniedException("Requested Order doesn't belong to this customer");
                 break;
-                // TODO REVIEW
-                // ! Ready for custom checks for other user types
+            // TODO REVIEW
+            // ! Ready for custom checks for other user types
         }
 
         return response()->json($order);

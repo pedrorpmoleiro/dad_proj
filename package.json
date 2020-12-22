@@ -27,7 +27,7 @@
         "vuetifyjs-mix-extension": "0.0.17"
     },
     "dependencies": {
-        "axios": "^0.21.0",
+        "axios": "^0.21.1",
         "vue": "^2.6.12",
         "vue-router": "^3.4.9",
         "vuetify": "^2.3.21",

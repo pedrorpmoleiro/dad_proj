@@ -25,7 +25,6 @@ use App\Models\Order;
 */
 
 /* *** SANCTUM Protected Routes *** */
-
 Route::middleware('auth:sanctum')->group(function () {
     /* *** Auth Routes *** */
     Route::prefix('auth')->group(function () {
@@ -85,7 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders/{id}', [OrderController::class, 'getOrder'])->name("order.get_order");
 
     // Get the current Order for the logged in Cook
-    Route::middleware('cook')->get('orders/cook', [OrderController::class, 'getCurrentCookOrder'])->name("order.get_current_cook_order");
+    Route::middleware('cook')->get('cook/order', [OrderController::class, 'getCurrentCookOrder'])->name("cook.current_order");
 });
 
 /* *** Unprotected Routes *** */
