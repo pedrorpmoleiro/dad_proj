@@ -1,3 +1,4 @@
+9
 <template>
     <v-container>
         <v-data-iterator
@@ -46,16 +47,18 @@
                                     v-on:click.prevent="sortDesc = !sortDesc"
                                 >
                                     <v-icon>{{
-                                        sortDesc
-                                            ? "arrow_downward"
-                                            : "arrow_upward"
-                                    }}</v-icon>
+                                            sortDesc
+                                                ? "arrow_downward"
+                                                : "arrow_upward"
+                                        }}
+                                    </v-icon>
                                 </v-btn>
 
                                 <v-spacer></v-spacer>
                                 <create-product-dialog v-if="getUser.type === 'EM'"
-                                    v-on:show-notification="openNotification"
+                                                       v-on:show-notification="openNotification"
                                 ></create-product-dialog>
+
 
                                 <v-spacer
                                     v-if="getUser.type === 'EM'"
@@ -98,7 +101,7 @@
                                 <p class="subtitle-1 font-italic">
                                     {{
                                         item.type.charAt(0).toUpperCase() +
-                                            item.type.slice(1)
+                                        item.type.slice(1)
                                     }}
                                 </p>
                                 <p class="text-justify">
@@ -131,16 +134,19 @@
                                         </v-btn>
                                     </div>
                                     <div v-if="getUser.type === 'EM'">
+
                                         <v-spacer></v-spacer>
-                                        <v-btn text>
-                                            <v-icon>create</v-icon>
-                                        </v-btn>
+
+                                        <edit-product-dialog v-if="getUser.type === 'EM' "
+                                                             v-on:show-notification="openNotification"
+                                                             v-on:click.prevent="setEditProduct(item)"
+
+                                        ></edit-product-dialog>
+
                                         <v-btn
                                             text
                                             color="red lighten-1"
-                                            v-on:click.prevent="
-                                                deleteProduct(item)
-                                            "
+                                            v-on:click.prevent="deleteProduct(item)"
                                         >
                                             <v-icon>delete</v-icon>
                                         </v-btn>
@@ -156,12 +162,14 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import CreateProductDialog from "../dialogs/CreateProductDialog";
+import EditProductDialog from "../dialogs/EditProductDialog";
 
 export default {
     components: {
-        "create-product-dialog": CreateProductDialog
+        "create-product-dialog": CreateProductDialog,
+        "edit-product-dialog": EditProductDialog
     },
     data() {
         return {
@@ -184,10 +192,10 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["isLoggedIn", "getShoppingCartItems", "getUser"])
+        ...mapGetters(["isLoggedIn", "getShoppingCartItems", "getUser", "getProduct"])
     },
     methods: {
-        ...mapActions(["addUpdateItemToCart"]),
+        ...mapActions(["addUpdateItemToCart", "setProduct"]),
         customSearchFilter(items, search) {
             if (
                 search === "" ||
@@ -208,6 +216,20 @@ export default {
             }
 
             return matchingProducts;
+        },
+        setEditProduct(product) {
+            axios.get("api/products/product", product).then(response => {
+                this.setProduct(response.data);
+
+                this.$emit(
+                    "show-notification",
+                    "success",
+                    "Got Product successfully!"
+                );
+
+            }).catch(e => {
+                this.$emit("show-notification", "error", "Failed to get products");
+            });
         },
         getProducts() {
             this.loading = true;
@@ -237,15 +259,33 @@ export default {
                     if (this.getShoppingCartItems[i].product.id === product.id)
                         amount += this.getShoppingCartItems[i].amount;
 
-            this.addUpdateItemToCart({ product, amount });
+            this.addUpdateItemToCart({product, amount});
             this.$emit(
                 "show-notification",
                 "success",
                 "Item was added to cart"
             );
         },
-        deleteProduct(product) {
-            // TODO
+        deleteProduct(item) {
+            console.log(item);
+            axios
+                .delete("api/products/delete", item)
+                .then(response => {
+                    this.loading = false;
+
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Product deleted successfully"
+                    );
+                }).catch(e => {
+                this.loading = false;
+                this.$emit(
+                    "show-notification",
+                    "error",
+                    "Failed to delete product"
+                );
+            });
         },
         openNotification(color, message, timeout = 6000) {
             this.$emit("show-notification", color, message, timeout);

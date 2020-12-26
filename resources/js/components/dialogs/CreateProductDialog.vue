@@ -10,7 +10,6 @@
         <v-card :loading="loading">
             <v-card-title dark class="headline red lighten-1">
                 Create Product
-                <!-- ! TODO -->
             </v-card-title>
 
             <v-card-text>
@@ -59,6 +58,17 @@
                         </v-row>
                         <v-row>
                             <v-col>
+                                <v-file-input
+                                    v-model="input.photo_url"
+                                    counter
+                                    :rules="[rules.required]"
+                                    accept="image/jpeg"
+                                    label="Product Photo"
+                                ></v-file-input>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
                                 <v-text-field
                                     v-model.number="input.price"
                                     :rules="[rules.required, rules.price]"
@@ -80,7 +90,7 @@
                 <v-btn
                     text
                     color="green"
-                    v-on:click.prevent="submit"
+                    v-on:click.prevent="submitProduct"
                     :disabled="!isFormValid"
                 >
                     Create
@@ -96,7 +106,7 @@
 <script>
 export default {
     data: () => ({
-        productTypes: [],
+        productTypes: ["Drink", "Dessert", "Cold dish", "Hot dish"],
         dialog: false,
         isFormValid: false,
         loading: false,
@@ -104,6 +114,7 @@ export default {
             name: "",
             type: "",
             description: "",
+            photo_url: "",
             price: ""
         },
         rules: {
@@ -121,14 +132,38 @@ export default {
         }
     }),
     methods: {
-        submit() {
+        submitProduct() {
             let product = {
                 name: this.input.name,
                 type: this.input.type,
                 description: this.input.description,
+                photo_url: this.input.photo_url,
                 price: this.input.price
             };
+
+            this.loading = true;
+
+            axios
+                .post("api/products/new", product)
+                .then(response => {
+                    this.loading = false;
+
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Product created successfully!"
+                    );
+                }).catch(e => {
+                this.loading = false;
+                this.$emit(
+                    "show-notification",
+                    "error",
+                    "Failed to create product"
+                );
+            });
         }
+    },
+    mounted() {
     }
 };
 </script>

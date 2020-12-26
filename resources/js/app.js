@@ -22,9 +22,13 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     state: {
         auth_user: null,
-        shopping_cart: []
+        shopping_cart: [],
+        product: null
     },
     getters: {
+        getProduct(state) {
+          return state.product;
+        },
         isLoggedIn(state) {
             return state.auth_user != null;
         },
@@ -41,6 +45,9 @@ const store = new Vuex.Store({
         },
         SET_AUTH_USER(state, user) {
             state.auth_user = user;
+        },
+        SET_PRODUCT(state, product) {
+            state.product = product;
         },
         REMOVE_ITEM_FROM_CART(state, itemId) {
             if (state.shopping_cart.length > 0)
@@ -65,6 +72,9 @@ const store = new Vuex.Store({
     actions: {
         setUser(context, user) {
             context.commit("SET_AUTH_USER", user);
+        },
+        setProduct(context, product) {
+            context.commit("SET_PRODUCT", product);
         },
         logOut(context) {
             context.commit("REMOVE_AUTH");

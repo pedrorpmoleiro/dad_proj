@@ -45,7 +45,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update Customer Data
     Route::middleware('customer')->post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
 
+
     Route::prefix('products')->middleware('manager')->group(function () {
+        // Get one specific product
+        Route::get('product', [ProductController::class, 'getProduct'])->name("product.get");
+
         // Create new Product
         Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 

@@ -171,7 +171,7 @@
                     ></v-text-field>
                   </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="this.getUser.type === 'C' ">
                   <v-col>
                     <v-text-field
                       v-model="updateUserData.input.address"
@@ -182,7 +182,7 @@
                     ></v-text-field>
                   </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="this.getUser.type === 'C' ">
                   <v-col>
                     <v-text-field
                       v-model="updateUserData.input.phone"
