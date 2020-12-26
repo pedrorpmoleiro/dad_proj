@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Delete a Product
         Route::delete('delete', [ProductController::class, 'delete'])->name("product.delete");
     });
+
 });
 
 /* *** Unprotected Routes *** */

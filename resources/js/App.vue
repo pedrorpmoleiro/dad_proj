@@ -120,7 +120,8 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-                        <shopping-cart-menu v-if="getUser.type === 'C'" v-on:show-notification="openNotification"></shopping-cart-menu>
+                        <shopping-cart-menu v-if="getUser.type === 'C'"
+                                            v-on:show-notification="openNotification"></shopping-cart-menu>
                     </div>
                 </div>
             </v-container>
@@ -160,11 +161,17 @@ export default {
             {
                 name: "Menu",
                 location: "/menu"
-            }
+            },
+
         ],
         cookLinks: [],
         deliveryManLinks: [],
-        managerLinks: [],
+        managerLinks: [
+            {
+                name: "Manage User Accounts",
+                location: "/manage"
+            }
+        ],
         notification: {
             color: "",
             showing: false,
