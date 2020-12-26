@@ -55,14 +55,12 @@
                                 </v-btn>
 
                                 <v-spacer></v-spacer>
-                                <create-product-dialog v-if="getUser.type === 'EM'"
+                                
+                                <create-product-dialog v-if="isUserManager"
                                                        v-on:show-notification="openNotification"
                                 ></create-product-dialog>
 
-
-                                <v-spacer
-                                    v-if="getUser.type === 'EM'"
-                                ></v-spacer>
+                                <v-spacer v-if="isUserManager"></v-spacer>
 
                                 <v-btn
                                     large
@@ -90,6 +88,7 @@
                     >
                         <v-card flat>
                             <v-img
+                                max-height="300"
                                 :src="'../storage/products/' + item.photo_url"
                             ></v-img>
 
@@ -114,7 +113,7 @@
                             <div v-if="isLoggedIn">
                                 <v-divider></v-divider>
                                 <v-card-actions>
-                                    <div v-if="getUser.type === 'C'">
+                                    <div v-if="isUserCustomer">
                                         <v-text-field
                                             rounded
                                             label="Quantity"
@@ -133,15 +132,10 @@
                                             <v-icon>add_shopping_cart</v-icon>
                                         </v-btn>
                                     </div>
-                                    <div v-if="getUser.type === 'EM'">
-
+                                    <div v-if="isUserManager">
                                         <v-spacer></v-spacer>
 
-                                        <edit-product-dialog v-if="getUser.type === 'EM' "
-                                                             v-on:show-notification="openNotification"
-                                                             v-on:click.prevent="setEditProduct(item)"
-
-                                        ></edit-product-dialog>
+                                        <edit-product-dialog v-on:show-notification="openNotification"></edit-product-dialog>
 
                                         <v-btn
                                             text
@@ -192,7 +186,13 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["isLoggedIn", "getShoppingCartItems", "getUser", "getProduct"])
+        ...mapGetters([
+            "isLoggedIn",
+            "getShoppingCartItems",
+            "getUser",
+            "isUserCustomer",
+            "isUserManager"
+        ])
     },
     methods: {
         ...mapActions(["addUpdateItemToCart", "setProduct"]),

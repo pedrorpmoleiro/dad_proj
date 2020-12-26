@@ -43,7 +43,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function toStdClass(): \stdClass {
+    public function toStdClass(): \stdClass
+    {
         $user = new \stdClass();
 
         $user->id = $this->id;
@@ -56,7 +57,8 @@ class User extends Authenticatable
         return $user;
     }
 
-    public function addToStdClass($user): \stdClass {
+    public function addToStdClass($user): \stdClass
+    {
         $user->id = $this->id;
         $user->name = $this->name;
         $user->email = $this->email;
