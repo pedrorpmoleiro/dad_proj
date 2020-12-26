@@ -263,7 +263,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["getUser", "isUserCustomer", "isAuthLoading"])
+        ...mapGetters(["isUserCustomer", "isAuthLoading"])
     },
     async mounted() {
         while (this.isAuthLoading)

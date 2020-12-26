@@ -327,7 +327,9 @@ export default {
             .then(response => {
                 // Logged in
                 // console.dir(response);
+                axios.defaults.withCredentials = true;
                 this.setUser(response.data);
+                // TODO - US 18 HERE
                 this.setAuthLoading(false);
             })
             .catch(e => {
