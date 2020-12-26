@@ -53,10 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update Customer Data
     Route::middleware('customer')->post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
 
-    Route::prefix('products')->middleware('manager')->group(function () {
-        // Get one specific product
-        Route::get('product', [ProductController::class, 'getProduct'])->name("product.get");
-
+    Route::middleware('manager')->prefix('products')->group(function () {
         // Create new Product
         Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 
@@ -64,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('update', [ProductController::class, 'update'])->name("product.update");
 
         // Delete a Product
-        Route::delete('delete', [ProductController::class, 'delete'])->name("product.delete");
+        Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
     });
 
     Route::middleware('customer')->group(function () {
@@ -108,8 +105,14 @@ Route::prefix('auth')->group(function () {
 
 // Customer Register Route
 Route::post('customers/register', [AuthController::class, 'registerCustomer'])->name("customer.register");
-// Get all products Route
-Route::get('products', [ProductController::class, 'all'])->name("product.get_all");
+
+Route::prefix('products')->group(function () {
+    // Get all products Route
+    Route::get('/', [ProductController::class, 'all'])->name("product.get_all");
+
+    // Get one specific product
+    Route::get('get/{id}', [ProductController::class, 'getProduct'])->name("product.get");
+});
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {

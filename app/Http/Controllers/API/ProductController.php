@@ -16,8 +16,10 @@ class ProductController extends Controller
         return Product::all();
     }
 
-    public function getProduct($id): JsonResponse
+    public function getProduct(Request $request): JsonResponse
     {
+        $id = $request->id;
+
         // Find product
         $product = Product::findOrFail($id);
 
@@ -25,38 +27,34 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    public function delete($id): JsonResponse
+    public function delete(Request $request): JsonResponse
     {
+        $id = $request->id;
+
         // Find product
         $product = Product::findOrFail($id);
 
         // Validate if model instance has been soft deleted
-        if ($product->trashed()) {
-            return response()->json(null, 404);
-        }
+        if ($product->trashed())
+            return response()->json(null, 410);
 
         // Delete
         $product->delete();
 
-
         // Return OK
-        return response()->json(null, 201);
-
+        return response()->json(null);
     }
 
     public function update(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'id' => ['required', 'numeric', 'min:1'],
+            'id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', Rule::in(['Drink', 'Dessert', 'Cold dish', 'Hot dish'])],
-            'description' => ['required', 'string', 'max:500'],
-            'price' => ['required', 'min:0.01', 'max:999.99', 'regex:/^\s*-?[1-9]\d{0,3}(\.\d{1,2})?\s*$/'],
-            'photo_url' => ['required'],
+            'type' => ['required', 'string', Rule::in(['drink', 'dessert', 'cold dish', 'hot dish'])],
+            'description' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0.01', 'max:999.99'],
+            'photo_url' => ['nullable', 'string'],
         ]);
-
-        // TODO: Must Auth User?
-        // $user = Auth::user();
 
         // Find product
         $product = Product::findOrFail($data['id']);
@@ -66,8 +64,12 @@ class ProductController extends Controller
         $product->type = $data['type'];
         $product->description = $data['description'];
         $product->price = $data['price'];
-        $product->photo_url = $data['photo_url'];
 
+        try {
+            if ($data['photo_url'])
+                $product->photo_url = $data['photo_url'];
+        } catch (\Exception $e) {
+        }
 
         // Commit Update
         $product->save();
@@ -80,24 +82,22 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', Rule::in(['Drink', 'Dessert', 'Cold dish', 'Hot dish'])],
-            'description' => ['required', 'string', 'max:500'],
-            'photo_url' => ['required'],
-            'price' => ['required', 'min:0.01', 'max:999.99', 'regex:/^\s*-?[1-9]\d{0,3}(\.\d{1,2})?\s*$/'],
-            'updated_at' => [],
-            'created_at' => [],
+            'type' => ['required', 'string', Rule::in(['drink', 'dessert', 'cold dish', 'hot dish'])],
+            'description' => ['required', 'string', 'max:255'],
+            'photo_url' => ['nullable', 'string'],
+            'price' => ['required', 'numeric', 'min:0.01', 'max:999.99'],
         ]);
 
-        $data['updated_at'] = date(env('INPUT_FORMAT_DATE'));
-        $data['created_at'] = date(env('INPUT_FORMAT_DATE'));
-
+        try {
+            $data['photo_url'];
+        } catch (\Exception $e) {
+            $data['photo_url'] = "";
+        }
 
         // Create Product
-        Product::create($data);
+        $product = Product::create($data);
 
         // Return OK
-        return response()->json(null, 201);
-
-
+        return response()->json($product, 201);
     }
 }

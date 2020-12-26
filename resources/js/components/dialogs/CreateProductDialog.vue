@@ -8,7 +8,7 @@
         </template>
 
         <v-card :loading="loading">
-            <v-card-title dark class="headline red lighten-1">
+            <v-card-title dark class="headline">
                 Create Product
             </v-card-title>
 
@@ -21,7 +21,6 @@
                                     v-model="input.name"
                                     :rules="[
                                         rules.required,
-                                        rules.name,
                                         rules.max
                                     ]"
                                     label="Product Name *"
@@ -38,6 +37,7 @@
                                     v-model="input.type"
                                     label="Product Type"
                                     :items="productTypes"
+                                    :rules="[rules.required]"
                                 ></v-autocomplete>
                             </v-col>
                         </v-row>
@@ -60,9 +60,7 @@
                             <v-col>
                                 <v-file-input
                                     v-model="input.photo_url"
-                                    counter
-                                    :rules="[rules.required]"
-                                    accept="image/jpeg"
+                                    accept="image/jpeg, image/png"
                                     label="Product Photo"
                                 ></v-file-input>
                             </v-col>
@@ -73,6 +71,7 @@
                                     v-model.number="input.price"
                                     :rules="[rules.required, rules.price]"
                                     label="Price *"
+                                    prefix="€ "
                                     clearable
                                     required
                                 ></v-text-field>
@@ -114,46 +113,46 @@ export default {
             name: "",
             type: "",
             description: "",
-            photo_url: "",
+            photo_url: null,
             price: ""
         },
         rules: {
             required: value => !!value || "Required",
             min: value => value.length >= 3 || "Min of 3 Characters",
             max: value => value.length < 255 || "Max of 255 Characters",
-            name: value => {
-                const pattern = /^[a-zA-Z\s]*$/;
-                return pattern.test(value) || "Only letters and spaces allowed";
-            },
             price: value => {
-                const pattern = /^\s*-?[1-9]\d{0,3}(\.\d{1,2})?\s*$/;
+                const pattern = /^(\d{0,3})|(\.\d{1,2})$/;
                 return pattern.test(value) || "Only numbers are allowed";
             }
         }
     }),
     methods: {
         submitProduct() {
+            this.loading = true;
+
             let product = {
                 name: this.input.name,
-                type: this.input.type,
+                type: this.input.type.toLowerCase(),
                 description: this.input.description,
-                photo_url: this.input.photo_url,
                 price: this.input.price
             };
 
-            this.loading = true;
+            if (this.input.photo_url)
+                product.photo_url = this.input.photo_url;
 
             axios
                 .post("api/products/new", product)
                 .then(response => {
+                    console.log(response);
                     this.loading = false;
-
                     this.$emit(
                         "show-notification",
                         "success",
                         "Product created successfully!"
                     );
+                    this.$emit("update-products");
                 }).catch(e => {
+                console.log(e);
                 this.loading = false;
                 this.$emit(
                     "show-notification",
@@ -162,8 +161,6 @@ export default {
                 );
             });
         }
-    },
-    mounted() {
     }
 };
 </script>

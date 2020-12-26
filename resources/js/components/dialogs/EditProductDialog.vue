@@ -1,13 +1,12 @@
 <template>
     <v-dialog v-model="dialog" scrollable width="750">
         <template v-slot:activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on">
+            <v-btn text v-bind="attrs" v-on="on">
                 <v-icon>create</v-icon>
             </v-btn>
         </template>
-
         <v-card :loading="loading">
-            <v-card-title dark class="headline red lighten-1">
+            <v-card-title dark class="headline">
                 Update Product
             </v-card-title>
 
@@ -20,7 +19,6 @@
                                     v-model="input.name"
                                     :rules="[
                                         rules.required,
-                                        rules.name,
                                         rules.max
                                     ]"
                                     label="Product Name *"
@@ -37,6 +35,7 @@
                                     v-model="input.type"
                                     label="Product Type"
                                     :items="productTypes"
+                                    :rules="[rules.required]"
                                 ></v-autocomplete>
                             </v-col>
                         </v-row>
@@ -59,9 +58,7 @@
                             <v-col>
                                 <v-file-input
                                     v-model="input.photo_url"
-                                    counter
-                                    :rules="[rules.required]"
-                                    accept="image/jpeg"
+                                    accept="image/jpeg, image/png"
                                     label="Product Photo"
                                 ></v-file-input>
                             </v-col>
@@ -72,6 +69,7 @@
                                     v-model.number="input.price"
                                     :rules="[rules.required, rules.price]"
                                     label="Price *"
+                                    prefix="€ "
                                     clearable
                                     required
                                 ></v-text-field>
@@ -92,7 +90,7 @@
                     v-on:click.prevent="updateProduct"
                     :disabled="!isFormValid"
                 >
-                    Create
+                    Update
                 </v-btn>
                 <v-btn text color="red" v-on:click.prevent="dialog = false">
                     Close
@@ -103,9 +101,8 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex";
-
 export default {
+    props: ["product"],
     data: () => ({
         productTypes: ["Drink", "Dessert", "Cold dish", "Hot dish"],
         dialog: false,
@@ -115,68 +112,64 @@ export default {
             name: "",
             type: "",
             description: "",
-            photo_url: "",
+            photo_url: null,
             price: ""
         },
         rules: {
             required: value => !!value || "Required",
             min: value => value.length >= 3 || "Min of 3 Characters",
             max: value => value.length < 255 || "Max of 255 Characters",
-            name: value => {
-                const pattern = /^[a-zA-Z\s]*$/;
-                return pattern.test(value) || "Only letters and spaces allowed";
-            },
             price: value => {
-                const pattern = /^\s*-?[1-9]\d{0,3}(\.\d{1,2})?\s*$/;
+                const pattern = /^(\d{0,3})|(\.\d{1,2})$/;
                 return pattern.test(value) || "Only numbers are allowed";
             }
         }
     }),
-    computed: {
-        ...mapGetters(["getProduct"]),
-    },
     methods: {
-        ...mapActions(["setProduct"]),
         updateProduct() {
+            this.loading = true;
+
             let product = {
+                id: this.product.id,
                 name: this.input.name,
-                type: this.input.type,
+                type: this.input.type.toLowerCase(),
                 description: this.input.description,
-                photo_url: this.input.photo_url,
                 price: this.input.price
             };
 
-            this.loading = true;
+            if (this.input.photo_url)
+                product.photo_url = this.input.photo_url;
+            else
+                product.photo_url = this.product.photo_url;
 
             axios
                 .put("/api/products/update", product)
                 .then(response => {
+                    // console.log(response);
                     this.loading = false;
-
                     this.$emit(
                         "show-notification",
                         "success",
                         "Product updated successfully!"
                     );
-                }).catch(e => {
-                this.loading = false;
-                this.$emit(
-                    "show-notification",
-                    "error",
-                    "Failed to update product"
-                );
-            });
+                    this.$emit("update-products");
+                })
+                .catch(e => {
+                    // console.log(e);
+                    this.loading = false;
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to update product"
+                    );
+                });
         }
     },
     mounted() {
-        // if (!this.isLoggedIn) this.$router.push("/home");
-
-        this.input.name = this.getProduct().name;
-        this.input.type = this.getProduct().type;
-        this.input.description = this.getProduct().description;
-        this.input.photo_url = this.getProduct().photo_url;
-        this.input.price = this.getProduct().price;
-
+        this.input.name = this.product.name;
+        this.input.type = this.product.type.charAt(0).toUpperCase() + this.product.type.slice(1);
+        this.input.description = this.product.description;
+        this.input.price = this.product.price;
     }
 };
 </script>

@@ -22,15 +22,11 @@ const store = new Vuex.Store({
     state: {
         auth_user: null,
         auth_loading: true,
-        shopping_cart: []
-        product: null
+        shopping_cart: [],
     },
     getters: {
         isAuthLoading(state) {
             return state.auth_loading;
-        },
-        getProduct(state) {
-          return state.product;
         },
         isLoggedIn(state) {
             return state.auth_user != null;
@@ -99,9 +95,6 @@ const store = new Vuex.Store({
         },
         setUser(context, user) {
             context.commit("SET_AUTH_USER", user);
-        },
-        setProduct(context, product) {
-            context.commit("SET_PRODUCT", product);
         },
         logOut(context) {
             context.commit("REMOVE_AUTH");

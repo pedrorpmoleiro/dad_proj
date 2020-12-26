@@ -55,9 +55,10 @@
                                 </v-btn>
 
                                 <v-spacer></v-spacer>
-                                
+
                                 <create-product-dialog v-if="isUserManager"
                                                        v-on:show-notification="openNotification"
+                                                       v-on:update-products="getProducts"
                                 ></create-product-dialog>
 
                                 <v-spacer v-if="isUserManager"></v-spacer>
@@ -135,7 +136,11 @@
                                     <div v-if="isUserManager">
                                         <v-spacer></v-spacer>
 
-                                        <edit-product-dialog v-on:show-notification="openNotification"></edit-product-dialog>
+                                        <edit-product-dialog
+                                            v-bind:product="item"
+                                            v-on:show-notification="openNotification"
+                                            v-on:update-products="getProducts"
+                                        ></edit-product-dialog>
 
                                         <v-btn
                                             text
@@ -157,6 +162,7 @@
 
 <script>
 import {mapActions, mapGetters} from "vuex";
+
 import CreateProductDialog from "../dialogs/CreateProductDialog";
 import EditProductDialog from "../dialogs/EditProductDialog";
 
@@ -195,7 +201,7 @@ export default {
         ])
     },
     methods: {
-        ...mapActions(["addUpdateItemToCart", "setProduct"]),
+        ...mapActions(["addUpdateItemToCart"]),
         customSearchFilter(items, search) {
             if (
                 search === "" ||
@@ -216,20 +222,6 @@ export default {
             }
 
             return matchingProducts;
-        },
-        setEditProduct(product) {
-            axios.get("api/products/product", product).then(response => {
-                this.setProduct(response.data);
-
-                this.$emit(
-                    "show-notification",
-                    "success",
-                    "Got Product successfully!"
-                );
-
-            }).catch(e => {
-                this.$emit("show-notification", "error", "Failed to get products");
-            });
         },
         getProducts() {
             this.loading = true;
@@ -266,20 +258,19 @@ export default {
                 "Item was added to cart"
             );
         },
-        deleteProduct(item) {
-            console.log(item);
+        deleteProduct(product) {
             axios
-                .delete("api/products/delete", item)
+                .delete(`api/products/delete/${product.id}`)
                 .then(response => {
-                    this.loading = false;
-
+                    console.log(response);
                     this.$emit(
                         "show-notification",
                         "success",
                         "Product deleted successfully"
                     );
+                    this.getProducts();
                 }).catch(e => {
-                this.loading = false;
+                console.log(e);
                 this.$emit(
                     "show-notification",
                     "error",
