@@ -36,7 +36,7 @@ class ProductController extends Controller
 
         // Validate if model instance has been soft deleted
         if ($product->trashed())
-            return response()->json(null, 410);
+            return response()->json(null, 404);
 
         // Delete
         $product->delete();

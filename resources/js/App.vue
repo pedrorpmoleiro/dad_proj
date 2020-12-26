@@ -224,7 +224,8 @@ export default {
             {
                 name: "Menu",
                 location: "/menu"
-            }
+            },
+
         ],
         cookLinks: [
             {
@@ -233,7 +234,12 @@ export default {
             }
         ],
         deliveryManLinks: [],
-        managerLinks: [],
+        managerLinks: [
+            {
+                name: "Manage User Accounts",
+                location: "/manage"
+            }
+        ],
         customerLinks: [
             {
                 name: "My Orders",
@@ -321,7 +327,9 @@ export default {
             .then(response => {
                 // Logged in
                 // console.dir(response);
+                axios.defaults.withCredentials = true;
                 this.setUser(response.data);
+                // TODO - US 18 HERE
                 this.setAuthLoading(false);
             })
             .catch(e => {

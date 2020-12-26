@@ -1,3 +1,5 @@
+import ManageAccounts from "./components/pages/ManageAccounts";
+
 require("./bootstrap");
 
 import "material-design-icons-iconfont/dist/material-design-icons.css";
@@ -151,6 +153,10 @@ const routes = [
     {
         path: "/foo/bar/tests",
         component: Tests
+    },
+    {
+        path: "/manage",
+        component: ManageAccounts
     }
 ];
 

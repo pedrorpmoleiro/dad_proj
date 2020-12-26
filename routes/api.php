@@ -50,9 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
-    // Update Customer Data
-    Route::middleware('customer')->post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
-
     Route::middleware('manager')->prefix('products')->group(function () {
         // Create new Product
         Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
