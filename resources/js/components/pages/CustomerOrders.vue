@@ -4,7 +4,9 @@
             <v-col>
                 <v-card flat>
                     <v-toolbar rounded flat>
-                        <v-toolbar-title class="font-weight-bold">Open Orders</v-toolbar-title>
+                        <v-toolbar-title class="font-weight-bold"
+                            >Open Orders</v-toolbar-title
+                        >
                         <v-spacer></v-spacer>
                         <v-btn
                             icon
@@ -15,10 +17,15 @@
                         </v-btn>
                     </v-toolbar>
                     <div v-if="open.loading || open.orders.length > 0">
-                        <v-data-table :headers="headers" :items="open.orders"
-                                      :loading="open.loading">
+                        <v-data-table
+                            :headers="headers"
+                            :items="open.orders"
+                            :loading="open.loading"
+                        >
                             <template v-slot:item.actions="{ item }">
-                                <view-order v-bind:order-prop="item"></view-order>
+                                <view-order
+                                    v-bind:order-prop="item"
+                                ></view-order>
                             </template>
                             <template v-slot:item.total_price="{ item }">
                                 {{ "€ " + item.total_price }}
@@ -39,7 +46,9 @@
             <v-col>
                 <v-card flat>
                     <v-toolbar rounded flat>
-                        <v-toolbar-title class="font-weight-bold">Order History</v-toolbar-title>
+                        <v-toolbar-title class="font-weight-bold"
+                            >Order History</v-toolbar-title
+                        >
                         <v-spacer></v-spacer>
                         <v-btn
                             icon
@@ -50,10 +59,15 @@
                         </v-btn>
                     </v-toolbar>
                     <div v-if="history.loading || history.orders.length > 0">
-                        <v-data-table :headers="headers" :items="history.orders"
-                                      :loading="history.loading">
+                        <v-data-table
+                            :headers="headers"
+                            :items="history.orders"
+                            :loading="history.loading"
+                        >
                             <template v-slot:item.actions="{ item }">
-                                <view-order v-bind:order-prop="item"></view-order>
+                                <view-order
+                                    v-bind:order-prop="item"
+                                ></view-order>
                             </template>
                             <template v-slot:item.total_price="{ item }">
                                 {{ "€ " + item.total_price }}
@@ -76,7 +90,7 @@
 <script>
 import ViewOrderDialog from "../dialogs/ViewOrderDialog";
 
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
     components: {
@@ -122,130 +136,140 @@ export default {
             this.history.orders = [];
             this.open.orders = [];
 
-            axios.get("api/orders").then(response => {
-                response.data.forEach(order => {
-                    switch (order.status) {
-                        case "H":
-                            order.status_text = "Holding";
-                            break;
-                        case "P":
-                            order.status_text = "Preparing";
-                            break;
-                        case "R":
-                            order.status_text = "Ready";
-                            break;
-                        case "T":
-                            order.status_text = "Transit";
-                            break;
-                        case "D":
-                            order.status_text = "Delivered";
-                            break;
-                        case "C":
-                            order.status_text = "Cancelled";
-                            break;
-                    }
+            axios
+                .get("api/orders/customer")
+                .then(response => {
+                    response.data.forEach(order => {
+                        switch (order.status) {
+                            case "H":
+                                order.status_text = "Holding";
+                                break;
+                            case "P":
+                                order.status_text = "Preparing";
+                                break;
+                            case "R":
+                                order.status_text = "Ready";
+                                break;
+                            case "T":
+                                order.status_text = "Transit";
+                                break;
+                            case "D":
+                                order.status_text = "Delivered";
+                                break;
+                            case "C":
+                                order.status_text = "Cancelled";
+                                break;
+                        }
 
-                    if (order.status === "D" || order.status === "C")
-                        this.history.orders.push(order);
-                    else
-                        this.open.orders.push(order)
+                        if (order.status === "D" || order.status === "C")
+                            this.history.orders.push(order);
+                        else this.open.orders.push(order);
+                    });
+
+                    this.history.loading = false;
+                    this.open.loading = false;
+                })
+                .catch(error => {
+                    this.$emit(
+                        "show-notification",
+                        "Error",
+                        error.response.data
+                    );
                 });
-
-                this.history.loading = false;
-                this.open.loading = false;
-            }).catch(error => {
-                this.$emit(
-                    "show-notification",
-                    "Error",
-                    error.response.data
-                );
-            });
         },
         getHistoryOrders() {
             this.history.loading = true;
             this.history.orders = [];
 
-            axios.get("api/orders/history").then(response => {
-                response.data.forEach(order => {
-                    switch (order.status) {
-                        case "H":
-                            order.status_text = "Holding";
-                            break;
-                        case "P":
-                            order.status_text = "Preparing";
-                            break;
-                        case "R":
-                            order.status_text = "Ready";
-                            break;
-                        case "T":
-                            order.status_text = "Transit";
-                            break;
-                        case "D":
-                            order.status_text = "Delivered";
-                            break;
-                        case "C":
-                            order.status_text = "Cancelled";
-                            break;
-                    }
+            axios
+                .get("api/orders/customer/history")
+                .then(response => {
+                    response.data.forEach(order => {
+                        switch (order.status) {
+                            case "H":
+                                order.status_text = "Holding";
+                                break;
+                            case "P":
+                                order.status_text = "Preparing";
+                                break;
+                            case "R":
+                                order.status_text = "Ready";
+                                break;
+                            case "T":
+                                order.status_text = "Transit";
+                                break;
+                            case "D":
+                                order.status_text = "Delivered";
+                                break;
+                            case "C":
+                                order.status_text = "Cancelled";
+                                break;
+                        }
 
-                    this.history.orders.push(order);
+                        this.history.orders.push(order);
+                    });
+
+                    this.history.loading = false;
+                })
+                .catch(error => {
+                    this.$emit(
+                        "show-notification",
+                        "Error",
+                        error.response.data
+                    );
                 });
-
-                this.history.loading = false;
-            }).catch(error => {
-                this.$emit(
-                    "show-notification",
-                    "Error",
-                    error.response.data
-                );
-            });
         },
         getOpenOrders() {
             this.open.loading = true;
             this.open.orders = [];
 
-            axios.get("api/orders/open").then(response => {
-                response.data.forEach(order => {
-                    switch (order.status) {
-                        case "H":
-                            order.status_text = "Holding";
-                            break;
-                        case "P":
-                            order.status_text = "Preparing";
-                            break;
-                        case "R":
-                            order.status_text = "Ready";
-                            break;
-                        case "T":
-                            order.status_text = "Transit";
-                            break;
-                        case "D":
-                            order.status_text = "Delivered";
-                            break;
-                        case "C":
-                            order.status_text = "Cancelled";
-                            break;
-                    }
+            axios
+                .get("api/orders/customer/open")
+                .then(response => {
+                    response.data.forEach(order => {
+                        switch (order.status) {
+                            case "H":
+                                order.status_text = "Holding";
+                                break;
+                            case "P":
+                                order.status_text = "Preparing";
+                                break;
+                            case "R":
+                                order.status_text = "Ready";
+                                break;
+                            case "T":
+                                order.status_text = "Transit";
+                                break;
+                            case "D":
+                                order.status_text = "Delivered";
+                                break;
+                            case "C":
+                                order.status_text = "Cancelled";
+                                break;
+                        }
 
-                    this.open.orders.push(order)
+                        this.open.orders.push(order);
+                    });
+
+                    this.open.loading = false;
+                })
+                .catch(error => {
+                    this.$emit(
+                        "show-notification",
+                        "Error",
+                        error.response.data
+                    );
                 });
-
-                this.open.loading = false;
-            }).catch(error => {
-                this.$emit(
-                    "show-notification",
-                    "Error",
-                    error.response.data
-                );
-            });
         }
     },
     computed: {
-        ...mapGetters(["getUser", "isUserCustomer"])
+        ...mapGetters(["getUser", "isUserCustomer", "isAuthLoading"])
     },
-    mounted() {
-        // TODO: Wait for user (e.g., loading)
-        // if (!this.isUserCustomer) this.$router.push("/home");
+    async mounted() {
+        while (this.isAuthLoading)
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+        if (!this.isUserCustomer) this.$router.push("/home");
         this.getAllOrders();
     }
 };

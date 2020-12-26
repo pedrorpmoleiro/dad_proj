@@ -21,9 +21,13 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     state: {
         auth_user: null,
-        shopping_cart: []
+        auth_loading: true,
+        shopping_cart: [],
     },
     getters: {
+        isAuthLoading(state) {
+            return state.auth_loading;
+        },
         isLoggedIn(state) {
             return state.auth_user != null;
         },
@@ -47,11 +51,17 @@ const store = new Vuex.Store({
         }
     },
     mutations: {
+        SET_AUTH_LOADING(state, loading) {
+            state.auth_loading = loading;
+        },
         REMOVE_AUTH(state) {
             state.auth_user = null;
         },
         SET_AUTH_USER(state, user) {
             state.auth_user = user;
+        },
+        SET_PRODUCT(state, product) {
+            state.product = product;
         },
         REMOVE_ITEM_FROM_CART(state, itemId) {
             if (state.shopping_cart.length > 0)
@@ -80,6 +90,9 @@ const store = new Vuex.Store({
         }
     },
     actions: {
+        setAuthLoading(context, loading) {
+            context.commit("SET_AUTH_LOADING", loading);
+        },
         setUser(context, user) {
             context.commit("SET_AUTH_USER", user);
         },
@@ -102,12 +115,13 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import Tests from "./components/pages/Tests.vue";
+import Tests from "./components/pages/Tests";
 
-import Home from "./components/pages/Home.vue";
-import Menu from "./components/pages/Menu.vue";
-import UpdateProfile from "./components/pages/UpdateProfile.vue";
-import CustomerOrders from "./components/pages/CustomerOrders.vue";
+import Home from "./components/pages/Home";
+import Menu from "./components/pages/Menu";
+import UpdateProfile from "./components/pages/UpdateProfile";
+import CustomerOrders from "./components/pages/CustomerOrders";
+import CookDashboard from "./components/pages/CookDashboard";
 
 const routes = [
     {
@@ -129,6 +143,10 @@ const routes = [
     {
         path: "/orders/customer",
         component: CustomerOrders
+    },
+    {
+        path: "/cook/dashboard",
+        component: CookDashboard
     },
     {
         path: "/foo/bar/tests",

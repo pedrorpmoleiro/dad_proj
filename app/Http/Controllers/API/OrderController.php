@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\User;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -103,6 +104,37 @@ class OrderController extends Controller
         }
 
         return response()->json($orders);
+    }
+
+    public function getCurrentCookOrder(): JsonResponse
+    {
+        $user = Auth::user();
+        $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
+
+        if ($order != null) {
+            $order->customer;
+            $customerUser = User::findOrFail($order->customer->id)->toStdClass();
+            $order->customer_extra = $customerUser;
+            $order->items;
+        } else
+            $order = ["error" => "No order to prepare"];
+
+        return response()->json($order);
+    }
+
+    public function setOrderPrepared(): JsonResponse
+    {
+        $user = Auth::user();
+        $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
+        $order->status = 'R';
+
+        $order->preparation_time = time() - strtotime($order->current_status_at);
+
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $order->save();
+
+        return response()->json(null);
     }
 
     public function getOrder($id): JsonResponse
