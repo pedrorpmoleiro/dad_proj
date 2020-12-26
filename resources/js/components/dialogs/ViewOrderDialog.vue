@@ -215,8 +215,6 @@ export default {
     },
     mounted() {
         this.order = this.orderProp;
-
-        // TODO Thread that refreshes the page every Y seconds
     }
 };
 </script>

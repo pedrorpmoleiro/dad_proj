@@ -269,14 +269,15 @@ export default {
                         "Product deleted successfully"
                     );
                     this.getProducts();
-                }).catch(e => {
-                console.log(e);
-                this.$emit(
-                    "show-notification",
-                    "error",
-                    "Failed to delete product"
-                );
-            });
+                })
+                .catch(e => {
+                    console.log(e);
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to delete product"
+                    );
+                });
         },
         openNotification(color, message, timeout = 6000) {
             this.$emit("show-notification", color, message, timeout);
