@@ -6,10 +6,10 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\OrderController;
+
 /* *** TESTS *** */
 
 use App\Models\Order;
-use App\Models\Customer;
 
 /* ***  END  *** */
 
@@ -25,10 +25,18 @@ use App\Models\Customer;
 */
 
 /* *** SANCTUM Protected Routes *** */
-
 Route::middleware('auth:sanctum')->group(function () {
-    // Logout Route
-    Route::post('logout', [AuthController::class, 'logout'])->name("user.logout");
+    /* *** Auth Routes *** */
+    Route::prefix('auth')->group(function () {
+        // Logout Route
+        Route::post('logout', [AuthController::class, 'logout'])->name("user.logout");
+
+        // Resend Email Verification
+        Route::get('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])->name("verification.send");
+
+        // Verify Email
+        Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->name("verification.verify");
+    });
 
     /* *** User Routes *** */
     Route::prefix('users')->group(function () {
@@ -42,10 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
-    // Update Customer Data
-    Route::middleware('customer')->post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
-
-    Route::prefix('products')->middleware('manager')->group(function () {
+    Route::middleware('manager')->prefix('products')->group(function () {
         // Create new Product
         Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 
@@ -53,31 +58,62 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('update', [ProductController::class, 'update'])->name("product.update");
 
         // Delete a Product
-        Route::delete('delete', [ProductController::class, 'delete'])->name("product.delete");
+        Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
     });
 
+    Route::middleware('customer')->group(function () {
+        // Update Customer Data
+        Route::post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
+
+        Route::prefix('orders')->group(function () {
+            // Create new Order
+            Route::post('new', [OrderController::class, 'create'])->name("order.new");
+
+            // Get Customer Orders
+            Route::get('customer/', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
+
+            // Get Customer Open Orders
+            Route::get('customer/open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");
+
+            // Get Customer Order History
+            Route::get('customer/history', [OrderController::class, 'getCustomerOrderHistory'])->name("order.get_history");
+        });
+    });
+
+    // Get a specific Order
+    Route::get('orders/{id}', [OrderController::class, 'getOrder'])->name("order.get_order");
+
+    // Get the current Order for the logged in Cook
+    Route::middleware('cook')->get('cook/order', [OrderController::class, 'getCurrentCookOrder'])->name("cook.current_order");
+
+    // Set Order Prepared
+    Route::middleware('cook')->post('cook/order/prepared', [OrderController::class, 'setOrderPrepared'])->name("cook.set_current_prepared");
 });
 
 /* *** Unprotected Routes *** */
-// User Login Route
-Route::post('login', [AuthController::class, 'login'])->name("user.login");
+/* *** Auth Routes *** */
+Route::prefix('auth')->group(function () {
+    // User Login Route
+    Route::post('login', [AuthController::class, 'login'])->name("user.login");
+
+    // TODO Reset Password
+    // https://laravel.com/docs/8.x/passwords#requesting-the-password-reset-link
+});
+
 // Customer Register Route
 Route::post('customers/register', [AuthController::class, 'registerCustomer'])->name("customer.register");
-// Get all products Route
-Route::get('products', [ProductController::class, 'all'])->name("product.get_all");
+
+Route::prefix('products')->group(function () {
+    // Get all products Route
+    Route::get('/', [ProductController::class, 'all'])->name("product.get_all");
+
+    // Get one specific product
+    Route::get('get/{id}', [ProductController::class, 'getProduct'])->name("product.get");
+});
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
-    $response = Order::find(1);
+    $order = Order::where('status', 'P')->where('prepared_by', 4)->first();
 
-    /*foreach ($response->items as $item) {
-        $item->pivot->quantity;
-        $item->pivot->unit_price;
-        $item->pivot->sub_total_price;
-    }*/
-    $response->items;
-
-    // $response = Customer::find(22);
-    // $response->orders;
-    return response()->json($response);
+    return response()->json($order);
 })->name("tests");

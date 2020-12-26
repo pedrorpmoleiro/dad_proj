@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Customer;
 use App\Http\Controllers\Controller;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,7 @@ use stdClass;
 
 class UserController extends Controller
 {
-    public function me()
+    public function me(): JsonResponse
     {
         $user = Auth::user();
 
@@ -27,7 +28,7 @@ class UserController extends Controller
         return response()->json($response);
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(Request $request): JsonResponse
     {
         $user = Auth::user();
 
@@ -47,10 +48,10 @@ class UserController extends Controller
         return response()->json(null);
     }
 
-    public function updateUserData(Request $request)
+    public function updateUserData(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email', 'regex:/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/']
         ]);
 
@@ -64,11 +65,11 @@ class UserController extends Controller
         // Commit Update
         $user->save();
 
-        // Return OK
+        // Return
         return response()->json($user);
     }
 
-    public function updateCustomerData(Request $request)
+    public function updateCustomerData(Request $request): JsonResponse
     {
         // Authenticate Customer
         $user = Auth::user();
@@ -78,7 +79,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/'],
             'address' => ['required', 'string'],
             'phone' => ['required', 'string', 'regex:/^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/'],
-            'nif' => ['min:1', 'max:999999999', 'regex:/^\d{0,8}[1-9]$/']
+            'nif' => ['integer', 'min:1', 'max:999999999']
         ]);
 
         $response = new stdClass();

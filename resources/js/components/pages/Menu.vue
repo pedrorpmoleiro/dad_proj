@@ -1,3 +1,4 @@
+9
 <template>
     <v-container>
         <v-data-iterator
@@ -46,20 +47,21 @@
                                     v-on:click.prevent="sortDesc = !sortDesc"
                                 >
                                     <v-icon>{{
-                                        sortDesc
-                                            ? "arrow_downward"
-                                            : "arrow_upward"
-                                    }}</v-icon>
+                                            sortDesc
+                                                ? "arrow_downward"
+                                                : "arrow_upward"
+                                        }}
+                                    </v-icon>
                                 </v-btn>
 
                                 <v-spacer></v-spacer>
-                                <create-product-dialog v-if="getUser.type === 'EM'"
-                                    v-on:show-notification="openNotification"
+
+                                <create-product-dialog v-if="isUserManager"
+                                                       v-on:show-notification="openNotification"
+                                                       v-on:update-products="getProducts"
                                 ></create-product-dialog>
 
-                                <v-spacer
-                                    v-if="getUser.type === 'EM'"
-                                ></v-spacer>
+                                <v-spacer v-if="isUserManager"></v-spacer>
 
                                 <v-btn
                                     large
@@ -87,6 +89,7 @@
                     >
                         <v-card flat>
                             <v-img
+                                max-height="300"
                                 :src="'../storage/products/' + item.photo_url"
                             ></v-img>
 
@@ -98,7 +101,7 @@
                                 <p class="subtitle-1 font-italic">
                                     {{
                                         item.type.charAt(0).toUpperCase() +
-                                            item.type.slice(1)
+                                        item.type.slice(1)
                                     }}
                                 </p>
                                 <p class="text-justify">
@@ -111,7 +114,7 @@
                             <div v-if="isLoggedIn">
                                 <v-divider></v-divider>
                                 <v-card-actions>
-                                    <div v-if="getUser.type === 'C'">
+                                    <div v-if="isUserCustomer">
                                         <v-text-field
                                             rounded
                                             label="Quantity"
@@ -130,17 +133,19 @@
                                             <v-icon>add_shopping_cart</v-icon>
                                         </v-btn>
                                     </div>
-                                    <div v-if="getUser.type === 'EM'">
+                                    <div v-if="isUserManager">
                                         <v-spacer></v-spacer>
-                                        <v-btn text>
-                                            <v-icon>create</v-icon>
-                                        </v-btn>
+
+                                        <edit-product-dialog
+                                            v-bind:product="item"
+                                            v-on:show-notification="openNotification"
+                                            v-on:update-products="getProducts"
+                                        ></edit-product-dialog>
+
                                         <v-btn
                                             text
                                             color="red lighten-1"
-                                            v-on:click.prevent="
-                                                deleteProduct(item)
-                                            "
+                                            v-on:click.prevent="deleteProduct(item)"
                                         >
                                             <v-icon>delete</v-icon>
                                         </v-btn>
@@ -156,12 +161,15 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
+
 import CreateProductDialog from "../dialogs/CreateProductDialog";
+import EditProductDialog from "../dialogs/EditProductDialog";
 
 export default {
     components: {
-        "create-product-dialog": CreateProductDialog
+        "create-product-dialog": CreateProductDialog,
+        "edit-product-dialog": EditProductDialog
     },
     data() {
         return {
@@ -184,7 +192,13 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["isLoggedIn", "getShoppingCartItems", "getUser"])
+        ...mapGetters([
+            "isLoggedIn",
+            "getShoppingCartItems",
+            "getUser",
+            "isUserCustomer",
+            "isUserManager"
+        ])
     },
     methods: {
         ...mapActions(["addUpdateItemToCart"]),
@@ -237,7 +251,7 @@ export default {
                     if (this.getShoppingCartItems[i].product.id === product.id)
                         amount += this.getShoppingCartItems[i].amount;
 
-            this.addUpdateItemToCart({ product, amount });
+            this.addUpdateItemToCart({product, amount});
             this.$emit(
                 "show-notification",
                 "success",
@@ -245,7 +259,24 @@ export default {
             );
         },
         deleteProduct(product) {
-            // TODO
+            axios
+                .delete(`api/products/delete/${product.id}`)
+                .then(response => {
+                    console.log(response);
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Product deleted successfully"
+                    );
+                    this.getProducts();
+                }).catch(e => {
+                console.log(e);
+                this.$emit(
+                    "show-notification",
+                    "error",
+                    "Failed to delete product"
+                );
+            });
         },
         openNotification(color, message, timeout = 6000) {
             this.$emit("show-notification", color, message, timeout);
