@@ -135,7 +135,8 @@
                                     </div>
                                     <div v-else>
                                         <v-icon class="mr-1"
-                                            >account_circle</v-icon
+                                        >account_circle
+                                        </v-icon
                                         >
                                     </div>
                                     <div>
@@ -152,8 +153,7 @@
                                     <v-btn
                                         text
                                         v-on:click.prevent="
-                                            $router.push('/profile');
-                                            on = !on;
+                                            $router.push('/profile')
                                         "
                                         :disabled="
                                             $router.currentRoute.path ===
@@ -203,7 +203,7 @@ import LoginDialog from "./components/dialogs/LoginDialog";
 import RegisterDialog from "./components/dialogs/RegisterDialog";
 import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 // TODO FORGOT PASSWORD LINK!
 // TODO RESEND EMAIL VERIFICATION!

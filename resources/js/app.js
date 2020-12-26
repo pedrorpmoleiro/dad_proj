@@ -22,7 +22,7 @@ const store = new Vuex.Store({
     state: {
         auth_user: null,
         auth_loading: true,
-        shopping_cart: []
+        shopping_cart: [],
     },
     getters: {
         isAuthLoading(state) {
@@ -59,6 +59,9 @@ const store = new Vuex.Store({
         },
         SET_AUTH_USER(state, user) {
             state.auth_user = user;
+        },
+        SET_PRODUCT(state, product) {
+            state.product = product;
         },
         REMOVE_ITEM_FROM_CART(state, itemId) {
             if (state.shopping_cart.length > 0)
