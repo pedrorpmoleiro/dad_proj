@@ -445,10 +445,17 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["isLoggedIn", "getUser", "isUserCustomer"])
+        ...mapGetters([
+            "isLoggedIn",
+            "getUser",
+            "isUserCustomer",
+            "isAuthLoading"
+        ])
     },
-    mounted() {
-        // TODO: Wait for user (e.g., loading) when entering 'Update Profile' Page
+    async mounted() {
+        while (this.isAuthLoading)
+            await new Promise(resolve => setTimeout(resolve, 500));
+
         if (!this.isLoggedIn) this.$router.push("/home");
 
         this.updateUserData.input.name = this.getUser.name;

@@ -104,7 +104,7 @@
 
                 <v-spacer></v-spacer>
 
-                <div v-if="loadingAuth">
+                <div v-if="isAuthLoading">
                     <v-progress-circular
                         indeterminate
                         color="primary"
@@ -135,7 +135,8 @@
                                     </div>
                                     <div v-else>
                                         <v-icon class="mr-1"
-                                            >account_circle</v-icon
+                                        >account_circle
+                                        </v-icon
                                         >
                                     </div>
                                     <div>
@@ -152,8 +153,7 @@
                                     <v-btn
                                         text
                                         v-on:click.prevent="
-                                            $router.push('/profile');
-                                            on = !on;
+                                            $router.push('/profile')
                                         "
                                         :disabled="
                                             $router.currentRoute.path ===
@@ -203,7 +203,7 @@ import LoginDialog from "./components/dialogs/LoginDialog";
 import RegisterDialog from "./components/dialogs/RegisterDialog";
 import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 // TODO FORGOT PASSWORD LINK!
 // TODO RESEND EMAIL VERIFICATION!
@@ -224,11 +224,22 @@ export default {
             {
                 name: "Menu",
                 location: "/menu"
+            },
+
+        ],
+        cookLinks: [
+            {
+                name: "Cook Dashboard",
+                location: "/cook/dashboard"
             }
         ],
-        cookLinks: [],
         deliveryManLinks: [],
-        managerLinks: [],
+        managerLinks: [
+            {
+                name: "Manage User Accounts",
+                location: "/manage"
+            }
+        ],
         customerLinks: [
             {
                 name: "My Orders",
@@ -241,11 +252,10 @@ export default {
             text: "",
             time: 0,
             timeout: 6000
-        },
-        loadingAuth: true
+        }
     }),
     methods: {
-        ...mapActions(["logOut", "setUser"]),
+        ...mapActions(["logOut", "setUser", "setAuthLoading"]),
         goHome() {
             if (this.$router.currentRoute.path !== "/home")
                 this.$router.push("/home");
@@ -305,23 +315,27 @@ export default {
             "isUserManager",
             "isUserCook",
             "isUserDeliveryMan",
-            "isUserCustomer"
+            "isUserCustomer",
+            "isAuthLoading"
         ])
     },
     mounted() {
         // ? A way to check if user is logged in -- Investigate more
+        this.setAuthLoading(true);
         axios
             .get("/api/users/me")
             .then(response => {
                 // Logged in
                 // console.dir(response);
+                axios.defaults.withCredentials = true;
                 this.setUser(response.data);
-                this.loadingAuth = false;
+                // TODO - US 18 HERE
+                this.setAuthLoading(false);
             })
             .catch(e => {
                 // Not Logged in
                 // console.log(e);
-                this.loadingAuth = false;
+                this.setAuthLoading(false);
             });
     }
 };

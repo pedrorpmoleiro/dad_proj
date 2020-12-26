@@ -25,7 +25,6 @@ use App\Models\Order;
 */
 
 /* *** SANCTUM Protected Routes *** */
-
 Route::middleware('auth:sanctum')->group(function () {
     /* *** Auth Routes *** */
     Route::prefix('auth')->group(function () {
@@ -51,7 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
-    Route::prefix('products')->middleware('manager')->group(function () {
+    Route::middleware('manager')->prefix('products')->group(function () {
         // Create new Product
         Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 
@@ -59,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('update', [ProductController::class, 'update'])->name("product.update");
 
         // Delete a Product
-        Route::delete('delete', [ProductController::class, 'delete'])->name("product.delete");
+        Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
     });
 
     Route::middleware('customer')->group(function () {
@@ -71,17 +70,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('new', [OrderController::class, 'create'])->name("order.new");
 
             // Get Customer Orders
-            Route::get('', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
+            Route::get('customer/', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
 
             // Get Customer Open Orders
-            Route::get('open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");
+            Route::get('customer/open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");
 
             // Get Customer Order History
-            Route::get('history', [OrderController::class, 'getCustomerOrderHistory'])->name("order.get_history");
+            Route::get('customer/history', [OrderController::class, 'getCustomerOrderHistory'])->name("order.get_history");
         });
     });
 
+    // Get a specific Order
     Route::get('orders/{id}', [OrderController::class, 'getOrder'])->name("order.get_order");
+
+    // Get the current Order for the logged in Cook
+    Route::middleware('cook')->get('cook/order', [OrderController::class, 'getCurrentCookOrder'])->name("cook.current_order");
+
+    // Set Order Prepared
+    Route::middleware('cook')->post('cook/order/prepared', [OrderController::class, 'setOrderPrepared'])->name("cook.set_current_prepared");
 });
 
 /* *** Unprotected Routes *** */
@@ -96,19 +102,18 @@ Route::prefix('auth')->group(function () {
 
 // Customer Register Route
 Route::post('customers/register', [AuthController::class, 'registerCustomer'])->name("customer.register");
-// Get all products Route
-Route::get('products', [ProductController::class, 'all'])->name("product.get_all");
+
+Route::prefix('products')->group(function () {
+    // Get all products Route
+    Route::get('/', [ProductController::class, 'all'])->name("product.get_all");
+
+    // Get one specific product
+    Route::get('get/{id}', [ProductController::class, 'getProduct'])->name("product.get");
+});
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
-    // dd(date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS')));
-    $response = Order::find(14);
-    // $response = Customer::find(22);
-    // $response->items;
-    $response->customer;
-    $response->cook;
-    $response->delivery_man;
-    // $response = $response->orders()->whereIn('status', ['C', 'D'])->get();
-    // $response = $response->orders()->whereNotIn('status', ['C', 'D'])->get();
-    return response()->json($response);
+    $order = Order::where('status', 'P')->where('prepared_by', 4)->first();
+
+    return response()->json($order);
 })->name("tests");
