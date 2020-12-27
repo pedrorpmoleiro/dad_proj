@@ -5,53 +5,87 @@
                 rounded
                 flat
             >
-                <v-toolbar-title>Manager Dashboard</v-toolbar-title>
+                <v-toolbar-title>
+                    Manager Dashboard
+                </v-toolbar-title>
                 <v-divider
                     class="mx-4"
                     inset
                     vertical
                 ></v-divider>
                 <v-spacer></v-spacer>
+                <v-text-field
+                    v-model="search"
+                    label="Search"
+                    append-icon="search"
+                    single-line
+                    class="ml-3 mb-2"
+                    hide-details
+                ></v-text-field>
                 <v-dialog v-model="dialogDelete" max-width="500px">
                     <v-card>
                         <v-card-title class="headline">Confirm delete action</v-card-title>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="red darken-1" text @click="closeDelete">Cancel</v-btn>
-                            <v-btn color="green darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                            <v-btn color="red darken-1" text @click.prevent="closeDelete">Cancel</v-btn>
+                            <v-btn color="green darken-1" text @click.prevent="deleteItemConfirm">OK</v-btn>
+                            <v-spacer></v-spacer>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+                <v-dialog v-model="dialogBlock" max-width="500px">
+                    <v-card>
+                        <v-card-title class="headline">Confirm block action</v-card-title>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="red darken-1" text @click.prevent="closeBlock">Cancel</v-btn>
+                            <v-btn color="green darken-1" text @click.prevent="blockUserConfirm">OK</v-btn>
                             <v-spacer></v-spacer>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
             </v-toolbar>
-            <v-data-table
-                :headers="headers"
-                :items="users"
-                sort-by="id"
-                class="elevation-1"
-            >
-                <template v-slot:item.actions="{ item }">
-                    <manager-edit-user-dialog v-if="isUserManager"
-                                              v-on:show-notification="openNotification"
-                                              v-on:update-products="getUsers">
-                    </manager-edit-user-dialog>
+            <div v-if="loading || users.length > 0">
+                <v-data-table
+                    :headers="headers"
+                    :items="users"
+                    :loading="loading"
+                    sort-by="id"
+                    class="elevation-1"
+                >
+                    <template v-slot:item.type="{ item }">
+                        {{ getTypeName(item.type) }}
+                    </template>
 
-                    <v-icon
-                        small
-                        @click="deleteItem(item)"
-                    >
-                        delete
-                    </v-icon>
-                </template>
-                <template v-slot:no-data>
-                    <v-btn
-                        color="primary"
-                        @click="initialize"
-                    >
-                        cached
-                    </v-btn>
-                </template>
-            </v-data-table>
+                    <template v-slot:item.actions="{ item }">
+                        <manager-edit-user-dialog v-if="isUserManager"
+                                                  v-bind:user="item"
+                                                  v-on:show-notification="openNotification"
+                                                  v-on:update-products="getUsers">
+                        </manager-edit-user-dialog>
+
+                        <v-icon
+                            small
+                            v-if="isUserManager"
+                            v-on:show-notification="openNotification"
+                            v-on:update-products="getUsers"
+                            @click="deleteItem(item)"
+                        >
+                            delete
+                        </v-icon>
+
+                        <v-icon
+                            small
+                            v-if="isUserManager"
+                            v-on:show-notification="openNotification"
+                            v-on:update-products="getUsers"
+                            @click="blockUser(item)"
+                        >
+                            lock
+                        </v-icon>
+                    </template>
+                </v-data-table>
+            </div>
         </v-card>
     </v-container>
 </template>
@@ -66,11 +100,12 @@ export default {
     },
     data: () => ({
         dialogDelete: false,
+        dialogBlock: false,
+        loading: false,
         headers: [
             {
                 text: 'ID',
                 align: 'start',
-                sortable: false,
                 value: 'id',
             },
             {text: 'Name', value: 'name'},
@@ -79,6 +114,7 @@ export default {
             {text: 'Actions', value: 'actions', sortable: false},
         ],
         users: [],
+        search: '',
         editedIndex: -1,
         defaultItem: {
             id: 0,
@@ -90,8 +126,8 @@ export default {
 
     computed: {
         ...mapGetters([
-            "isLoggedIn",
-            "isUserManager"
+            "isUserManager",
+            "isAuthLoading"
         ])
     },
 
@@ -101,40 +137,33 @@ export default {
         },
     },
 
-    created() {
-        this.initialize()
-    },
-
     methods: {
-        initialize() {
-            this.users = [
-                {
-                    id: 1,
-                    name: 'Maria',
-                    email: 'maria@mail.pt',
-                    type: 'EM',
-                    created: '2020-05-13 16:30:30'
-                },
-                {
-                    id: 1,
-                    name: 'Maria Martins',
-                    email: 'mariaMartins@mail.pt',
-                    type: 'C',
-                    created: '2020-07-13 16:30:30'
-                }
-            ]
-        },
-
-        editItem(item) {
-            // TODO
-        },
-
-        deleteItem(item) {
+        deleteItem() {
             this.dialogDelete = true;
         },
 
+        // TODO: Not passing user
         deleteItemConfirm() {
-            this.users.splice(this.editedIndex, 1)
+            axios
+                .delete(`api/users/delete/${user.id}`)
+                .then(response => {
+                    console.log(response);
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "User deleted successfully"
+                    );
+                    this.getUsers();
+                })
+                .catch(e => {
+                    console.log(e);
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to delete user"
+                    );
+                });
+
             this.closeDelete()
         },
 
@@ -157,25 +186,62 @@ export default {
         getTypeName(item) {
             switch (item) {
                 case "C":
-                    this.users.type = "Client";
+                    return "Client";
                     break;
                 case "EM":
-                    this.users.type = "Manager";
+                    return "Manager";
                     break;
                 case "EC":
-                    this.users.type = "Cook";
+                    return "Cook";
                     break;
                 case "ED":
-                    this.users.type = "Delivery Man";
+                    return "Delivery Man";
                     break;
             }
         },
         getUsers() {
-            // TODO
+            this.loading = true;
+            // Cleans data table
+            this.users = [];
+
+            // Gets Users from DB
+            axios
+                .get("api/users")
+                .then(response => {
+                    this.users = response.data;
+                    this.loading = false;
+                })
+                .catch(e => {
+                    console.log(e.response);
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Unable to load users"
+                    );
+                });
         },
         openNotification(color, message, timeout = 6000) {
             this.$emit("show-notification", color, message, timeout);
+        },
+        // TODO: Not passing user
+        blockUser(item) {
+            this.dialogBlock = true;
+        },
+        blockUserConfirm(item) {
+            // TODO:
+        },
+        closeBlock() {
+            this.dialogBlock = false;
         }
+    },
+
+    async mounted() {
+        while (this.isAuthLoading)
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+        if (!this.isUserManager) this.$router.push("/home");
+
+        this.getUsers();
     },
 }
 </script>

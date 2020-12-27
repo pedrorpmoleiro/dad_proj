@@ -40,6 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* *** User Routes *** */
     Route::prefix('users')->group(function () {
+        // Get all users
+        Route::get('/', [UserController::class, 'all'])->name("user.get_all");
+
         // Get current user data
         Route::get('me', [UserController::class, 'me'])->name("user.get_auth_user_info");
 
@@ -48,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Update User Password
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
+
+        // Delete User
+        Route::delete('delete/{id}', [ UserController::class, 'deleteUser'])->name("user.delete_auth_user");
     });
 
     Route::middleware('manager')->prefix('products')->group(function () {

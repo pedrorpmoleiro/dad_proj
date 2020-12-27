@@ -1,9 +1,7 @@
 <template>
     <v-dialog v-model="dialog" scrollable width="750">
         <template v-slot:activator="{ on, attrs }">
-            <v-btn small v-bind="attrs" v-on="on">
-                <v-icon>create</v-icon>
-            </v-btn>
+            <v-icon small v-bind="attrs" v-on="on">create</v-icon>
         </template>
         <v-card :loading="loading">
             <v-card-title dark class="headline">
@@ -47,6 +45,10 @@
                                     :items="userTypes"
                                 ></v-autocomplete>
                             </v-col>
+                            <v-spacer></v-spacer>
+                            <v-btn color="red darken-1" text @click="closeDialog">Cancel</v-btn>
+                            <v-btn color="green darken-1" text @click="saveEdit">OK</v-btn>
+                            <v-spacer></v-spacer>
                         </v-row>
                     </v-container>
                 </v-form>
@@ -57,7 +59,6 @@
 
 <script>
 export default {
-    // TODO: Add Save and Cancel BTN
     props: ["user"],
     name: "ManagerEditUserDialog",
     data: () => ({
@@ -75,15 +76,70 @@ export default {
     methods: {
         getTypeName(item) {
             switch (item) {
-                case "C":
+                case "Client":
+                    return "C";
                     break;
-                case "EM":
+                case "Manager":
+                    return "EM";
                     break;
-                case "EC":
+                case "Cook":
+                    return "EC";
                     break;
-                case "ED":
+                case "Delivery Man":
+                    return "ED";
                     break;
             }
+        },
+        closeDialog() {
+            this.dialog = false;
+        },
+        saveEdit() {
+            let data = {
+                name: this.editedItem.name,
+                email: this.editedItem.email,
+                type: this.editedItem.type
+            };
+
+            this.loading = true;
+
+            axios
+                .post("api/users/update", data)
+                .then(response => {
+
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Updated user successfully!"
+                    );
+                })
+                .catch(e => {
+                    this.loading = false;
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to update user!"
+                    );
+                });
+        }
+    },
+
+    async mounted() {
+        this.editedItem.name = this.user.name;
+        this.editedItem.email = this.user.email;
+
+        switch (this.user.type) {
+            case "C":
+                this.editedItem.type = "Client";
+                break;
+            case "EM":
+                this.editedItem.type = "Manager";
+                break;
+            case "EC":
+                this.editedItem.type = "Cook";
+                break;
+            case "ED":
+                this.editedItem.type = "Delivery Man";
+                break;
         }
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Customer;
 use App\Http\Controllers\Controller;
 
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,11 @@ use stdClass;
 
 class UserController extends Controller
 {
+    public function all()
+    {
+        return User::all();
+    }
+
     public function me(): JsonResponse
     {
         $user = Auth::user();
@@ -107,5 +113,37 @@ class UserController extends Controller
 
 
         return response()->json($response);
+    }
+
+    public function delete(Request $request): JsonResponse
+    {
+        $id = $request->id;
+
+        // Find User
+        $user = User::findOrFail($id);
+
+        // Validate if model instance has been soft deleted
+        if ($user->trashed())
+            return response()->json(null, 404);
+
+        // Delete User
+        $user->delete();
+
+        if ($user->type == 'C') {
+            // Find Customer
+            $customer = Customer::findOrFail($id);
+
+            // Validate if model instance has been soft deleted
+            if ($customer->trashed())
+                return response()->json(null, 404);
+
+
+            // Delete Customer
+            $customer->delete();
+        }
+
+
+        // Return OK
+        return response()->json(null);
     }
 }
