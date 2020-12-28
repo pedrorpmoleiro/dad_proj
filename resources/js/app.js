@@ -45,6 +45,9 @@ const store = new Vuex.Store({
         isUserDeliveryMan(state) {
             return state.auth_user != null && state.auth_user.type === "ED";
         },
+        isUserBlocked(state) {
+            return state.auth_user != null && state.auth_user.blocked === 1;
+        },
         getUser(state) {
             return state.auth_user;
         },

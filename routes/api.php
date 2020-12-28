@@ -53,7 +53,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
 
         // Delete User
-        Route::delete('delete/{id}', [ UserController::class, 'deleteUser'])->name("user.delete_auth_user");
+        Route::delete('delete/{id}', [ UserController::class, 'deleteUser'])->name("user.delete");
+
+        // Block or Unblock a User
+        Route::patch('block/{id}', [UserController::class, 'block'])->name("user.block");
     });
 
     Route::middleware('manager')->prefix('products')->group(function () {

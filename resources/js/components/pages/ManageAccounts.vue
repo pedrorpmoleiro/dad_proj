@@ -76,12 +76,21 @@
 
                         <v-icon
                             small
-                            v-if="isUserManager"
+                            v-if="isUserManager && !isUserBlocked"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
                             @click="blockUser(item)"
                         >
                             lock
+                        </v-icon>
+                        <v-icon
+                            small
+                            v-if="isUserManager && isUserBlocked"
+                            v-on:show-notification="openNotification"
+                            v-on:update-products="getUsers"
+                            @click="blockUser(item)"
+                        >
+                            open_lock
                         </v-icon>
                     </template>
                 </v-data-table>
@@ -127,7 +136,8 @@ export default {
     computed: {
         ...mapGetters([
             "isUserManager",
-            "isAuthLoading"
+            "isAuthLoading",
+            "isUserBlocked"
         ])
     },
 
@@ -228,7 +238,25 @@ export default {
             this.dialogBlock = true;
         },
         blockUserConfirm(item) {
-            // TODO:
+            axios
+                .patch(`api/users/block/${user.id}`)
+                .then(response => {
+                    console.log(response);
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "User blocked/unblocked successfully"
+                    );
+                    this.getUsers();
+                })
+                .catch(e => {
+                    console.log(e);
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to block/unblock user"
+                    );
+                });
         },
         closeBlock() {
             this.dialogBlock = false;

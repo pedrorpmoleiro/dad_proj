@@ -146,4 +146,29 @@ class UserController extends Controller
         // Return OK
         return response()->json(null);
     }
+
+    public function block(Request $request): JsonResponse
+    {
+        // Get User ID
+        $id = $request->id;
+
+        // Find User
+        $user = User::findOrFail($id);
+
+        // Se if user is to be blocked or unblocked
+        if ($user->blocked == 0) {
+            $user->blocked = 1;
+        } else {
+            $user->blocked = 0;
+        }
+
+        // Commit update
+        $user->save();
+
+        // Return OK
+        return response()->json(null);
+
+
+
+    }
 }
