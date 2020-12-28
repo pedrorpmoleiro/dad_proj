@@ -69,7 +69,7 @@
                             v-if="isUserManager"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
-                            @click="deleteItem(item)"
+                            @click="deleteItemConfirm(item)"
                         >
                             delete
                         </v-icon>
@@ -79,7 +79,7 @@
                             v-if="isUserManager && !isUserBlocked"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
-                            @click="blockUser(item)"
+                            @click="blockUserConfirm(item)"
                         >
                             lock
                         </v-icon>
@@ -153,9 +153,9 @@ export default {
         },
 
         // TODO: Not passing user
-        deleteItemConfirm() {
+        deleteItemConfirm(item) {
             axios
-                .delete(`api/users/delete/${user.id}`)
+                .delete(`api/users/delete/${item.id}`)
                 .then(response => {
                     console.log(response);
                     this.$emit(
@@ -239,7 +239,7 @@ export default {
         },
         blockUserConfirm(item) {
             axios
-                .patch(`api/users/block/${user.id}`)
+                .patch(`api/users/block/${item.id}`)
                 .then(response => {
                     console.log(response);
                     this.$emit(
