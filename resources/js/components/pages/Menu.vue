@@ -11,7 +11,7 @@
             loading-text="Loading Menu"
         >
             <template v-slot:header>
-                <v-card flat>
+                <v-card flat class="mb-4">
                     <v-container>
                         <v-col>
                             <v-row>
@@ -46,7 +46,8 @@
                                     depressed
                                     v-on:click.prevent="sortDesc = !sortDesc"
                                 >
-                                    <v-icon>{{
+                                    <v-icon
+                                        >{{
                                             sortDesc
                                                 ? "arrow_downward"
                                                 : "arrow_upward"
@@ -56,9 +57,10 @@
 
                                 <v-spacer></v-spacer>
 
-                                <create-product-dialog v-if="isUserManager"
-                                                       v-on:show-notification="openNotification"
-                                                       v-on:update-products="getProducts"
+                                <create-product-dialog
+                                    v-if="isUserManager"
+                                    v-on:show-notification="openNotification"
+                                    v-on:update-products="getProducts"
                                 ></create-product-dialog>
 
                                 <v-spacer v-if="isUserManager"></v-spacer>
@@ -101,7 +103,7 @@
                                 <p class="subtitle-1 font-italic">
                                     {{
                                         item.type.charAt(0).toUpperCase() +
-                                        item.type.slice(1)
+                                            item.type.slice(1)
                                     }}
                                 </p>
                                 <p class="text-justify">
@@ -138,14 +140,18 @@
 
                                         <edit-product-dialog
                                             v-bind:product="item"
-                                            v-on:show-notification="openNotification"
+                                            v-on:show-notification="
+                                                openNotification
+                                            "
                                             v-on:update-products="getProducts"
                                         ></edit-product-dialog>
 
                                         <v-btn
                                             text
                                             color="red lighten-1"
-                                            v-on:click.prevent="deleteProduct(item)"
+                                            v-on:click.prevent="
+                                                deleteProduct(item)
+                                            "
                                         >
                                             <v-icon>delete</v-icon>
                                         </v-btn>
@@ -161,7 +167,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 import CreateProductDialog from "../dialogs/CreateProductDialog";
 import EditProductDialog from "../dialogs/EditProductDialog";
@@ -251,7 +257,7 @@ export default {
                     if (this.getShoppingCartItems[i].product.id === product.id)
                         amount += this.getShoppingCartItems[i].amount;
 
-            this.addUpdateItemToCart({product, amount});
+            this.addUpdateItemToCart({ product, amount });
             this.$emit(
                 "show-notification",
                 "success",
