@@ -25,6 +25,7 @@ use App\Models\Order;
 */
 
 /* *** SANCTUM Protected Routes *** */
+
 Route::middleware('auth:sanctum')->group(function () {
     /* *** Auth Routes *** */
     Route::prefix('auth')->group(function () {

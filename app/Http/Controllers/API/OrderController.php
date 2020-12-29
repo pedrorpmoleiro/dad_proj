@@ -153,6 +153,12 @@ class OrderController extends Controller
         } else {
             $ordersReady = Order::where('status', 'R')->get();
 
+            foreach ($ordersReady as $order) {
+                $order->customer;
+                $customerUser = User::findOrFail($order->customer->id)->toStdClass();
+                $order->customer_extra = $customerUser;
+            }
+
             if ($ordersReady != null)
                 return response()->json(["availableOrders" => $ordersReady]);
             else
