@@ -3,6 +3,7 @@
         <template v-slot:activator="{ on, attrs }">
             <v-icon small v-bind="attrs" v-on="on">create</v-icon>
         </template>
+
         <v-card :loading="loading">
             <v-card-title dark class="headline">
                 Edit User Information
@@ -12,6 +13,18 @@
                 <v-form v-model="isFormValid">
                     <v-container>
                         <v-row>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                    v-model="editedItem.id"
+                                    label="ID"
+                                    disabled
+
+                                ></v-text-field>
+                            </v-col>
                             <v-col
                                 cols="12"
                                 sm="6"
@@ -46,8 +59,8 @@
                                 ></v-autocomplete>
                             </v-col>
                             <v-spacer></v-spacer>
-                            <v-btn color="red darken-1" text @click="closeDialog">Cancel</v-btn>
-                            <v-btn color="green darken-1" text @click="saveEdit">OK</v-btn>
+                            <v-btn color="red darken-1" text v-on:click.prevent="closeDialog">Cancel</v-btn>
+                            <v-btn color="green darken-1" v-on:click.prevent="saveEdit" :disabled="!isFormValid">Save</v-btn>
                             <v-spacer></v-spacer>
                         </v-row>
                     </v-container>
@@ -95,15 +108,16 @@ export default {
         },
         saveEdit() {
             let data = {
+                id: this.editedItem.id,
                 name: this.editedItem.name,
                 email: this.editedItem.email,
-                type: this.editedItem.type
+                type: this.getTypeName(this.editedItem.type)
             };
 
             this.loading = true;
 
             axios
-                .post("api/users/update", data)
+                .patch(`api/users/patch/${this.editedItem.id}`, data)
                 .then(response => {
 
                     this.$emit(
@@ -111,6 +125,9 @@ export default {
                         "success",
                         "Updated user successfully!"
                     );
+
+                    this.dialog = false;
+                    this.$emit("get-users");
                 })
                 .catch(e => {
                     this.loading = false;
@@ -124,6 +141,7 @@ export default {
     },
 
     async mounted() {
+        this.editedItem.id = this.user.id;
         this.editedItem.name = this.user.name;
         this.editedItem.email = this.user.email;
 

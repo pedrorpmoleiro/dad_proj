@@ -61,7 +61,7 @@
                         <manager-edit-user-dialog v-if="isUserManager"
                                                   v-bind:user="item"
                                                   v-on:show-notification="openNotification"
-                                                  v-on:update-products="getUsers">
+                                                  v-on:get-users="getUsers">
                         </manager-edit-user-dialog>
 
                         <v-icon
@@ -76,7 +76,7 @@
 
                         <v-icon
                             small
-                            v-if="isUserManager && !isUserBlocked"
+                            v-if="isUserManager && !isThisUserBlocked(item.blocked)"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
                             @click="blockUserConfirm(item)"
@@ -85,10 +85,10 @@
                         </v-icon>
                         <v-icon
                             small
-                            v-if="isUserManager && isUserBlocked"
+                            v-if="isUserManager && isThisUserBlocked(item.blocked)"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
-                            @click="blockUser(item)"
+                            @click="blockUserConfirm(item)"
                         >
                             open_lock
                         </v-icon>
@@ -120,6 +120,7 @@ export default {
             {text: 'Name', value: 'name'},
             {text: 'Email', value: 'email'},
             {text: 'Type', value: 'type'},
+            {text: 'Block Status', value: 'blocked'},
             {text: 'Actions', value: 'actions', sortable: false},
         ],
         users: [],
@@ -130,14 +131,15 @@ export default {
             name: '',
             email: '',
             type: '',
+            blocked: '',
         },
     }),
 
     computed: {
         ...mapGetters([
             "isUserManager",
-            "isAuthLoading",
-            "isUserBlocked"
+            "isAuthLoading"
+            // "isUserBlocked",
         ])
     },
 
@@ -148,11 +150,12 @@ export default {
     },
 
     methods: {
-        deleteItem() {
-            this.dialogDelete = true;
+        isThisUserBlocked(item) {
+            console.log(item);
+            return item === 1;
         },
 
-        // TODO: Not passing user
+        // TODO: Not using confirmation dialogs for now
         deleteItemConfirm(item) {
             axios
                 .delete(`api/users/delete/${item.id}`)
@@ -233,7 +236,7 @@ export default {
         openNotification(color, message, timeout = 6000) {
             this.$emit("show-notification", color, message, timeout);
         },
-        // TODO: Not passing user
+        // TODO: Not using confirmation dialogs for now
         blockUser(item) {
             this.dialogBlock = true;
         },

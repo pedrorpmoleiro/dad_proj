@@ -335,7 +335,7 @@ export default {
                     // User is denied access
                     this.logoutUser();
                 }
-                
+
                 this.setAuthLoading(false);
             })
             .catch(e => {

@@ -56,13 +56,15 @@ class UserController extends Controller
 
     public function updateUserData(Request $request): JsonResponse
     {
+
+        // Authenticate User
+        $user = Auth::user();
+
         $data = $request->validate([
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/']
         ]);
 
-        // Authenticate User
-        $user = Auth::user();
 
         // Update user data
         $user->email = $data['email'];
@@ -167,8 +169,29 @@ class UserController extends Controller
 
         // Return OK
         return response()->json(null);
+    }
+
+    public function patchUserData(Request $request): JsonResponse
+    {
+        // Get User ID & Find User
+        $user = User::findOrFail($request->id);
+
+        $data = $request->validate([
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/'],
+            'type' => ['required', 'string', Rule::in(['EC', 'C', 'EM', 'ED'])],
+        ]);
 
 
+        // Update user data
+        $user->email = $data['email'];
+        $user->name = $data['name'];
+        $user->type = $data['type'];
 
+        // Commit Update
+        $user->save();
+
+        // Return OK
+        return response()->json(null);
     }
 }
