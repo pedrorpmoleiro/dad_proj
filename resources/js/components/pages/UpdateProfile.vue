@@ -375,7 +375,7 @@ export default {
             this.updatePassword.loading = true;
 
             axios
-                .post("api/users/update/password", data)
+                .patch("api/users/update/password", data)
                 .then(response => {
                     this.updatePassword.loading = false;
                     // console.log(response);
@@ -420,7 +420,7 @@ export default {
             } else route = "api/users/update";
 
             axios
-                .post(route, data)
+                .patch(route, data)
                 .then(response => {
                     this.updateUserData.loading = false;
                     // console.log(response);

@@ -149,12 +149,12 @@ class OrderController extends Controller
             $customerUser = User::findOrFail($currentOrder->customer->id)->toStdClass();
             $currentOrder->customer_extra = $customerUser;
 
-            return response()->json($currentOrder);
+            return response()->json(["currentOrder" => $currentOrder]);
         } else {
             $ordersReady = Order::where('status', 'R')->get();
 
             if ($ordersReady != null)
-                return response()->json($ordersReady);
+                return response()->json(["availableOrders" => $ordersReady]);
             else
                 return response()->json(["error" => "No orders to deliver"]);
         }
@@ -162,11 +162,9 @@ class OrderController extends Controller
 
     public function setOrderInTransit(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'orderId' => ['required', 'integer']
-        ]);
+        $id = $request->id;
 
-        $order = Order::findOrFail($data['orderId']);
+        $order = Order::findOrFail($id);
         $user = Auth::user();
 
         $order->status = 'T';

@@ -50,13 +50,13 @@ class UserController extends Controller
 
     public function updateUserData(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/']
-        ]);
-
         // Authenticate User
         $user = Auth::user();
+
+        $data = $request->validate([
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/']
+        ]);
 
         // Update user data
         $user->email = $data['email'];
@@ -76,7 +76,7 @@ class UserController extends Controller
 
         $data = $request->validate([
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id), 'regex:/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/'],
-            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/'],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/'],
             'address' => ['required', 'string'],
             'phone' => ['required', 'string', 'regex:/^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/'],
             'nif' => ['integer', 'min:1', 'max:999999999']
