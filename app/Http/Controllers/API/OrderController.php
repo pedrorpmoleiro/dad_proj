@@ -163,14 +163,19 @@ class OrderController extends Controller
     public function setOrderInTransit(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'orderId' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id), 'regex:/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/'],
-            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]*$/'],
-            'address' => ['required', 'string'],
-            'phone' => ['required', 'string', 'regex:/^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/'],
-            'nif' => ['integer', 'min:1', 'max:999999999']
+            'orderId' => ['required', 'integer']
         ]);
 
-        // TODO !!
+        $order = Order::findOrFail($data['orderId']);
+        $user = Auth::user();
+
+        $order->status = 'T';
+        $order->delivered_by = $user->id;
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $order->save();
+
+        return response()->json(null);
     }
 
     public function setOrderDelivered(): JsonResponse
@@ -182,7 +187,7 @@ class OrderController extends Controller
             return response()->json(null, 404);
 
         $order->status = 'D';
-        $order->preparation_time = time() - strtotime($order->current_status_at);
+        $order->delivery_time = time() - strtotime($order->current_status_at);
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
         $order->closed_at = $order->current_status_at;
         $order->total_time = strtotime($order->closed_at) - strtotime($order->opened_at);
