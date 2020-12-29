@@ -100,7 +100,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Change the status of an Order ready to deliver to 'in transit'
         Route::patch('orders/transit/{id}', [OrderController::class, 'setOrderInTransit'])->name("delivery_man.set_order_in_transit");
-
+        console
         // Change the status of an Order to Delivered
         Route::patch('orders/delivered', [OrderController::class, 'setOrderDelivered'])->name("delivery_man.set_order_delivered");
     });

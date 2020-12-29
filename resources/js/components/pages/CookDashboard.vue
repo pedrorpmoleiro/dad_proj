@@ -192,7 +192,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["getUser", "isUserCook", "isAuthLoading"])
+        ...mapGetters(["isUserCook", "isAuthLoading"])
     },
     async mounted() {
         while (this.isAuthLoading)

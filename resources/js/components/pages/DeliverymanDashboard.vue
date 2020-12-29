@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-card flat>
+        <v-card flat :loading="cardLoading">
             <div v-if="loading">
                 <v-container>
                     <v-layout align-center justify-center>
@@ -24,23 +24,26 @@
                         <v-icon>cached</v-icon>
                     </v-btn>
                 </v-card-title>
-                <v-data-table :headers="headers" :items="availableOrders">
+                <v-data-table
+                    :headers="headers"
+                    :items="availableOrders"
+                    disable-filtering
+                    disable-sort
+                    sort-by="time"
+                >
                     <template v-slot:item.customer_extra.name="{ item }">
                         {{ getUserFirstAndLastName(item.customer_extra.name) }}
                     </template>
-                    <template v-slot:item.current_status_at="{ item }">
-                        {{
-                            new Date(
-                                item.current_status_at
-                            ).toLocaleTimeString()
-                        }}
+                    <template v-slot:item.time="{ item }">
+                        {{ item.time.toLocaleTimeString() }}
                     </template>
                     <template v-slot:item.actions="{ item }">
                         <v-btn
+                            v-if="item.id === oldestOrderId"
                             dark
                             depressed
                             color="green lighten-1"
-                            v-on:click.prevent=""
+                            v-on:click.prevent="setOrderInTransit"
                         >
                             <v-icon class="mr-1">local_shipping</v-icon>
                             Deliver
@@ -68,24 +71,19 @@ export default {
         headers: [
             {
                 text: "Order Id",
-                value: "id",
-                sortable: false
+                value: "id"
             },
             {
                 text: "Customer Name",
-                value: "customer_extra.name",
-                sortable: false
+                value: "customer_extra.name"
             },
-            { text: "Time Ready", value: "current_status_at", sortable: false },
-            {
-                value: "actions",
-                sortable: false,
-                filterable: false
-            }
+            { text: "Time Ready", value: "time" },
+            { value: "actions" }
         ],
         oldestOrderId: -1,
         currentOrder: null,
-        loading: true
+        loading: true,
+        cardLoading: false
     }),
     methods: {
         getOrders() {
@@ -94,11 +92,15 @@ export default {
             axios
                 .get("api/deliveryman/orders")
                 .then(response => {
-                    console.log(response);
+                    // console.log(response);
                     if (response.data.currentOrder)
                         this.currentOrder = response.data.currentOrder;
                     else if (response.data.availableOrders) {
                         this.availableOrders = response.data.availableOrders;
+                        this.availableOrders.forEach(
+                            value =>
+                                (value.time = new Date(value.current_status_at))
+                        );
                         this.setOldestOrder();
                     } else {
                         this.availableOrders = [];
@@ -108,6 +110,7 @@ export default {
                     this.loading = false;
                 })
                 .catch(e => {
+                    // console.log(e);
                     this.availableOrders = [];
                     this.currentOrder = null;
                     this.oldestOrderId = -1;
@@ -119,11 +122,51 @@ export default {
                     );
                 });
         },
-        async setOldestOrder() {
-            // TODO
+        setOldestOrder() {
+            return new Promise(() => {
+                let oldestId = -1;
+                let oldestTime = new Date().getTime();
+
+                for (const i in this.availableOrders) {
+                    const order = this.availableOrders[i];
+                    const auxTime = order.time.getTime();
+                    if (auxTime < oldestTime) {
+                        oldestTime = auxTime;
+                        oldestId = order.id;
+                    }
+                }
+
+                if (oldestId !== -1) this.oldestOrderId = oldestId;
+            });
         },
         setOrderInTransit() {
+            this.cardLoading = true;
+
+            axios
+                .patch(`api/deliveryman/orders/transit/${this.oldestOrderId}`)
+                .then(response => {
+                    // console.log(response);
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Currently delivering updated"
+                    );
+                    this.cardLoading = false;
+                })
+                .catch(error => {
+                    // console.log(e);
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to set order in transit"
+                    );
+                    this.cardLoading = false;
+                });
+            this.getOrders();
+        },
+        setOrderDelivered() {
             // TODO
+            // this.getOrders();
         },
         getUserFirstAndLastName(userFullName) {
             let aux = userFullName.split(" ");
@@ -131,7 +174,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["getUser", "isUserDeliveryMan", "isAuthLoading"])
+        ...mapGetters(["isUserDeliveryMan", "isAuthLoading"])
     },
     async mounted() {
         while (this.isAuthLoading)
