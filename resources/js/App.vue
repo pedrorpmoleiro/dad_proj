@@ -233,7 +233,12 @@ export default {
                 location: "/cook/dashboard"
             }
         ],
-        deliveryManLinks: [],
+        deliveryManLinks: [
+            {
+                name: "Deliveryman Dashboard",
+                location: "/deliveryman/dashboard"
+            }
+        ],
         managerLinks: [
             {
                 name: "Manage User Accounts",

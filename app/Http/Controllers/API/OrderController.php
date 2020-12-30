@@ -126,11 +126,79 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
+
+        if ($order == null)
+            return response()->json(null, 404);
+
         $order->status = 'R';
-
         $order->preparation_time = time() - strtotime($order->current_status_at);
-
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $order->save();
+
+        return response()->json(null);
+    }
+
+    public function getDeliverymanOrders(): JsonResponse
+    {
+        $user = Auth::user();
+        $currentOrder = Order::where('status', 'T')->where('delivered_by', $user->id)->first();
+
+        if ($currentOrder != null) {
+            $currentOrder->customer;
+            $customerUser = User::findOrFail($currentOrder->customer->id)->toStdClass();
+            $currentOrder->customer_extra = $customerUser;
+            $currentOrder->items;
+
+            return response()->json(["currentOrder" => $currentOrder]);
+        } else {
+            $ordersReady = Order::where('status', 'R')->get();
+
+            foreach ($ordersReady as $order) {
+                $order->customer;
+                $customerUser = User::findOrFail($order->customer->id)->toStdClass();
+                $order->customer_extra = $customerUser;
+            }
+
+            if ($ordersReady != null)
+                return response()->json(["availableOrders" => $ordersReady]);
+            else
+                return response()->json(["error" => "No orders to deliver"]);
+        }
+    }
+
+    public function setOrderInTransit(Request $request): JsonResponse
+    {
+        $id = $request->id;
+
+        $order = Order::findOrFail($id);
+        $user = Auth::user();
+
+        $order->status = 'T';
+        $order->delivered_by = $user->id;
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $order->save();
+
+        return response()->json(null);
+    }
+
+    public function setOrderDelivered(): JsonResponse
+    {
+        $user = Auth::user();
+        $order = Order::where('status', 'T')->where('delivered_by', $user->id)->first();
+
+        if ($order == null)
+            return response()->json(null, 404);
+
+        $order->status = 'D';
+
+        $order->save();
+
+        $order->delivery_time = time() - strtotime($order->current_status_at);
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+        $order->closed_at = $order->current_status_at;
+        $order->total_time = strtotime($order->closed_at) - strtotime($order->opened_at);
 
         $order->save();
 
@@ -152,8 +220,8 @@ class OrderController extends Controller
                 if ($user->id != $order->customer->id)
                     throw new AccessDeniedException("Requested Order doesn't belong to this customer");
                 break;
-            // TODO REVIEW
-            // ! Ready for custom checks for other user types
+                // TODO REVIEW
+                // ! Ready for custom checks for other user types
         }
 
         return response()->json($order);

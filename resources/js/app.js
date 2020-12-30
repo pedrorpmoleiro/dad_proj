@@ -24,7 +24,7 @@ const store = new Vuex.Store({
     state: {
         auth_user: null,
         auth_loading: true,
-        shopping_cart: [],
+        shopping_cart: []
     },
     getters: {
         isAuthLoading(state) {
@@ -124,6 +124,7 @@ import Menu from "./components/pages/Menu";
 import UpdateProfile from "./components/pages/UpdateProfile";
 import CustomerOrders from "./components/pages/CustomerOrders";
 import CookDashboard from "./components/pages/CookDashboard";
+import DeliverymanDashboard from "./components/pages/DeliverymanDashboard";
 
 const routes = [
     {
@@ -157,6 +158,10 @@ const routes = [
     {
         path: "/manage",
         component: ManageAccounts
+    },
+    {
+        path: "/deliveryman/dashboard",
+        component: DeliverymanDashboard
     }
 ];
 

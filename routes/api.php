@@ -25,6 +25,7 @@ use App\Models\Order;
 */
 
 /* *** SANCTUM Protected Routes *** */
+
 Route::middleware('auth:sanctum')->group(function () {
     /* *** Auth Routes *** */
     Route::prefix('auth')->group(function () {
@@ -44,10 +45,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [UserController::class, 'me'])->name("user.get_auth_user_info");
 
         // Update User Data
-        Route::post('update', [UserController::class, 'updateUserData'])->name("user.update_auth_user_info");
+        Route::patch('update', [UserController::class, 'updateUserData'])->name("user.update_auth_user_info");
 
         // Update User Password
-        Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
+        Route::patch('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
     Route::middleware('manager')->prefix('products')->group(function () {
@@ -63,14 +64,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('customer')->group(function () {
         // Update Customer Data
-        Route::post('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
+        Route::patch('customers/update', [UserController::class, 'updateCustomerData'])->name("customer.update_info");
 
         Route::prefix('orders')->group(function () {
             // Create new Order
             Route::post('new', [OrderController::class, 'create'])->name("order.new");
 
             // Get Customer Orders
-            Route::get('customer/', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
+            Route::get('customer', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
 
             // Get Customer Open Orders
             Route::get('customer/open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");
@@ -83,11 +84,26 @@ Route::middleware('auth:sanctum')->group(function () {
     // Get a specific Order
     Route::get('orders/{id}', [OrderController::class, 'getOrder'])->name("order.get_order");
 
-    // Get the current Order for the logged in Cook
-    Route::middleware('cook')->get('cook/order', [OrderController::class, 'getCurrentCookOrder'])->name("cook.current_order");
+    /* *** Cook Protected Routes *** */
+    Route::middleware('cook')->prefix('cook')->group(function () {
+        // Get the current Order for the logged in Cook
+        Route::get('order', [OrderController::class, 'getCurrentCookOrder'])->name("cook.current_order");
 
-    // Set Order Prepared
-    Route::middleware('cook')->post('cook/order/prepared', [OrderController::class, 'setOrderPrepared'])->name("cook.set_current_prepared");
+        // Set Order Prepared
+        Route::patch('order/prepared', [OrderController::class, 'setOrderPrepared'])->name("cook.set_current_prepared");
+    });
+
+    /* *** DeliveryMan Protected Routes *** */
+    Route::middleware('delivery_man')->prefix('deliveryman')->group(function () {
+        // Get the current Order being delivered by the delivery man or a list of available Orders ready to deliver
+        Route::get('orders', [OrderController::class, 'getDeliverymanOrders'])->name("delivery_man.get_orders");
+
+        // Change the status of an Order ready to deliver to 'in transit'
+        Route::patch('orders/transit/{id}', [OrderController::class, 'setOrderInTransit'])->name("delivery_man.set_order_in_transit");
+
+        // Change the status of an Order to Delivered
+        Route::patch('orders/delivered', [OrderController::class, 'setOrderDelivered'])->name("delivery_man.set_order_delivered");
+    });
 });
 
 /* *** Unprotected Routes *** */
