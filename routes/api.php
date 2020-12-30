@@ -51,26 +51,30 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Update User Password
         Route::post('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
-
-        // Delete User
-        Route::delete('delete/{id}', [ UserController::class, 'delete'])->name("user.delete");
-
-        // Block or Unblock a User
-        Route::patch('block/{id}', [UserController::class, 'block'])->name("user.block");
-
-        // Patch User Data (manager)
-        Route::patch('patch/{id}', [UserController::class, 'patchUserData'])->name("user.patch_user_info");
     });
 
-    Route::middleware('manager')->prefix('products')->group(function () {
-        // Create new Product
-        Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
+    Route::middleware('manager')->group(function () {
+        Route::prefix('products')->group(function () {
+            // Create new Product
+            Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 
-        // Update a Product
-        Route::put('update', [ProductController::class, 'update'])->name("product.update");
+            // Update a Product
+            Route::put('update', [ProductController::class, 'update'])->name("product.update");
 
-        // Delete a Product
-        Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
+            // Delete a Product
+            Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
+        });
+
+        Route::prefix('users')->group(function () {
+            // Delete User
+            Route::delete('delete/{id}', [UserController::class, 'delete'])->name("user.delete");
+
+            // Block or Unblock a User
+            Route::patch('block/{id}', [UserController::class, 'block'])->name("user.block");
+
+            // Patch User Data (manager)
+            Route::patch('patch/{id}', [UserController::class, 'patchUserData'])->name("user.patch_user_info");
+        });
     });
 
     Route::middleware('customer')->group(function () {
@@ -82,7 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('new', [OrderController::class, 'create'])->name("order.new");
 
             // Get Customer Orders
-            Route::get('customer/', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
+            Route::get('customer', [OrderController::class, 'getCustomerOrders'])->name("order.get_all");
 
             // Get Customer Open Orders
             Route::get('customer/open', [OrderController::class, 'getCustomerOpenOrders'])->name("order.get_open");

@@ -8,11 +8,6 @@
                 <v-toolbar-title>
                     Manager Dashboard
                 </v-toolbar-title>
-<!--                <v-divider-->
-<!--                    class="mx-4"-->
-<!--                    inset-->
-<!--                    vertical-->
-<!--                ></v-divider>-->
                 <v-spacer></v-spacer>
                 <v-text-field
                     v-model="search"
@@ -22,85 +17,56 @@
                     class="ml-3 mb-2"
                     hide-details
                 ></v-text-field>
-                <v-dialog v-model="dialogDelete" max-width="500px">
-                    <v-card>
-                        <v-card-title class="headline">Confirm delete action</v-card-title>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="red darken-1" text @click.prevent="closeDelete">Cancel</v-btn>
-                            <v-btn color="green darken-1" text @click.prevent="deleteItemConfirm">OK</v-btn>
-                            <v-spacer></v-spacer>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
-                <v-dialog v-model="dialogBlock" max-width="500px">
-                    <v-card>
-                        <v-card-title class="headline">Confirm block action</v-card-title>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="red darken-1" text @click.prevent="closeBlock">Cancel</v-btn>
-                            <v-btn color="green darken-1" text @click.prevent="blockUserConfirm">OK</v-btn>
-                            <v-spacer></v-spacer>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
+                <v-btn :loading="loading" color="primary" text v-on:click.prevent="getUsers">
+                    <v-icon>cached</v-icon>
+                </v-btn>
             </v-toolbar>
-            <div v-if="loading || users.length > 0">
-                <v-data-table
-                    :headers="headers"
-                    :items="users"
-                    :loading="loading"
-                    sort-by="id"
-                    class="elevation-1"
-                >
-                    <template v-slot:item.type="{ item }">
-                        {{ getTypeName(item.type) }}
-                    </template>
-
-                    <template v-slot:item.actions="{ item }">
-                        <manager-edit-user-dialog v-if="isUserManager && !(getUser.id === item.id) && (item.type !== 'C')"
-                                                  v-bind:user="item"
-                                                  v-on:show-notification="openNotification"
-                                                  v-on:get-users="getUsers">
+            <v-data-table
+                :headers="headers"
+                :items="users"
+                :loading="loading"
+                :search="search"
+                sort-by="id"
+                class="elevation-1"
+            >
+                <template v-slot:item.type="{ item }">
+                    {{ getTypeName(item.type) }}
+                </template>
+                <template v-slot:item.blocked="{ item }">
+                    <div v-if="item.blocked === 1">
+                        Blocked
+                    </div>
+                    <div v-else>
+                        Not blocked
+                    </div>
+                </template>
+                <template v-slot:item.actions="{ item }">
+                    <div v-if="getUser.id !== item.id">
+                        <manager-edit-user-dialog
+                            v-if="item.type !== 'C'"
+                            v-bind:user="item"
+                            v-on:show-notification="openNotification"
+                            v-on:get-users="getUsers">
                         </manager-edit-user-dialog>
 
-                        <v-icon
-                            small
-                            v-if="isUserManager && !(getUser.id === item.id)"
-                            v-on:show-notification="openNotification"
-                            v-on:update-products="getUsers"
-                            @click="deleteItemConfirm(item)"
-                        >
-                            delete
-                        </v-icon>
+                        <v-btn icon color="red lighten-1"
+                               v-on:click="deleteUser(item)">
+                            <v-icon>delete</v-icon>
+                        </v-btn>
 
-                        <v-icon
-                            small
-                            v-if="isUserManager && !isThisUserBlocked(item.blocked) && !(getUser.id === item.id)"
-                            v-on:show-notification="openNotification"
-                            v-on:update-products="getUsers"
-                            @click="blockUserConfirm(item)"
-                        >
-                            lock
-                        </v-icon>
-                        <v-icon
-                            small
-                            v-if="isUserManager && isThisUserBlocked(item.blocked) && !(getUser.id === item.id)"
-                            v-on:show-notification="openNotification"
-                            v-on:update-products="getUsers"
-                            @click="blockUserConfirm(item)"
-                        >
-                            open_lock
-                        </v-icon>
-                    </template>
-                </v-data-table>
-            </div>
+                        <v-btn icon v-on:click.prevent="blockUser(item)">
+                            <v-icon>{{ item.blocked === 0 ? 'lock' : 'lock_open' }}</v-icon>
+                        </v-btn>
+                    </div>
+                </template>
+            </v-data-table>
         </v-card>
     </v-container>
 </template>
 
 <script>
 import ManagerEditUserDialog from "../dialogs/ManagerEditUserDialog";
+
 import {mapGetters} from "vuex";
 
 export default {
@@ -108,9 +74,7 @@ export default {
         "manager-edit-user-dialog": ManagerEditUserDialog
     },
     data: () => ({
-        dialogDelete: false,
-        dialogBlock: false,
-        loading: false,
+        loading: true,
         headers: [
             {
                 text: 'ID',
@@ -126,42 +90,20 @@ export default {
         users: [],
         search: '',
         editedIndex: -1,
-        defaultItem: {
-            id: 0,
-            name: '',
-            email: '',
-            type: '',
-            blocked: '',
-        },
     }),
-
     computed: {
         ...mapGetters([
             "isUserManager",
             "isAuthLoading",
             "getUser"
-            // "isUserBlocked",
         ])
     },
-
-    watch: {
-        dialogDelete(val) {
-            val || this.closeDelete()
-        },
-    },
-
     methods: {
-        isThisUserBlocked(item) {
-            console.log(item);
-            return item === 1;
-        },
-
-        // TODO: Not using confirmation dialogs for now
-        deleteItemConfirm(item) {
+        deleteUser(item) {
             axios
                 .delete(`api/users/delete/${item.id}`)
                 .then(response => {
-                    console.log(response);
+                    // console.log(response);
                     this.$emit(
                         "show-notification",
                         "success",
@@ -170,51 +112,29 @@ export default {
                     this.getUsers();
                 })
                 .catch(e => {
-                    console.log(e);
+                    // console.log(e);
                     this.$emit(
                         "show-notification",
                         "error",
                         "Failed to delete user"
                     );
                 });
-
-            this.closeDelete()
-        },
-
-        closeDelete() {
-            this.dialogDelete = false
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
-            })
-        },
-
-        save() {
-            if (this.editedIndex > -1) {
-                Object.assign(this.users[this.editedIndex], this.editedItem)
-            } else {
-                this.users.push(this.editedItem)
-            }
-            this.close()
         },
         getTypeName(item) {
             switch (item) {
                 case "C":
-                    return "Client";
-                    break;
+                    return "Customer";
                 case "EM":
                     return "Manager";
-                    break;
                 case "EC":
                     return "Cook";
-                    break;
                 case "ED":
                     return "Delivery Man";
-                    break;
             }
         },
         getUsers() {
             this.loading = true;
+
             // Cleans data table
             this.users = [];
 
@@ -226,7 +146,7 @@ export default {
                     this.loading = false;
                 })
                 .catch(e => {
-                    console.log(e.response);
+                    // console.log(e.response);
                     this.$emit(
                         "show-notification",
                         "error",
@@ -237,15 +157,11 @@ export default {
         openNotification(color, message, timeout = 6000) {
             this.$emit("show-notification", color, message, timeout);
         },
-        // TODO: Not using confirmation dialogs for now
         blockUser(item) {
-            this.dialogBlock = true;
-        },
-        blockUserConfirm(item) {
             axios
                 .patch(`api/users/block/${item.id}`)
                 .then(response => {
-                    console.log(response);
+                    // console.log(response);
                     this.$emit(
                         "show-notification",
                         "success",
@@ -254,19 +170,15 @@ export default {
                     this.getUsers();
                 })
                 .catch(e => {
-                    console.log(e);
+                    // console.log(e);
                     this.$emit(
                         "show-notification",
                         "error",
                         "Failed to block/unblock user"
                     );
                 });
-        },
-        closeBlock() {
-            this.dialogBlock = false;
         }
     },
-
     async mounted() {
         while (this.isAuthLoading)
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -277,7 +189,3 @@ export default {
     },
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -1,7 +1,9 @@
 <template>
     <v-dialog v-model="dialog" scrollable width="750">
         <template v-slot:activator="{ on, attrs }">
-            <v-icon small v-bind="attrs" v-on="on">create</v-icon>
+            <v-btn icon v-bind="attrs" v-on="on">
+                <v-icon>create</v-icon>
+            </v-btn>
         </template>
 
         <v-card :loading="loading">
@@ -9,47 +11,36 @@
                 Edit User Information
             </v-card-title>
 
-            <v-card-text>
-                <v-form v-model="isFormValid">
+            <v-form v-model="isFormValid">
+                <v-card-text>
                     <v-container>
                         <v-row>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
+                            <v-col>
                                 <v-text-field
                                     v-model="editedItem.id"
                                     label="ID"
                                     disabled
-
                                 ></v-text-field>
                             </v-col>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
+                        </v-row>
+                        <v-row>
+                            <v-col>
                                 <v-text-field
                                     v-model="editedItem.name"
                                     label="Name"
                                 ></v-text-field>
                             </v-col>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
+                        </v-row>
+                        <v-row>
+                            <v-col>
                                 <v-text-field
                                     v-model="editedItem.email"
                                     label="Email"
                                 ></v-text-field>
                             </v-col>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
+                        </v-row>
+                        <v-row>
+                            <v-col>
                                 <v-autocomplete
                                     clearable
                                     flat
@@ -58,14 +49,16 @@
                                     :items="userTypes"
                                 ></v-autocomplete>
                             </v-col>
-                            <v-spacer></v-spacer>
-                            <v-btn color="red darken-1" text v-on:click.prevent="closeDialog">Cancel</v-btn>
-                            <v-btn color="green darken-1" v-on:click.prevent="saveEdit" :disabled="!isFormValid">Save</v-btn>
-                            <v-spacer></v-spacer>
                         </v-row>
                     </v-container>
-                </v-form>
-            </v-card-text>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="green darken-1" text v-on:click.prevent="saveEdit" :disabled="!isFormValid">Save
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn color="red darken-1" text v-on:click.prevent="dialog = false">Cancel</v-btn>
+                </v-card-actions>
+            </v-form>
         </v-card>
     </v-dialog>
 </template>
@@ -73,12 +66,11 @@
 <script>
 export default {
     props: ["user"],
-    name: "ManagerEditUserDialog",
     data: () => ({
         isFormValid: false,
         loading: false,
         dialog: false,
-        userTypes: ["Client", "Manager", "Cook", "Delivery Man"],
+        userTypes: ["Customer", "Manager", "Cook", "Delivery Man"],
         editedItem: {
             id: 0,
             name: '',
@@ -89,22 +81,15 @@ export default {
     methods: {
         getTypeName(item) {
             switch (item) {
-                case "Client":
+                case "Customer":
                     return "C";
-                    break;
                 case "Manager":
                     return "EM";
-                    break;
                 case "Cook":
                     return "EC";
-                    break;
                 case "Delivery Man":
                     return "ED";
-                    break;
             }
-        },
-        closeDialog() {
-            this.dialog = false;
         },
         saveEdit() {
             let data = {
@@ -139,7 +124,6 @@ export default {
                 });
         }
     },
-
     async mounted() {
         this.editedItem.id = this.user.id;
         this.editedItem.name = this.user.name;
@@ -147,7 +131,7 @@ export default {
 
         switch (this.user.type) {
             case "C":
-                this.editedItem.type = "Client";
+                this.editedItem.type = "Customer";
                 break;
             case "EM":
                 this.editedItem.type = "Manager";

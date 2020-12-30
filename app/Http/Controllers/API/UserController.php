@@ -128,9 +128,6 @@ class UserController extends Controller
         if ($user->trashed())
             return response()->json(null, 404);
 
-        // Delete User
-        $user->delete();
-
         if ($user->type == 'C') {
             // Find Customer
             $customer = Customer::findOrFail($id);
@@ -144,6 +141,8 @@ class UserController extends Controller
             $customer->delete();
         }
 
+        // Delete User
+        $user->delete();
 
         // Return OK
         return response()->json(null);
@@ -158,11 +157,10 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // Se if user is to be blocked or unblocked
-        if ($user->blocked == 0) {
+        if ($user->blocked == 0)
             $user->blocked = 1;
-        } else {
+        else
             $user->blocked = 0;
-        }
 
         // Commit update
         $user->save();
