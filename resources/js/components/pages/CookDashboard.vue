@@ -62,7 +62,7 @@
                                         <div class="mx-1">
                                             {{
                                                 "Name: " +
-                                                    order.customer_extra.name
+                                                order.customer_extra.name
                                             }}
                                         </div>
                                     </v-col>
@@ -108,7 +108,7 @@
                                     <template v-slot:item.type="{ item }">
                                         {{
                                             item.type.charAt(0).toUpperCase() +
-                                                item.type.slice(1)
+                                            item.type.slice(1)
                                         }}
                                     </template>
                                 </v-data-table>
@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     data: () => ({
@@ -136,10 +136,10 @@ export default {
                 filterable: false,
                 sortable: false
             },
-            { text: "Name", value: "name", filterable: false },
-            { text: "Description", value: "description", filterable: false },
-            { text: "Quantity", value: "pivot.quantity" },
-            { text: "Type", value: "type" }
+            {text: "Name", value: "name", filterable: false},
+            {text: "Description", value: "description", filterable: false},
+            {text: "Quantity", value: "pivot.quantity"},
+            {text: "Type", value: "type"}
         ],
         timeElapsed: 0,
         stopTimeElapsed: false
@@ -156,7 +156,7 @@ export default {
                     else this.order = response.data;
                     this.loading = false;
                     this.stopTimeElapsed = false;
-                    this.setOrderPrepared();
+                    this.timeElapsedCalculator();
                 })
                 .catch(error => {
                     // console.log(error);

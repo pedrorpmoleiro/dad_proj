@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
@@ -52,7 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
-    Route::middleware('manager')->group(function() {
+    Route::middleware('manager')->group(function () {
         Route::prefix('products')->group(function () {
             // Create new Product
             Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
@@ -138,7 +139,5 @@ Route::prefix('products')->group(function () {
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
-    $employees = User::where('type', 'EC')->orWhere('type', 'ED')->orWhere('type', 'EM')->get();
-
-    return response()->json($employees);
+    return response()->json(Order::where('status', 'T')->where('delivered_by', 10)->get());
 })->name("tests");

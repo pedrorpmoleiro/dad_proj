@@ -14,6 +14,15 @@ class ManagerController extends Controller
     {
         $employees = User::where('type', 'EC')->orWhere('type', 'ED')->orWhere('type', 'EM')->get();
 
+        foreach ($employees as $employee)
+            try {
+                if ($employee->type == 'EC')
+                    $employee->order = Order::where('status', 'P')->where('prepared_by', $employee->id)->first();
+                else if ($employee->type == 'ED')
+                    $employee->order = Order::where('status', 'T')->where('delivered_by', $employee->id)->first();
+            } catch (\Exception $e) {
+            }
+
         return response()->json($employees);
     }
 

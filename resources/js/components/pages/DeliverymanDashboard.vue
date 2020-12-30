@@ -127,7 +127,7 @@
                             <template v-slot:item.type="{ item }">
                                 {{
                                     item.type.charAt(0).toUpperCase() +
-                                        item.type.slice(1)
+                                    item.type.slice(1)
                                 }}
                             </template>
                         </v-data-table>
@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     data: () => ({
@@ -197,8 +197,8 @@ export default {
                 value: "customer_extra.name",
                 sortable: false
             },
-            { text: "Time Ready", value: "time", sortable: false },
-            { value: "actions", sortable: false }
+            {text: "Time Ready", value: "time", sortable: false},
+            {value: "actions", sortable: false}
         ],
         oldestOrderId: -1,
         currentOrder: null,
@@ -208,10 +208,10 @@ export default {
                 value: "photo_url",
                 sortable: false
             },
-            { text: "Name", value: "name" },
-            { text: "Description", value: "description" },
-            { text: "Quantity", value: "pivot.quantity" },
-            { text: "Type", value: "type" }
+            {text: "Name", value: "name"},
+            {text: "Description", value: "description"},
+            {text: "Quantity", value: "pivot.quantity"},
+            {text: "Type", value: "type"}
         ],
         loading: true,
         cardLoading: false,
@@ -292,7 +292,7 @@ export default {
 
             axios
                 .patch(`api/deliveryman/orders/transit/${this.oldestOrderId}`)
-                .then(response => {
+                .then(async response => {
                     // console.log(response);
                     this.$emit(
                         "show-notification",
@@ -300,6 +300,18 @@ export default {
                         "Currently delivering updated"
                     );
                     this.cardLoading = false;
+
+                    this.loading = true;
+                    for (let i = 0; i < 10; i++) {
+                        this.getOrders(false);
+                        if (
+                            this.availableOrders.length === 0 &&
+                            this.currentOrder != null
+                        )
+                            break;
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    }
+                    this.loading = false;
                 })
                 .catch(e => {
                     // console.log(e);
@@ -309,8 +321,8 @@ export default {
                         "Failed to set order in transit"
                     );
                     this.cardLoading = false;
+                    this.getOrders();
                 });
-            this.getOrders();
         },
         setOrderDelivered() {
             this.cardLoading = true;
@@ -334,11 +346,11 @@ export default {
                         this.getOrders(false);
                         if (this.availableOrders.length > 0) break;
                         else if (
-                            this.availableOrders.length == 0 &&
+                            this.availableOrders.length === 0 &&
                             this.currentOrder == null
                         )
                             break;
-                        else if (this.currentOrder.id != currentOrderId) break;
+                        else if (this.currentOrder.id !== currentOrderId) break;
                         await new Promise(resolve => setTimeout(resolve, 3000));
                     }
                     this.loading = false;

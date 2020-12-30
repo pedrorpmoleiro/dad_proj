@@ -126,7 +126,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $user->available_at = null;
+        $user->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
 
         $user->save();
 
@@ -179,7 +179,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $user = Auth::user();
 
-        $user->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+        $user->available_at = null;
 
         $user->save();
 
@@ -196,7 +196,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $user->available_at = null;
+        $user->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
 
         $user->save();
 
@@ -206,9 +206,6 @@ class OrderController extends Controller
             return response()->json(null, 404);
 
         $order->status = 'D';
-
-        $order->save();
-
         $order->delivery_time = time() - strtotime($order->current_status_at);
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
         $order->closed_at = $order->current_status_at;
@@ -234,8 +231,8 @@ class OrderController extends Controller
                 if ($user->id != $order->customer->id)
                     throw new AccessDeniedException("Requested Order doesn't belong to this customer");
                 break;
-                // TODO REVIEW
-                // ! Ready for custom checks for other user types
+            // TODO REVIEW
+            // ! Ready for custom checks for other user types
         }
 
         return response()->json($order);

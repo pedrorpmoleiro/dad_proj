@@ -324,7 +324,7 @@
 
 <script>
 export default {
-    props: ["orderProp"],
+    props: ["orderProp", "manager"],
     data: () => ({
         dialog: false,
         loading: false,

@@ -5,7 +5,8 @@
                 <v-card flat :loading="employees.loading">
                     <v-toolbar rounded flat>
                         <v-toolbar-title class="font-weight-bold"
-                            >Employees</v-toolbar-title
+                        >Employees
+                        </v-toolbar-title
                         >
                         <v-spacer></v-spacer>
                         <v-btn
@@ -35,18 +36,18 @@
                                     ></v-img>
                                 </div>
                                 <div v-else>
-                                    <v-icon x-large>account_circle </v-icon>
+                                    <v-icon x-large>account_circle</v-icon>
                                 </div>
                             </v-layout>
                         </template>
                         <template v-slot:item.type="{ item }">
-                            <div v-if="item.type == 'EC'">
+                            <div v-if="item.type === 'EC'">
                                 Cook
                             </div>
-                            <div v-else-if="item.type == 'ED'">
+                            <div v-else-if="item.type === 'ED'">
                                 Delivery Man
                             </div>
-                            <div v-else-if="item.type == 'EM'">
+                            <div v-else-if="item.type === 'EM'">
                                 Manager
                             </div>
                         </template>
@@ -72,7 +73,7 @@
                             </v-badge>
                             <div v-else-if="item.available_at == null">
                                 <v-badge
-                                    v-if="item.type == 'EC'"
+                                    v-if="item.type === 'EC'"
                                     class="font-italic"
                                     inline
                                     left
@@ -82,7 +83,7 @@
                                     Preparing
                                 </v-badge>
                                 <v-badge
-                                    v-else-if="item.type == 'ED'"
+                                    v-else-if="item.type === 'ED'"
                                     class="font-italic"
                                     inline
                                     left
@@ -103,8 +104,13 @@
                                 Available
                             </v-badge>
                         </template>
-                        <template v-slot:item.actions="{ item }"
-                            ><!-- TODO --></template
+                        <template v-slot:item.order="{ item }">
+                            <div
+                                v-if="(item.type === 'EC' || item.type === 'ED') && item.order"
+                            >
+                                <view-order v-bind:order-prop="item.order" v-bind:manager="true"></view-order>
+                            </div>
+                        </template
                         >
                     </v-data-table>
                 </v-card>
@@ -115,7 +121,8 @@
                 <v-card flat :loading="orders.loading">
                     <v-toolbar rounded flat>
                         <v-toolbar-title class="font-weight-bold"
-                            >Open Orders</v-toolbar-title
+                        >Open Orders
+                        </v-toolbar-title
                         >
                         <v-spacer></v-spacer>
                         <v-btn
@@ -133,30 +140,30 @@
                         :items="orders.list"
                     >
                         <template v-slot:item.status="{ item }">
-                            <div v-if="item.status == 'H'">
+                            <div v-if="item.status === 'H'">
                                 Holding
                             </div>
-                            <div v-else-if="item.status == 'P'">
+                            <div v-else-if="item.status === 'P'">
                                 Preparing
                             </div>
-                            <div v-else-if="item.status == 'R'">
+                            <div v-else-if="item.status === 'R'">
                                 Ready
                             </div>
-                            <div v-else-if="item.status == 'T'">
+                            <div v-else-if="item.status === 'T'">
                                 In transit
                             </div>
-                            <div v-else-if="item.status == 'D'">
+                            <div v-else-if="item.status === 'D'">
                                 Delivered
                             </div>
-                            <div v-else-if="item.status == 'C'">
+                            <div v-else-if="item.status === 'C'">
                                 Cancelled
                             </div>
                         </template>
                         <template v-slot:item.name="{ item }">
-                            <div v-if="item.status == 'P'">
+                            <div v-if="item.status === 'P'">
                                 {{ item.cook.name }}
                             </div>
-                            <div v-else-if="item.status == 'T'">
+                            <div v-else-if="item.status === 'T'">
                                 {{ item.delivery_man.name }}
                             </div>
                         </template>
@@ -167,9 +174,9 @@
                                 ).toLocaleString()
                             }}
                         </template>
-                        <template v-slot:item.actions="{ item }"
-                            ><!-- TODO --></template
-                        >
+                        <template v-slot:item.order="{ item }">
+                            <view-order v-bind:order-prop="item" v-bind:manager="true"></view-order>
+                        </template>
                     </v-data-table>
                 </v-card>
             </v-col>
@@ -180,7 +187,7 @@
 <script>
 import ViewOrderDialog from "../dialogs/ViewOrderDialog";
 
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     components: {
@@ -216,7 +223,8 @@ export default {
                     value: "status"
                 },
                 {
-                    value: "actions"
+                    text: "Order",
+                    value: "order"
                 }
             ]
         },
@@ -241,8 +249,8 @@ export default {
                     value: "lastUpdate"
                 },
                 {
-                    text: "Actions",
-                    value: "actions"
+                    text: "Order",
+                    value: "order"
                 }
             ]
         }
