@@ -148,6 +148,7 @@ class OrderController extends Controller
             $currentOrder->customer;
             $customerUser = User::findOrFail($currentOrder->customer->id)->toStdClass();
             $currentOrder->customer_extra = $customerUser;
+            $currentOrder->items;
 
             return response()->json(["currentOrder" => $currentOrder]);
         } else {
@@ -191,6 +192,9 @@ class OrderController extends Controller
             return response()->json(null, 404);
 
         $order->status = 'D';
+
+        $order->save();
+
         $order->delivery_time = time() - strtotime($order->current_status_at);
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
         $order->closed_at = $order->current_status_at;

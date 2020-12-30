@@ -72,7 +72,6 @@
                                         >
                                             Time
                                         </div>
-                                        <!-- TODO TIME ELAPSED -->
                                         <p class="mx-1">
                                             {{ order.current_status_at }}
                                         </p>
@@ -141,7 +140,9 @@ export default {
             { text: "Description", value: "description", filterable: false },
             { text: "Quantity", value: "pivot.quantity" },
             { text: "Type", value: "type" }
-        ]
+        ],
+        timeElapsed: 0,
+        stopTimeElapsed: false
     }),
     methods: {
         getOrder() {
@@ -154,11 +155,15 @@ export default {
                     if (response.data.error) this.order = null;
                     else this.order = response.data;
                     this.loading = false;
+                    this.stopTimeElapsed = false;
+                    this.setOrderPrepared();
                 })
                 .catch(error => {
                     // console.log(error);
                     this.loading = false;
                     this.order = null;
+                    this.timeElapsed = 0;
+                    this.stopTimeElapsed = true;
                     this.$emit(
                         "show-notification",
                         "error",
@@ -172,6 +177,7 @@ export default {
                 .patch("api/cook/order/prepared")
                 .then(response => {
                     // console.log(response);
+                    this.stopTimeElapsed = true;
                     this.cardLoading = false;
                     this.$emit(
                         "show-notification",
@@ -189,6 +195,19 @@ export default {
                         "Failed to Update order"
                     );
                 });
+        },
+        timeElapsedCalculator() {
+            this.stopTimeElapsed = false;
+
+            return new Promise(async () => {
+                while (!this.stopTimeElapsed) {
+                    const aux =
+                        new Date().getTime() -
+                        new Date(this.currentOrder.current_status_at).getTime();
+                    this.timeElapsed = parseInt(aux / 1000 / 60);
+                    await new Promise(resolve => setTimeout(resolve, 30000));
+                }
+            });
         }
     },
     computed: {

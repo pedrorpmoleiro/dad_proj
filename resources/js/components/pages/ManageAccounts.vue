@@ -92,6 +92,7 @@
                     </v-card>
                 </v-dialog>
             </v-toolbar>
+            <v-divider></v-divider>
             <v-data-table
                 :headers="headers"
                 :items="users"

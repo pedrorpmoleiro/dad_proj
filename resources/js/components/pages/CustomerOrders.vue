@@ -16,6 +16,7 @@
                             <v-icon>cached</v-icon>
                         </v-btn>
                     </v-toolbar>
+                    <v-divider></v-divider>
                     <div v-if="open.loading || open.orders.length > 0">
                         <v-data-table
                             :headers="headers"
@@ -58,6 +59,7 @@
                             <v-icon>cached</v-icon>
                         </v-btn>
                     </v-toolbar>
+                    <v-divider></v-divider>
                     <div v-if="history.loading || history.orders.length > 0">
                         <v-data-table
                             :headers="headers"
