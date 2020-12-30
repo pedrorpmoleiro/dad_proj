@@ -64,7 +64,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
         });
 
+        // Get all Employees
         Route::get('employees', [ManagerController::class, 'getEmployees'])->name("manager.get_employees");
+
+        // Get all open Orders
+        Route::get('orders/open', [ManagerController::class, 'getOpenOrders'])->name("manager.get_open_orders");
     });
 
     Route::middleware('customer')->group(function () {

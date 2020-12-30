@@ -103,6 +103,73 @@
                                 Available
                             </v-badge>
                         </template>
+                        <template v-slot:item.actions="{ item }"
+                            ><!-- TODO --></template
+                        >
+                    </v-data-table>
+                </v-card>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-card flat :loading="orders.loading">
+                    <v-toolbar rounded flat>
+                        <v-toolbar-title class="font-weight-bold"
+                            >Open Orders</v-toolbar-title
+                        >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            icon
+                            :loading="orders.loading"
+                            v-on:click.prevent="getOrders"
+                            color="primary"
+                        >
+                            <v-icon>cached</v-icon>
+                        </v-btn>
+                    </v-toolbar>
+                    <v-divider></v-divider>
+                    <v-data-table
+                        :headers="orders.headers"
+                        :items="orders.list"
+                    >
+                        <template v-slot:item.status="{ item }">
+                            <div v-if="item.status == 'H'">
+                                Holding
+                            </div>
+                            <div v-else-if="item.status == 'P'">
+                                Preparing
+                            </div>
+                            <div v-else-if="item.status == 'R'">
+                                Ready
+                            </div>
+                            <div v-else-if="item.status == 'T'">
+                                In transit
+                            </div>
+                            <div v-else-if="item.status == 'D'">
+                                Delivered
+                            </div>
+                            <div v-else-if="item.status == 'C'">
+                                Cancelled
+                            </div>
+                        </template>
+                        <template v-slot:item.name="{ item }">
+                            <div v-if="item.status == 'P'">
+                                {{ item.cook.name }}
+                            </div>
+                            <div v-else-if="item.status == 'T'">
+                                {{ item.delivery_man.name }}
+                            </div>
+                        </template>
+                        <template v-slot:item.lastUpdate="{ item }">
+                            {{
+                                new Date(
+                                    item.current_status_at
+                                ).toLocaleString()
+                            }}
+                        </template>
+                        <template v-slot:item.actions="{ item }"
+                            ><!-- TODO --></template
+                        >
                     </v-data-table>
                 </v-card>
             </v-col>
@@ -111,9 +178,14 @@
 </template>
 
 <script>
+import ViewOrderDialog from "../dialogs/ViewOrderDialog";
+
 import { mapGetters } from "vuex";
 
 export default {
+    components: {
+        "view-order": ViewOrderDialog
+    },
     data: () => ({
         employees: {
             loading: true,
@@ -142,6 +214,35 @@ export default {
                 {
                     text: "Available",
                     value: "status"
+                },
+                {
+                    value: "actions"
+                }
+            ]
+        },
+        orders: {
+            loading: true,
+            list: [],
+            headers: [
+                {
+                    text: "Id",
+                    value: "id"
+                },
+                {
+                    text: "Status",
+                    value: "status"
+                },
+                {
+                    text: "Employee name",
+                    value: "name"
+                },
+                {
+                    text: "Last Updated",
+                    value: "lastUpdate"
+                },
+                {
+                    text: "Actions",
+                    value: "actions"
                 }
             ]
         }
@@ -161,6 +262,21 @@ export default {
                     // console.log(e);
                     this.employees.loading = false;
                 });
+        },
+        getOrders() {
+            this.orders.loading = true;
+
+            axios
+                .get("api/orders/open")
+                .then(response => {
+                    // console.log(response);
+                    this.orders.list = response.data;
+                    this.orders.loading = false;
+                })
+                .catch(e => {
+                    // console.log(e);
+                    this.orders.loading = false;
+                });
         }
     },
     computed: {
@@ -173,6 +289,7 @@ export default {
         if (!this.isUserManager) this.$router.push("/home");
 
         this.getEmployees();
+        this.getOrders();
     }
 };
 </script>
