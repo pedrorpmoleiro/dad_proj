@@ -125,6 +125,11 @@ class OrderController extends Controller
     public function setOrderPrepared(): JsonResponse
     {
         $user = Auth::user();
+
+        $user->available_at = null;
+
+        $user->save();
+
         $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
 
         if ($order == null)
@@ -174,6 +179,10 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $user = Auth::user();
 
+        $user->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $user->save();
+
         $order->status = 'T';
         $order->delivered_by = $user->id;
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
@@ -186,6 +195,11 @@ class OrderController extends Controller
     public function setOrderDelivered(): JsonResponse
     {
         $user = Auth::user();
+
+        $user->available_at = null;
+
+        $user->save();
+
         $order = Order::where('status', 'T')->where('delivered_by', $user->id)->first();
 
         if ($order == null)

@@ -117,14 +117,13 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import Tests from "./components/pages/Tests";
-
 import Home from "./components/pages/Home";
 import Menu from "./components/pages/Menu";
 import UpdateProfile from "./components/pages/UpdateProfile";
 import CustomerOrders from "./components/pages/CustomerOrders";
 import CookDashboard from "./components/pages/CookDashboard";
 import DeliverymanDashboard from "./components/pages/DeliverymanDashboard";
+import ManagerDashboard from "./components/pages/ManagerDashboard";
 
 const routes = [
     {
@@ -152,16 +151,16 @@ const routes = [
         component: CookDashboard
     },
     {
-        path: "/foo/bar/tests",
-        component: Tests
-    },
-    {
-        path: "/manage",
+        path: "/manager/accounts",
         component: ManageAccounts
     },
     {
         path: "/deliveryman/dashboard",
         component: DeliverymanDashboard
+    },
+    {
+        path: "/manager/dashboard",
+        component: ManagerDashboard
     }
 ];
 

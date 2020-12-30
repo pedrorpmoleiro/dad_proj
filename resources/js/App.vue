@@ -135,9 +135,8 @@
                                     </div>
                                     <div v-else>
                                         <v-icon class="mr-1"
-                                        >account_circle
-                                        </v-icon
-                                        >
+                                            >account_circle
+                                        </v-icon>
                                     </div>
                                     <div>
                                         {{
@@ -203,7 +202,7 @@ import LoginDialog from "./components/dialogs/LoginDialog";
 import RegisterDialog from "./components/dialogs/RegisterDialog";
 import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
 
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 // TODO FORGOT PASSWORD LINK!
 // TODO RESEND EMAIL VERIFICATION!
@@ -218,14 +217,9 @@ export default {
     data: () => ({
         pubLinks: [
             {
-                name: "Tests",
-                location: "/foo/bar/tests"
-            },
-            {
                 name: "Menu",
                 location: "/menu"
-            },
-
+            }
         ],
         cookLinks: [
             {
@@ -242,7 +236,11 @@ export default {
         managerLinks: [
             {
                 name: "Manage User Accounts",
-                location: "/manage"
+                location: "/manager/accounts"
+            },
+            {
+                name: "Manager Dashboard",
+                location: "/manager/dashboard"
             }
         ],
         customerLinks: [

@@ -3,13 +3,14 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ManagerController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\OrderController;
 
 /* *** TESTS *** */
 
-use App\Models\Order;
+use App\Models\User;
 
 /* ***  END  *** */
 
@@ -51,15 +52,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
-    Route::middleware('manager')->prefix('products')->group(function () {
-        // Create new Product
-        Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
+    Route::middleware('manager')->group(function() {
+        Route::prefix('products')->group(function () {
+            // Create new Product
+            Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 
-        // Update a Product
-        Route::put('update', [ProductController::class, 'update'])->name("product.update");
+            // Update a Product
+            Route::put('update', [ProductController::class, 'update'])->name("product.update");
 
-        // Delete a Product
-        Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
+            // Delete a Product
+            Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
+        });
+
+        Route::get('employees', [ManagerController::class, 'getEmployees'])->name("manager.get_employees");
     });
 
     Route::middleware('customer')->group(function () {
@@ -129,7 +134,7 @@ Route::prefix('products')->group(function () {
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
-    $order = Order::where('status', 'P')->where('prepared_by', 4)->first();
+    $employees = User::where('type', 'EC')->orWhere('type', 'ED')->orWhere('type', 'EM')->get();
 
-    return response()->json($order);
+    return response()->json($employees);
 })->name("tests");
