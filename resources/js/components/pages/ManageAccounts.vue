@@ -8,11 +8,11 @@
                 <v-toolbar-title>
                     Manager Dashboard
                 </v-toolbar-title>
-                <v-divider
-                    class="mx-4"
-                    inset
-                    vertical
-                ></v-divider>
+<!--                <v-divider-->
+<!--                    class="mx-4"-->
+<!--                    inset-->
+<!--                    vertical-->
+<!--                ></v-divider>-->
                 <v-spacer></v-spacer>
                 <v-text-field
                     v-model="search"
@@ -58,7 +58,7 @@
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                        <manager-edit-user-dialog v-if="isUserManager"
+                        <manager-edit-user-dialog v-if="isUserManager && !(getUser.id === item.id) && (item.type !== 'C')"
                                                   v-bind:user="item"
                                                   v-on:show-notification="openNotification"
                                                   v-on:get-users="getUsers">
@@ -66,7 +66,7 @@
 
                         <v-icon
                             small
-                            v-if="isUserManager"
+                            v-if="isUserManager && !(getUser.id === item.id)"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
                             @click="deleteItemConfirm(item)"
@@ -76,7 +76,7 @@
 
                         <v-icon
                             small
-                            v-if="isUserManager && !isThisUserBlocked(item.blocked)"
+                            v-if="isUserManager && !isThisUserBlocked(item.blocked) && !(getUser.id === item.id)"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
                             @click="blockUserConfirm(item)"
@@ -85,7 +85,7 @@
                         </v-icon>
                         <v-icon
                             small
-                            v-if="isUserManager && isThisUserBlocked(item.blocked)"
+                            v-if="isUserManager && isThisUserBlocked(item.blocked) && !(getUser.id === item.id)"
                             v-on:show-notification="openNotification"
                             v-on:update-products="getUsers"
                             @click="blockUserConfirm(item)"
@@ -138,7 +138,8 @@ export default {
     computed: {
         ...mapGetters([
             "isUserManager",
-            "isAuthLoading"
+            "isAuthLoading",
+            "getUser"
             // "isUserBlocked",
         ])
     },
