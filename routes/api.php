@@ -66,6 +66,9 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::prefix('users')->group(function () {
+            // Create User
+            Route::post('create', [UserController::class, 'create'])->name("user.create");
+
             // Delete User
             Route::delete('delete/{id}', [UserController::class, 'delete'])->name("user.delete");
 

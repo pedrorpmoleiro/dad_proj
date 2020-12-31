@@ -27,7 +27,14 @@
                             <v-col>
                                 <v-text-field
                                     v-model="editedItem.name"
+                                    :rules="[
+                                        rules.required,
+                                        rules.name,
+                                        rules.max
+                                    ]"
                                     label="Name"
+                                    clearable
+                                    required
                                 ></v-text-field>
                             </v-col>
                         </v-row>
@@ -35,7 +42,14 @@
                             <v-col>
                                 <v-text-field
                                     v-model="editedItem.email"
+                                    :rules="[
+                                        rules.required,
+                                        rules.email,
+                                        rules.max
+                                    ]"
                                     label="Email"
+                                    clearable
+                                    required
                                 ></v-text-field>
                             </v-col>
                         </v-row>
@@ -44,6 +58,7 @@
                                 <v-autocomplete
                                     clearable
                                     flat
+                                    required
                                     v-model="editedItem.type"
                                     label="Type"
                                     :items="userTypes"
@@ -77,6 +92,18 @@ export default {
             email: '',
             type: '',
         },
+        rules: {
+            required: value => !!value || "Required",
+            max: value => value.length < 255 || "Max of 255 Characters",
+            email: value => {
+                const pattern = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
+                return pattern.test(value) || "Invalid E-mail format!!";
+            },
+            name: value => {
+                const pattern = /^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/;
+                return pattern.test(value) || "Only letters and spaces allowed";
+            }
+        }
     }),
     methods: {
         getTypeName(item) {

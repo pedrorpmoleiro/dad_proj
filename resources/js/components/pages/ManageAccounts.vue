@@ -9,6 +9,11 @@
                     Manager Dashboard
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
+                <manager-create-user-dialog
+                    v-on:show-notification="openNotification"
+                    v-on:get-users="getUsers">
+                </manager-create-user-dialog>
+                <v-spacer></v-spacer>
                 <v-text-field
                     v-model="search"
                     label="Search"
@@ -68,10 +73,12 @@
 import ManagerEditUserDialog from "../dialogs/ManagerEditUserDialog";
 
 import {mapGetters} from "vuex";
+import ManagerCreateUserDialog from "../dialogs/ManagerCreateUserDialog";
 
 export default {
     components: {
-        "manager-edit-user-dialog": ManagerEditUserDialog
+        "manager-edit-user-dialog": ManagerEditUserDialog,
+        "manager-create-user-dialog": ManagerCreateUserDialog
     },
     data: () => ({
         loading: true,
