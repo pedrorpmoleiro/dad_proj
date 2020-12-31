@@ -47,7 +47,7 @@
                                     v-on:click.prevent="sortDesc = !sortDesc"
                                 >
                                     <v-icon
-                                        >{{
+                                    >{{
                                             sortDesc
                                                 ? "arrow_downward"
                                                 : "arrow_upward"
@@ -103,7 +103,7 @@
                                 <p class="subtitle-1 font-italic">
                                     {{
                                         item.type.charAt(0).toUpperCase() +
-                                            item.type.slice(1)
+                                        item.type.slice(1)
                                     }}
                                 </p>
                                 <p class="text-justify">
@@ -167,7 +167,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 import CreateProductDialog from "../dialogs/CreateProductDialog";
 import EditProductDialog from "../dialogs/EditProductDialog";
@@ -177,26 +177,24 @@ export default {
         "create-product-dialog": CreateProductDialog,
         "edit-product-dialog": EditProductDialog
     },
-    data() {
-        return {
-            search: "",
-            sortDesc: false,
-            sortBy: "name",
-            keys: ["Name", "Price", "Type"],
-            productTypes: ["Drink", "Dessert", "Cold dish", "Hot dish"],
-            rules: {
-                amount: value => {
-                    const pattern = /^[1-9][0-9]?$/;
-                    return (
-                        pattern.test(value) || "Value must be between 1 and 99"
-                    );
-                }
-            },
-            products: [],
-            loading: false,
-            orderAmount: []
-        };
-    },
+    data: () => ({
+        search: "",
+        sortDesc: false,
+        sortBy: "name",
+        keys: ["Name", "Price", "Type"],
+        productTypes: ["Drink", "Dessert", "Cold dish", "Hot dish"],
+        rules: {
+            amount: value => {
+                const pattern = /^[1-9][0-9]?$/;
+                return (
+                    pattern.test(value) || "Value must be between 1 and 99"
+                );
+            }
+        },
+        products: [],
+        loading: false,
+        orderAmount: []
+    }),
     computed: {
         ...mapGetters([
             "isLoggedIn",
@@ -257,7 +255,7 @@ export default {
                     if (this.getShoppingCartItems[i].product.id === product.id)
                         amount += this.getShoppingCartItems[i].amount;
 
-            this.addUpdateItemToCart({ product, amount });
+            this.addUpdateItemToCart({product, amount});
             this.$emit(
                 "show-notification",
                 "success",

@@ -225,6 +225,7 @@ class OrderController extends Controller
         $order->customer;
         $order->cook;
         $order->delivery_man;
+        $order->items;
 
         switch ($user->type) {
             case 'C':
