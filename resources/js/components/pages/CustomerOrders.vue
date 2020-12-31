@@ -5,7 +5,8 @@
                 <v-card flat>
                     <v-toolbar rounded flat>
                         <v-toolbar-title class="font-weight-bold"
-                            >Open Orders</v-toolbar-title
+                        >Open Orders
+                        </v-toolbar-title
                         >
                         <v-spacer></v-spacer>
                         <v-btn
@@ -22,6 +23,8 @@
                             :headers="headers"
                             :items="open.orders"
                             :loading="open.loading"
+                            sort-by="id"
+                            :sort-desc="false"
                         >
                             <template v-slot:item.actions="{ item }">
                                 <view-order
@@ -47,9 +50,9 @@
             <v-col>
                 <v-card flat>
                     <v-toolbar rounded flat>
-                        <v-toolbar-title class="font-weight-bold"
-                            >Order History</v-toolbar-title
-                        >
+                        <v-toolbar-title class="font-weight-bold">
+                            Order History
+                        </v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-btn
                             icon
@@ -65,6 +68,8 @@
                             :headers="headers"
                             :items="history.orders"
                             :loading="history.loading"
+                            sort-by="id"
+                            sort-desc
                         >
                             <template v-slot:item.actions="{ item }">
                                 <view-order
@@ -92,7 +97,7 @@
 <script>
 import ViewOrderDialog from "../dialogs/ViewOrderDialog";
 
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     components: {

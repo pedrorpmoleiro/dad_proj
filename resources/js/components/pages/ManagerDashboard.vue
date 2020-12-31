@@ -175,11 +175,14 @@
                                 ).toLocaleString()
                             }}
                         </template>
-                        <template v-slot:item.order="{ item }">
+                        <template v-slot:item.actions="{ item }">
                             <view-order
                                 v-bind:order-prop="item"
                                 v-bind:manager="true"
                             ></view-order>
+                            <v-btn icon v-on:click.prevent="cancelOrder(item)" color="red lighten-1">
+                                <v-icon>clear</v-icon>
+                            </v-btn>
                         </template>
                     </v-data-table>
                 </v-card>
@@ -268,8 +271,8 @@ export default {
                     filterable: false,
                 },
                 {
-                    text: "Order",
-                    value: "order",
+                    text: "Actions",
+                    value: "actions",
                     filterable: false,
                     sortable: false,
                 },
@@ -355,6 +358,31 @@ export default {
             return this.orderStatusToString(value.toString().toUpperCase()) ===
                 search.toString()
         },
+        cancelOrder(order) {
+            this.orders.loading = true;
+
+            axios
+                .patch(`api/orders/cancel/${order.id}`)
+                .then((response) => {
+                    // console.log(response);
+                    this.orders.loading = false;
+                    this.getOrders();
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Order Cancelled Successfully"
+                    );
+                })
+                .catch((e) => {
+                    // console.log(e);
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to cancel order"
+                    );
+                    this.orders.loading = false;
+                });
+        }
     },
     computed: {
         ...mapGetters(["isUserManager", "isAuthLoading"]),

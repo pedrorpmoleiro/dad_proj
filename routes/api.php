@@ -68,8 +68,13 @@ Route::middleware('auth:sanctum')->group(function () {
         // Get all Employees
         Route::get('employees', [ManagerController::class, 'getEmployees'])->name("manager.get_employees");
 
-        // Get all open Orders
-        Route::get('orders/open', [ManagerController::class, 'getOpenOrders'])->name("manager.get_open_orders");
+        Route::prefix('orders')->group(function () {
+            // Get all open Orders
+            Route::get('open', [ManagerController::class, 'getOpenOrders'])->name("manager.get_open_orders");
+
+            // Block order
+            Route::patch('cancel/{id}', [OrderController::class, 'cancelOrder'])->name("manager.cancel_order");
+        });
     });
 
     Route::middleware('customer')->group(function () {

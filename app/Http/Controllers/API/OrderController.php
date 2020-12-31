@@ -238,4 +238,20 @@ class OrderController extends Controller
 
         return response()->json($order);
     }
+
+    public function cancelOrder(Request $request): JsonResponse
+    {
+        $id = $request->id;
+
+        $order = Order::findOrFail($id);
+
+        $order->status = 'C';
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+        $order->closed_at = $order->current_status_at;
+        $order->total_time = strtotime($order->closed_at) - strtotime($order->opened_at);
+
+        $order->save();
+
+        return response()->json(null);
+    }
 }
