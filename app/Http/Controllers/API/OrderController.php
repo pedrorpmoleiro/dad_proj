@@ -244,6 +244,16 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
 
+        if ($order->status == 'P') {
+            $cook = User::findOrFail($order->cook->id);
+            $cook->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+            $cook->save();
+        } else if ($order->status == 'T') {
+            $deliveryMan = User::findOrFail($order->delivery_man->id);
+            $deliveryMan->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+            $deliveryMan->save();
+        }
+
         $order->status = 'C';
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
         $order->closed_at = $order->current_status_at;
@@ -261,6 +271,17 @@ class OrderController extends Controller
             "cookId" => ["required", "integer"]
         ]);
 
-        dd($data);
+        $cook = User::findOrFail($data["cookId"]);
+        $order = Order::findOrFail($data["orderId"]);
+
+        $cook->available_at = null;
+        $cook->save();
+
+        $order->status = 'P';
+        $order->prepared_by = $cook->id;
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+        $order->save();
+
+        return response()->json(null);
     }
 }

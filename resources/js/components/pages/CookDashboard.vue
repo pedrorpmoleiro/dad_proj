@@ -70,10 +70,10 @@
                                         <div
                                             class="subtitle-1 font-weight-bold mb-1"
                                         >
-                                            Time
+                                            Time Elapsed:
                                         </div>
                                         <p class="mx-1">
-                                            {{ order.current_status_at }}
+                                            {{ timeElapsed }} minutes
                                         </p>
                                     </v-col>
                                     <v-col>
@@ -173,10 +173,12 @@ export default {
                 .then(response => {
                     // console.log(response);
                     if (response.data.error) this.order = null;
-                    else this.order = response.data;
+                    else {
+                        this.order = response.data;
+                        this.stopTimeElapsed = false;
+                        this.timeElapsedCalculator();
+                    }
                     this.loading = false;
-                    this.stopTimeElapsed = false;
-                    this.timeElapsedCalculator();
                 })
                 .catch(error => {
                     // console.log(error);
@@ -200,7 +202,7 @@ export default {
                     this.stopTimeElapsed = true;
                     this.cardLoading = false;
 
-                    this.$socket.emit("order_updated", {
+                    this.$socket.emit("order_prepared", {
                         user: {type: this.getUser.type, id: this.getUser.id},
                         order: {customerID: this.order.customer.id}
                     });
@@ -229,7 +231,7 @@ export default {
                 while (!this.stopTimeElapsed) {
                     const aux =
                         new Date().getTime() -
-                        new Date(this.currentOrder.current_status_at).getTime();
+                        new Date(this.order.current_status_at).getTime();
                     this.timeElapsed = parseInt(aux / 1000 / 60);
                     await new Promise(resolve => setTimeout(resolve, 30000));
                 }

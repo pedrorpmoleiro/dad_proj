@@ -229,6 +229,9 @@ export default {
                 "Order has been cancelled by a manager"
             );
             this.getOrders();
+        },
+        order_prepared() {
+            this.getOrders();
         }
     },
     methods: {
@@ -314,8 +317,6 @@ export default {
                     );
                     this.cardLoading = false;
 
-                    this.$socket.emit("order_picked_up", {type: this.getUser.type, id: this.getUser.id});
-
                     let order;
                     for (const i in this.availableOrders) {
                         const orderInTransit = this.availableOrders[i];
@@ -325,7 +326,7 @@ export default {
                         }
                     }
 
-                    this.$socket.emit("order_updated", {
+                    this.$socket.emit("order_picked_up", {
                         user: {type: this.getUser.type, id: this.getUser.id},
                         order: {customerID: order.customer.id}
                     });
@@ -370,7 +371,10 @@ export default {
                         "Order Delivered"
                     );
 
-                    this.$socket.emit("order_updated", {type: this.getUser.type, id: this.getUser.id});
+                    this.$socket.emit("order_updated", {
+                        user: {type: this.getUser.type, id: this.getUser.id},
+                        order: {customerID: this.currentOrder.customer.id}
+                    });
 
                     this.loading = true;
                     for (let i = 0; i < 10; i++) {

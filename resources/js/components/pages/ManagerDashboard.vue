@@ -315,6 +315,13 @@ export default {
         },
         order_updated() {
             this.getOrders();
+            this.getEmployees();
+        },
+        user_logged_out() {
+            this.getEmployees();
+        },
+        user_logged_in() {
+            this.getEmployees();
         }
     },
     methods: {
@@ -409,6 +416,20 @@ export default {
                 .then((response) => {
                     // console.log(response);
                     this.orders.loading = false;
+
+                    let payload = {
+                        user: {type: this.getUser.type, id: this.getUser.id},
+                        order: {status: order.status, customerID: order.customer.id}
+                    };
+
+                    if (payload.order.status.toUpperCase() === "P")
+                        payload.order.cookId = order.cook.id;
+                    else if (payload.order.status.toUpperCase() === "T") {
+                        payload.order.deliveryManId = order.delivery_man.id;
+                    }
+
+                    this.$socket.emit("order_canceled", payload);
+
                     this.getOrders();
                     this.$emit(
                         "show-notification",
@@ -458,10 +479,13 @@ export default {
                     "success",
                     "Order assigned to cook"
                 );
+
                 this.$socket.emit("assign_order", {
                     user: {id: this.getUser.id, type: this.getUser.type},
-                    cookID: assignment.cookId
+                    cookID: assignment.cookId,
+                    order: {customerID: order.customer.id}
                 });
+
                 this.getOrders();
             }).catch(e => {
                 console.log(e);
