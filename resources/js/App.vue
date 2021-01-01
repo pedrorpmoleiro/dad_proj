@@ -319,7 +319,8 @@ export default {
             "isUserCook",
             "isUserDeliveryMan",
             "isUserCustomer",
-            "isAuthLoading"
+            "isAuthLoading",
+            "isUserBlocked"
         ])
     },
     mounted() {
@@ -332,7 +333,13 @@ export default {
                 // console.dir(response);
                 axios.defaults.withCredentials = true;
                 this.setUser(response.data);
-                // TODO - US 18 HERE
+
+                if (this.isUserBlocked) {
+                    // User is denied access
+                    this.logoutUser();
+                    this.openNotification("error", "Your account has been blocked");
+                }
+
                 this.setAuthLoading(false);
             })
             .catch(e => {

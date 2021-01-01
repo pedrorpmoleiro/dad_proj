@@ -43,6 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* *** User Routes *** */
     Route::prefix('users')->group(function () {
+        // Get all users
+        Route::get('/', [UserController::class, 'all'])->name("user.get_all");
+
         // Get current user data
         Route::get('me', [UserController::class, 'me'])->name("user.get_auth_user_info");
 
@@ -61,6 +64,8 @@ Route::middleware('auth:sanctum')->group(function () {
             // Update a Product
             Route::put('update', [ProductController::class, 'update'])->name("product.update");
 
+            Route::delete('delete/{id}', [UserController::class, 'delete'])->name("user.delete");
+
             // Delete a Product
             Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
         });
@@ -74,6 +79,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
             // Block order
             Route::patch('cancel/{id}', [OrderController::class, 'cancelOrder'])->name("manager.cancel_order");
+        });
+
+        Route::prefix('users')->group(function () {
+            // Create User
+            Route::post('create', [UserController::class, 'create'])->name("user.create");
+
+            // Delete User
+            Route::delete('delete/{id}', [UserController::class, 'delete'])->name("user.delete");
+
+            // Block or Unblock a User
+            Route::patch('block/{id}', [UserController::class, 'block'])->name("user.block");
+
+            // Patch User Data (manager)
+            Route::patch('patch/{id}', [UserController::class, 'patchUserData'])->name("user.patch_user_info");
         });
     });
 
