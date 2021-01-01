@@ -226,6 +226,7 @@ export default {
                         "success",
                         "Register was successful, please Login"
                     );
+                    this.dialog = false;
                 })
                 .catch(e => {
                     this.loading = false;
