@@ -20,7 +20,16 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            return response()->json(Auth::user());
+            $user = Auth::user();
+
+            $user->logged_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+            if ($user->type == 'ED' || $user->type == 'EM' || $user->type == 'EC')
+                $user->available_at = $user->logged_at;
+
+            $user->save();
+
+            return response()->json($user);
         } else {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
@@ -28,6 +37,15 @@ class AuthController extends Controller
 
     public function logout(): JsonResponse
     {
+        $user = Auth::user();
+
+        $user->logged_at = null;
+
+        if ($user->type == 'ED' || $user->type == 'EM' || $user->type == 'EC')
+            $user->available_at = null;
+
+        $user->save();
+
         Auth::guard('web')->logout();
         return response()->json(['msg' => 'User session closed'], 200);
     }
@@ -35,6 +53,7 @@ class AuthController extends Controller
     public function resendVerificationEmail(): JsonResponse
     {
         $user = Auth::user();
+
         if ($user->email_verified_at == null)
             return response()->json(['msg' => 'Email already verified']);
 
@@ -53,6 +72,7 @@ class AuthController extends Controller
     public function verifyEmail(EmailVerificationRequest $request): JsonResponse
     {
         $request->fulfill();
+
         return response()->json(['msg' => 'Email verified']);
     }
 

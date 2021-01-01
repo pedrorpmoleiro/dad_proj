@@ -11,9 +11,9 @@ use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
-    public function all()
+    public function all(): JsonResponse
     {
-        return Product::all();
+        return response()->json(Product::all());
     }
 
     public function getProduct(Request $request): JsonResponse

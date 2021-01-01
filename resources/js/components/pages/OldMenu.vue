@@ -68,10 +68,10 @@ export default {
                 filterable: false,
                 sortable: false
             },
-            { text: "Name", value: "name", filterable: false },
-            { text: "Description", value: "description", filterable: false },
-            { text: "Type", value: "type" },
-            { text: "Price", value: "price", filterable: false }
+            {text: "Name", value: "name", filterable: false},
+            {text: "Description", value: "description", filterable: false},
+            {text: "Type", value: "type"},
+            {text: "Price", value: "price", filterable: false}
         ],
         products: [],
         loading: true,

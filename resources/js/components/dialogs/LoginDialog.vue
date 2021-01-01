@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import {mapActions} from "vuex";
 
 export default {
     data: () => ({
@@ -85,33 +85,47 @@ export default {
         }
     }),
     methods: {
-        ...mapActions(["setUser"]),
+        ...mapActions(["setUser", "setAuthLoading"]),
         submit() {
+            this.loading = true;
+            this.setAuthLoading(true);
+
             let user = {
                 email: this.input.email,
                 password: this.input.password
             };
 
-            this.loading = true;
-
             axios.get("sanctum/csrf-cookie").then(() => {
                 axios
                     .post("api/auth/login", user)
                     .then(response => {
+                        // console.log(response);
+                        const user = response.data;
+
                         this.loading = false;
-                        // console.log(e);
-                        this.setUser(response.data);
-                        axios.defaults.withCredentials = true;
                         this.dialog = false;
+                        this.setAuthLoading(false);
+
+                        if (user.blocked === 1) {
+                            this.$emit("user-blocked")
+                            return;
+                        }
+
+                        this.setUser(user);
+                        axios.defaults.withCredentials = true;
+
                         this.$emit(
                             "show-notification",
                             "success",
                             "Login Successful"
                         );
+
+                        this.$socket.emit("user_logged_in", {type: user.type, id: user.id});
                     })
                     .catch(e => {
-                        this.loading = false;
                         // console.log(e);
+                        this.loading = false;
+                        this.setAuthLoading(false);
                         this.$emit(
                             "show-notification",
                             "error",

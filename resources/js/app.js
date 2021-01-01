@@ -6,14 +6,23 @@ import "material-design-icons-iconfont/dist/material-design-icons.css";
 
 window.Vue = require("vue");
 
+import VueSocketIO from "vue-socket.io";
+
+Vue.use(
+    new VueSocketIO({
+        debug: process.env.MIX_APP_DEBUG,
+        connection: process.env.MIX_APP_URL + ":8080",
+    })
+);
+
 import Vuetify from "vuetify/lib";
 
 Vue.use(Vuetify);
 
 const vuetify = new Vuetify({
     icons: {
-        iconfont: "md"
-    }
+        iconfont: "md",
+    },
 });
 
 import Vuex from "vuex";
@@ -24,7 +33,7 @@ const store = new Vuex.Store({
     state: {
         auth_user: null,
         auth_loading: true,
-        shopping_cart: []
+        shopping_cart: [],
     },
     getters: {
         isAuthLoading(state) {
@@ -45,12 +54,15 @@ const store = new Vuex.Store({
         isUserDeliveryMan(state) {
             return state.auth_user != null && state.auth_user.type === "ED";
         },
+        isUserBlocked(state) {
+            return state.auth_user != null && state.auth_user.blocked === 1;
+        },
         getUser(state) {
             return state.auth_user;
         },
         getShoppingCartItems(state) {
             return state.shopping_cart;
-        }
+        },
     },
     mutations: {
         SET_AUTH_LOADING(state, loading) {
@@ -84,12 +96,12 @@ const store = new Vuex.Store({
 
             state.shopping_cart.push({
                 product: item.product,
-                amount: item.amount
+                amount: item.amount,
             });
         },
         CLEAR_CART(state) {
             state.shopping_cart = [];
-        }
+        },
     },
     actions: {
         setAuthLoading(context, loading) {
@@ -109,15 +121,13 @@ const store = new Vuex.Store({
         },
         clearShoppingCart(context) {
             context.commit("CLEAR_CART");
-        }
-    }
+        },
+    },
 });
 
 import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
-
-import Tests from "./components/pages/Tests";
 
 import Home from "./components/pages/Home";
 import Menu from "./components/pages/Menu";
@@ -125,44 +135,45 @@ import UpdateProfile from "./components/pages/UpdateProfile";
 import CustomerOrders from "./components/pages/CustomerOrders";
 import CookDashboard from "./components/pages/CookDashboard";
 import DeliverymanDashboard from "./components/pages/DeliverymanDashboard";
+import ManagerDashboard from "./components/pages/ManagerDashboard";
 
 const routes = [
     {
         path: "/",
-        redirect: "/home"
+        redirect: "/home",
     },
     {
         path: "/home",
-        component: Home
+        component: Home,
     },
     {
         path: "/menu",
-        component: Menu
+        component: Menu,
     },
     {
         path: "/profile",
-        component: UpdateProfile
+        component: UpdateProfile,
     },
     {
         path: "/orders/customer",
-        component: CustomerOrders
+        component: CustomerOrders,
     },
     {
         path: "/cook/dashboard",
-        component: CookDashboard
+        component: CookDashboard,
     },
     {
-        path: "/foo/bar/tests",
-        component: Tests
-    },
-    {
-        path: "/manage",
-        component: ManageAccounts
+        path: "/manager/accounts",
+        component: ManageAccounts,
     },
     {
         path: "/deliveryman/dashboard",
-        component: DeliverymanDashboard
-    }
+        component: DeliverymanDashboard,
+    },
+    {
+        path: "/manager/dashboard",
+        component: ManagerDashboard,
+    },
 ];
 
 const router = new VueRouter({ routes });
@@ -173,5 +184,5 @@ new Vue({
     vuetify,
     router,
     store,
-    render: h => h(App)
+    render: (h) => h(App),
 }).$mount("#app");

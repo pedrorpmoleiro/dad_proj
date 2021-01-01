@@ -165,7 +165,7 @@ export default {
                 });
         }
     },
-    mounted() {
+    async mounted() {
         this.input.name = this.product.name;
         this.input.type = this.product.type.charAt(0).toUpperCase() + this.product.type.slice(1);
         this.input.description = this.product.description;
