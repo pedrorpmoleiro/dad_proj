@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 import CheckoutDialog from "../dialogs/CheckoutDialog";
 

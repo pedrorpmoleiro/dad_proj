@@ -176,7 +176,7 @@ const routes = [
     },
 ];
 
-const router = new VueRouter({ routes });
+const router = new VueRouter({routes});
 
 import App from "./App.vue";
 

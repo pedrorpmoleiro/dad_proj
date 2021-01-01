@@ -91,9 +91,7 @@ export default {
 
                     this.clearShoppingCart();
 
-                    // TODO MOVE TO ORDERS PAGE
-                    // TODO RECEIVE ORDER INFO
-                    // TODO WITH ORDER INFO SET THE COOK
+                    this.$router.push("/orders/customer")
                 })
                 .catch(e => {
                     // console.log(e);
