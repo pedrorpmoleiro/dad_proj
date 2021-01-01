@@ -3,7 +3,7 @@ const SSL_KEY = "";
 const SSL_CA = "";
 
 let httpServer;
-if (SSL_CRT !== "" && SSL_PEM !== "" && SSL_CA !== "") {
+if (SSL_CRT !== "" && SSL_KEY !== "" && SSL_CA !== "") {
     console.log("Found SSL Files Path");
     const fs = require("fs");
     let options;
