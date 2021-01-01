@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import {mapActions} from "vuex";
 
 export default {
     data: () => ({
@@ -100,7 +100,8 @@ export default {
                     .then(response => {
                         this.loading = false;
                         // console.log(e);
-                        this.setUser(response.data);
+                        const user = response.data;
+                        this.setUser(user);
                         axios.defaults.withCredentials = true;
                         this.dialog = false;
                         this.$emit(
@@ -108,6 +109,7 @@ export default {
                             "success",
                             "Login Successful"
                         );
+                        this.$socket.emit("user_logged_in", {type: user.type, id: user.id});
                     })
                     .catch(e => {
                         this.loading = false;
