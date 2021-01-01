@@ -216,8 +216,6 @@ export default {
             )
                 user.nif = Number(this.input.nif);
 
-            console.log(user);
-
             axios
                 .post("api/customers/register", user)
                 .then(response => {

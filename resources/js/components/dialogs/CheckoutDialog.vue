@@ -57,7 +57,7 @@ export default {
         input: ""
     }),
     computed: {
-        ...mapGetters(["getShoppingCartItems"]),
+        ...mapGetters(["getShoppingCartItems", "getUser"]),
     },
     methods: {
         ...mapActions(["clearShoppingCart"]),
@@ -78,7 +78,7 @@ export default {
             axios
                 .post("api/orders/new", order)
                 .then(response => {
-                    console.log(response);
+                    // console.log(response);
                     this.loading = false;
                     this.dialog = false;
                     this.$emit(
@@ -86,15 +86,22 @@ export default {
                         "success",
                         "Order Placed"
                     );
+
+                    this.$socket.emit("order_created", {type: this.getUser.type, id: this.getUser.id});
+
                     this.clearShoppingCart();
+
+                    // TODO MOVE TO ORDERS PAGE
+                    // TODO RECEIVE ORDER INFO
+                    // TODO WITH ORDER INFO SET THE COOK
                 })
                 .catch(e => {
-                    this.loading = false;
                     // console.log(e);
+                    this.loading = false;
                     this.$emit(
                         "show-notification",
                         "error",
-                        e.response.data.msg
+                        "Unable to checkout"
                     );
                 });
         }

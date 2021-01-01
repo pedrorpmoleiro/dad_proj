@@ -127,7 +127,7 @@
                             <template v-slot:item.type="{ item }">
                                 {{
                                     item.type.charAt(0).toUpperCase() +
-                                        item.type.slice(1)
+                                    item.type.slice(1)
                                 }}
                             </template>
                         </v-data-table>
@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     data: () => ({
@@ -197,8 +197,8 @@ export default {
                 value: "customer_extra.name",
                 sortable: false
             },
-            { text: "Time Ready", value: "time", sortable: false },
-            { value: "actions", sortable: false }
+            {text: "Time Ready", value: "time", sortable: false},
+            {value: "actions", sortable: false}
         ],
         oldestOrderId: -1,
         currentOrder: null,
@@ -208,16 +208,32 @@ export default {
                 value: "photo_url",
                 sortable: false
             },
-            { text: "Name", value: "name" },
-            { text: "Description", value: "description" },
-            { text: "Quantity", value: "pivot.quantity" },
-            { text: "Type", value: "type" }
+            {text: "Name", value: "name"},
+            {text: "Description", value: "description"},
+            {text: "Quantity", value: "pivot.quantity"},
+            {text: "Type", value: "type"}
         ],
         loading: true,
         cardLoading: false,
         timeElapsed: 0,
         stopTimeElapsed: false
     }),
+    sockets: {
+        order_picked_up() {
+            this.getOrders();
+        },
+        order_canceled() {
+            this.$emit(
+                "show-notification",
+                "error",
+                "Order has been cancelled by a manager"
+            );
+            this.getOrders();
+        },
+        order_prepared() {
+            this.getOrders();
+        }
+    },
     methods: {
         getOrders(setLoading = true) {
             if (setLoading) this.loading = true;
@@ -292,7 +308,7 @@ export default {
 
             axios
                 .patch(`api/deliveryman/orders/transit/${this.oldestOrderId}`)
-                .then(response => {
+                .then(async response => {
                     // console.log(response);
                     this.$emit(
                         "show-notification",
@@ -300,6 +316,32 @@ export default {
                         "Currently delivering updated"
                     );
                     this.cardLoading = false;
+
+                    let order;
+                    for (const i in this.availableOrders) {
+                        const orderInTransit = this.availableOrders[i];
+                        if (orderInTransit.id === this.oldestOrderId) {
+                            order = orderInTransit;
+                            break;
+                        }
+                    }
+
+                    this.$socket.emit("order_picked_up", {
+                        user: {type: this.getUser.type, id: this.getUser.id},
+                        order: {customerID: order.customer.id}
+                    });
+
+                    this.loading = true;
+                    for (let i = 0; i < 10; i++) {
+                        this.getOrders(false);
+                        if (
+                            this.availableOrders.length === 0 &&
+                            this.currentOrder != null
+                        )
+                            break;
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    }
+                    this.loading = false;
                 })
                 .catch(e => {
                     // console.log(e);
@@ -309,8 +351,8 @@ export default {
                         "Failed to set order in transit"
                     );
                     this.cardLoading = false;
+                    this.getOrders();
                 });
-            this.getOrders();
         },
         setOrderDelivered() {
             this.cardLoading = true;
@@ -329,16 +371,21 @@ export default {
                         "Order Delivered"
                     );
 
+                    this.$socket.emit("order_updated", {
+                        user: {type: this.getUser.type, id: this.getUser.id},
+                        order: {customerID: this.currentOrder.customer.id}
+                    });
+
                     this.loading = true;
                     for (let i = 0; i < 10; i++) {
                         this.getOrders(false);
                         if (this.availableOrders.length > 0) break;
                         else if (
-                            this.availableOrders.length == 0 &&
+                            this.availableOrders.length === 0 &&
                             this.currentOrder == null
                         )
                             break;
-                        else if (this.currentOrder.id != currentOrderId) break;
+                        else if (this.currentOrder.id !== currentOrderId) break;
                         await new Promise(resolve => setTimeout(resolve, 3000));
                     }
                     this.loading = false;
@@ -359,7 +406,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["isUserDeliveryMan", "isAuthLoading"])
+        ...mapGetters(["isUserDeliveryMan", "isAuthLoading", "getUser"])
     },
     async mounted() {
         while (this.isAuthLoading)

@@ -60,4 +60,3 @@ TBD
 
 * **Pedro Moleiro - 2171264**
 * **Pedro Galveias - 2161966**
-* **Thainá Braz - 2161902**

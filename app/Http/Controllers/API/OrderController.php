@@ -13,7 +13,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class OrderController extends Controller
@@ -125,6 +124,11 @@ class OrderController extends Controller
     public function setOrderPrepared(): JsonResponse
     {
         $user = Auth::user();
+
+        $user->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $user->save();
+
         $order = Order::where('status', 'P')->where('prepared_by', $user->id)->first();
 
         if ($order == null)
@@ -174,6 +178,10 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $user = Auth::user();
 
+        $user->available_at = null;
+
+        $user->save();
+
         $order->status = 'T';
         $order->delivered_by = $user->id;
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
@@ -186,15 +194,17 @@ class OrderController extends Controller
     public function setOrderDelivered(): JsonResponse
     {
         $user = Auth::user();
+
+        $user->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+
+        $user->save();
+
         $order = Order::where('status', 'T')->where('delivered_by', $user->id)->first();
 
         if ($order == null)
             return response()->json(null, 404);
 
         $order->status = 'D';
-
-        $order->save();
-
         $order->delivery_time = time() - strtotime($order->current_status_at);
         $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
         $order->closed_at = $order->current_status_at;
@@ -214,16 +224,64 @@ class OrderController extends Controller
         $order->customer;
         $order->cook;
         $order->delivery_man;
+        $order->items;
 
         switch ($user->type) {
             case 'C':
                 if ($user->id != $order->customer->id)
                     throw new AccessDeniedException("Requested Order doesn't belong to this customer");
                 break;
-                // TODO REVIEW
-                // ! Ready for custom checks for other user types
+            // TODO REVIEW
+            // ! Ready for custom checks for other user types
         }
 
         return response()->json($order);
+    }
+
+    public function cancelOrder(Request $request): JsonResponse
+    {
+        $id = $request->id;
+
+        $order = Order::findOrFail($id);
+
+        if ($order->status == 'P') {
+            $cook = User::findOrFail($order->cook->id);
+            $cook->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+            $cook->save();
+        } else if ($order->status == 'T') {
+            $deliveryMan = User::findOrFail($order->delivery_man->id);
+            $deliveryMan->available_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+            $deliveryMan->save();
+        }
+
+        $order->status = 'C';
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+        $order->closed_at = $order->current_status_at;
+        $order->total_time = strtotime($order->closed_at) - strtotime($order->opened_at);
+
+        $order->save();
+
+        return response()->json(null);
+    }
+
+    public function assignOrderToCook(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            "orderId" => ["required", "integer"],
+            "cookId" => ["required", "integer"]
+        ]);
+
+        $cook = User::findOrFail($data["cookId"]);
+        $order = Order::findOrFail($data["orderId"]);
+
+        $cook->available_at = null;
+        $cook->save();
+
+        $order->status = 'P';
+        $order->prepared_by = $cook->id;
+        $order->current_status_at = date(env('INPUT_FORMAT_DATE') . ' ' . env('INPUT_FORMAT_TIME_SECONDS'));
+        $order->save();
+
+        return response()->json(null);
     }
 }

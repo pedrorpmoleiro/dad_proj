@@ -60,6 +60,7 @@
                         >
                             {{ link.name }}
                         </v-btn>
+                        <global-message></global-message>
                     </div>
                     <div v-if="isUserCook">
                         <v-btn
@@ -114,6 +115,7 @@
                     <div v-if="!isLoggedIn">
                         <login-dialog
                             v-on:show-notification="openNotification"
+                            v-on:user-blocked="userBlocked"
                         ></login-dialog>
                         <register-dialog
                             v-on:show-notification="openNotification"
@@ -136,8 +138,7 @@
                                     <div v-else>
                                         <v-icon class="mr-1"
                                         >account_circle
-                                        </v-icon
-                                        >
+                                        </v-icon>
                                     </div>
                                     <div>
                                         {{
@@ -202,6 +203,7 @@
 import LoginDialog from "./components/dialogs/LoginDialog";
 import RegisterDialog from "./components/dialogs/RegisterDialog";
 import ShoppingCartMenu from "./components/menus/ShoppingCartMenu";
+import GlobalMessageDialog from "./components/dialogs/GlobalMessageDialog";
 
 import {mapActions, mapGetters} from "vuex";
 
@@ -213,19 +215,15 @@ export default {
     components: {
         "login-dialog": LoginDialog,
         "register-dialog": RegisterDialog,
-        "shopping-cart-menu": ShoppingCartMenu
+        "shopping-cart-menu": ShoppingCartMenu,
+        "global-message": GlobalMessageDialog
     },
     data: () => ({
         pubLinks: [
             {
-                name: "Tests",
-                location: "/foo/bar/tests"
-            },
-            {
                 name: "Menu",
                 location: "/menu"
-            },
-
+            }
         ],
         cookLinks: [
             {
@@ -242,7 +240,11 @@ export default {
         managerLinks: [
             {
                 name: "Manage User Accounts",
-                location: "/manage"
+                location: "/manager/accounts"
+            },
+            {
+                name: "Manager Dashboard",
+                location: "/manager/dashboard"
             }
         ],
         customerLinks: [
@@ -259,22 +261,34 @@ export default {
             timeout: 6000
         }
     }),
+    sockets: {
+        global_message(payload) {
+            this.openNotification(payload.color, payload.message, 20000);
+        }
+    },
     methods: {
         ...mapActions(["logOut", "setUser", "setAuthLoading"]),
+        userBlocked() {
+            this.logoutUser(false);
+            this.openNotification("error", "Your account has been blocked");
+        },
         goHome() {
             if (this.$router.currentRoute.path !== "/home")
                 this.$router.push("/home");
         },
-        logoutUser() {
+        logoutUser(socket = true) {
             if (!this.isLoggedIn) return;
 
             axios
                 .post("api/auth/logout")
-                .then(() => {
-                    this.logOut();
+                .then(response => {
+                    // console.log(response);
                     axios.defaults.withCredentials = false;
                     this.openNotification("success", "Logout Success");
                     this.goHome();
+                    if (socket)
+                        this.$socket.emit("user_logged_out", {type: this.getUser.type, id: this.getUser.id});
+                    this.logOut();
                 })
                 .catch(e => {
                     console.log("Error");
@@ -321,7 +335,8 @@ export default {
             "isUserCook",
             "isUserDeliveryMan",
             "isUserCustomer",
-            "isAuthLoading"
+            "isAuthLoading",
+            "isUserBlocked"
         ])
     },
     mounted() {
@@ -334,12 +349,17 @@ export default {
                 // console.dir(response);
                 axios.defaults.withCredentials = true;
                 this.setUser(response.data);
-                // TODO - US 18 HERE
                 this.setAuthLoading(false);
+
+                if (this.isUserBlocked)
+                    // User is denied access
+                    this.userBlocked();
+                else
+                    this.$socket.emit("user_logged_in", {type: this.getUser.type, id: this.getUser.id});
             })
             .catch(e => {
-                // Not Logged in
                 // console.log(e);
+                // Not Logged in
                 this.setAuthLoading(false);
             });
     }

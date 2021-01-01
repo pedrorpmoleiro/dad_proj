@@ -1,15 +1,17 @@
 <?php
 
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ManagerController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\OrderController;
 
 /* *** TESTS *** */
 
-use App\Models\Order;
+use App\Models\User;
 
 /* ***  END  *** */
 
@@ -41,6 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* *** User Routes *** */
     Route::prefix('users')->group(function () {
+        // Get all users
+        Route::get('/', [UserController::class, 'all'])->name("user.get_all");
+
         // Get current user data
         Route::get('me', [UserController::class, 'me'])->name("user.get_auth_user_info");
 
@@ -51,15 +56,47 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
     });
 
-    Route::middleware('manager')->prefix('products')->group(function () {
-        // Create new Product
-        Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
+    Route::middleware('manager')->group(function () {
+        Route::prefix('products')->group(function () {
+            // Create new Product
+            Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 
-        // Update a Product
-        Route::put('update', [ProductController::class, 'update'])->name("product.update");
+            // Update a Product
+            Route::put('update', [ProductController::class, 'update'])->name("product.update");
 
-        // Delete a Product
-        Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
+            Route::delete('delete/{id}', [UserController::class, 'delete'])->name("user.delete");
+
+            // Delete a Product
+            Route::delete('delete/{id}', [ProductController::class, 'delete'])->name("product.delete");
+        });
+
+        // Get all Employees
+        Route::get('employees', [ManagerController::class, 'getEmployees'])->name("manager.get_employees");
+
+        Route::prefix('orders')->group(function () {
+            // Get all open Orders
+            Route::get('open', [ManagerController::class, 'getOpenOrders'])->name("manager.get_open_orders");
+
+            // Cancel order
+            Route::patch('cancel/{id}', [OrderController::class, 'cancelOrder'])->name("manager.cancel_order");
+
+            // Assign Order to Cook
+            Route::patch('cook/assign', [OrderController::class, 'assignOrderToCook'])->name("manager.assing_to_cook");
+        });
+
+        Route::prefix('users')->group(function () {
+            // Create User
+            Route::post('create', [UserController::class, 'create'])->name("user.create");
+
+            // Delete User
+            Route::delete('delete/{id}', [UserController::class, 'delete'])->name("user.delete");
+
+            // Block or Unblock a User
+            Route::patch('block/{id}', [UserController::class, 'block'])->name("user.block");
+
+            // Patch User Data (manager)
+            Route::patch('patch/{id}', [UserController::class, 'patchUserData'])->name("user.patch_user_info");
+        });
     });
 
     Route::middleware('customer')->group(function () {
@@ -129,7 +166,5 @@ Route::prefix('products')->group(function () {
 
 /* !!! TESTING ROUTE !!! */
 Route::get('tests', function () {
-    $order = Order::where('status', 'P')->where('prepared_by', 4)->first();
-
-    return response()->json($order);
+    return response()->json(Order::where('status', 'T')->where('delivered_by', 10)->get());
 })->name("tests");

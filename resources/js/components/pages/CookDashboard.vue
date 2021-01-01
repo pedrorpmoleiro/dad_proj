@@ -62,7 +62,7 @@
                                         <div class="mx-1">
                                             {{
                                                 "Name: " +
-                                                    order.customer_extra.name
+                                                order.customer_extra.name
                                             }}
                                         </div>
                                     </v-col>
@@ -70,10 +70,10 @@
                                         <div
                                             class="subtitle-1 font-weight-bold mb-1"
                                         >
-                                            Time
+                                            Time Elapsed:
                                         </div>
                                         <p class="mx-1">
-                                            {{ order.current_status_at }}
+                                            {{ timeElapsed }} minutes
                                         </p>
                                     </v-col>
                                     <v-col>
@@ -108,7 +108,7 @@
                                     <template v-slot:item.type="{ item }">
                                         {{
                                             item.type.charAt(0).toUpperCase() +
-                                                item.type.slice(1)
+                                            item.type.slice(1)
                                         }}
                                     </template>
                                 </v-data-table>
@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     data: () => ({
@@ -136,14 +136,34 @@ export default {
                 filterable: false,
                 sortable: false
             },
-            { text: "Name", value: "name", filterable: false },
-            { text: "Description", value: "description", filterable: false },
-            { text: "Quantity", value: "pivot.quantity" },
-            { text: "Type", value: "type" }
+            {text: "Name", value: "name", filterable: false},
+            {text: "Description", value: "description", filterable: false},
+            {text: "Quantity", value: "pivot.quantity"},
+            {text: "Type", value: "type"}
         ],
         timeElapsed: 0,
         stopTimeElapsed: false
     }),
+    sockets: {
+        order_canceled() {
+            this.$emit(
+                "show-notification",
+                "error",
+                "Order has been cancelled by a manager"
+            );
+            this.getOrder();
+        },
+        order_assigned() {
+            if (this.order == null) {
+                this.$emit(
+                    "show-notification",
+                    "success",
+                    "A new order has been assigned"
+                );
+                this.getOrder();
+            }
+        }
+    },
     methods: {
         getOrder() {
             this.loading = true;
@@ -153,10 +173,12 @@ export default {
                 .then(response => {
                     // console.log(response);
                     if (response.data.error) this.order = null;
-                    else this.order = response.data;
+                    else {
+                        this.order = response.data;
+                        this.stopTimeElapsed = false;
+                        this.timeElapsedCalculator();
+                    }
                     this.loading = false;
-                    this.stopTimeElapsed = false;
-                    this.setOrderPrepared();
                 })
                 .catch(error => {
                     // console.log(error);
@@ -179,6 +201,12 @@ export default {
                     // console.log(response);
                     this.stopTimeElapsed = true;
                     this.cardLoading = false;
+
+                    this.$socket.emit("order_prepared", {
+                        user: {type: this.getUser.type, id: this.getUser.id},
+                        order: {customerID: this.order.customer.id}
+                    });
+
                     this.$emit(
                         "show-notification",
                         "success",
@@ -186,8 +214,8 @@ export default {
                     );
                     this.getOrder();
                 })
-                .catch(error => {
-                    // console.log(error);
+                .catch(e => {
+                    // console.log(e);
                     this.cardLoading = false;
                     this.$emit(
                         "show-notification",
@@ -203,7 +231,7 @@ export default {
                 while (!this.stopTimeElapsed) {
                     const aux =
                         new Date().getTime() -
-                        new Date(this.currentOrder.current_status_at).getTime();
+                        new Date(this.order.current_status_at).getTime();
                     this.timeElapsed = parseInt(aux / 1000 / 60);
                     await new Promise(resolve => setTimeout(resolve, 30000));
                 }
@@ -211,7 +239,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["isUserCook", "isAuthLoading"])
+        ...mapGetters(["isUserCook", "isAuthLoading", "getUser"])
     },
     async mounted() {
         while (this.isAuthLoading)
