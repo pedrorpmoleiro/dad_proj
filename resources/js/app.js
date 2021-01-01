@@ -11,7 +11,7 @@ import VueSocketIO from "vue-socket.io";
 Vue.use(
     new VueSocketIO({
         debug: process.env.MIX_APP_DEBUG,
-        connection: process.env.MIX_APP_URL + ":8080",
+        connection: process.env.MIX_APP_URL,
     })
 );
 
