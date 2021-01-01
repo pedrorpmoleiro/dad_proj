@@ -13,7 +13,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class OrderController extends Controller
@@ -253,5 +252,15 @@ class OrderController extends Controller
         $order->save();
 
         return response()->json(null);
+    }
+
+    public function assignOrderToCook(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            "orderId" => ["required", "integer"],
+            "cookId" => ["required", "integer"]
+        ]);
+
+        dd($data);
     }
 }

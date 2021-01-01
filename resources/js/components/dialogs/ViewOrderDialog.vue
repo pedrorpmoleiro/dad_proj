@@ -330,6 +330,11 @@ export default {
             {text: "Type", value: "type"}
         ],
     }),
+    sockets: {
+        order_updated() {
+            this.refreshOrderData();
+        }
+    },
     methods: {
         refreshOrderData() {
             this.loading = true;

@@ -144,6 +144,26 @@ export default {
         timeElapsed: 0,
         stopTimeElapsed: false
     }),
+    sockets: {
+        order_canceled() {
+            this.$emit(
+                "show-notification",
+                "error",
+                "Order has been cancelled by a manager"
+            );
+            this.getOrder();
+        },
+        order_assigned() {
+            if (this.order == null) {
+                this.$emit(
+                    "show-notification",
+                    "success",
+                    "A new order has been assigned"
+                );
+                this.getOrder();
+            }
+        }
+    },
     methods: {
         getOrder() {
             this.loading = true;
@@ -179,6 +199,12 @@ export default {
                     // console.log(response);
                     this.stopTimeElapsed = true;
                     this.cardLoading = false;
+
+                    this.$socket.emit("order_updated", {
+                        user: {type: this.getUser.type, id: this.getUser.id},
+                        order: {customerID: this.order.customer.id}
+                    });
+
                     this.$emit(
                         "show-notification",
                         "success",
@@ -186,8 +212,8 @@ export default {
                     );
                     this.getOrder();
                 })
-                .catch(error => {
-                    // console.log(error);
+                .catch(e => {
+                    // console.log(e);
                     this.cardLoading = false;
                     this.$emit(
                         "show-notification",
@@ -211,7 +237,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["isUserCook", "isAuthLoading"])
+        ...mapGetters(["isUserCook", "isAuthLoading", "getUser"])
     },
     async mounted() {
         while (this.isAuthLoading)

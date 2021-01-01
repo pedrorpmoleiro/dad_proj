@@ -77,8 +77,11 @@ Route::middleware('auth:sanctum')->group(function () {
             // Get all open Orders
             Route::get('open', [ManagerController::class, 'getOpenOrders'])->name("manager.get_open_orders");
 
-            // Block order
+            // Cancel order
             Route::patch('cancel/{id}', [OrderController::class, 'cancelOrder'])->name("manager.cancel_order");
+
+            // Assign Order to Cook
+            Route::patch('cook/assign', [OrderController::class, 'assignOrderToCook'])->name("manager.assing_to_cook");
         });
 
         Route::prefix('users')->group(function () {

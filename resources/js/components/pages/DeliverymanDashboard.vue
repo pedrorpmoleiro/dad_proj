@@ -218,6 +218,19 @@ export default {
         timeElapsed: 0,
         stopTimeElapsed: false
     }),
+    sockets: {
+        order_picked_up() {
+            this.getOrders();
+        },
+        order_canceled() {
+            this.$emit(
+                "show-notification",
+                "error",
+                "Order has been cancelled by a manager"
+            );
+            this.getOrders();
+        }
+    },
     methods: {
         getOrders(setLoading = true) {
             if (setLoading) this.loading = true;
@@ -301,6 +314,22 @@ export default {
                     );
                     this.cardLoading = false;
 
+                    this.$socket.emit("order_picked_up", {type: this.getUser.type, id: this.getUser.id});
+
+                    let order;
+                    for (const i in this.availableOrders) {
+                        const orderInTransit = this.availableOrders[i];
+                        if (orderInTransit.id === this.oldestOrderId) {
+                            order = orderInTransit;
+                            break;
+                        }
+                    }
+
+                    this.$socket.emit("order_updated", {
+                        user: {type: this.getUser.type, id: this.getUser.id},
+                        order: {customerID: order.customer.id}
+                    });
+
                     this.loading = true;
                     for (let i = 0; i < 10; i++) {
                         this.getOrders(false);
@@ -341,6 +370,8 @@ export default {
                         "Order Delivered"
                     );
 
+                    this.$socket.emit("order_updated", {type: this.getUser.type, id: this.getUser.id});
+
                     this.loading = true;
                     for (let i = 0; i < 10; i++) {
                         this.getOrders(false);
@@ -371,7 +402,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["isUserDeliveryMan", "isAuthLoading"])
+        ...mapGetters(["isUserDeliveryMan", "isAuthLoading", "getUser"])
     },
     async mounted() {
         while (this.isAuthLoading)

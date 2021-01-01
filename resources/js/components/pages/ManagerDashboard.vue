@@ -53,6 +53,9 @@
                         <template v-slot:item.type="{ item }">
                             {{ employeeTypeToString(item.type) }}
                         </template>
+                        <template v-slot:item.name="{ item }">
+                            {{ getUserFirstAndLastName(item.name) }}
+                        </template>
                         <template v-slot:item.started="{ item }">
                             <div v-if="item.logged_at != null">
                                 {{
@@ -162,10 +165,10 @@
                         </template>
                         <template v-slot:item.name="{ item }">
                             <div v-if="item.status === 'P'">
-                                {{ item.cook.name }}
+                                {{ getUserFirstAndLastName(item.cook.name) }}
                             </div>
                             <div v-else-if="item.status === 'T'">
-                                {{ item.delivery_man.name }}
+                                {{ getUserFirstAndLastName(item.delivery_man.name) }}
                             </div>
                         </template>
                         <template v-slot:item.lastUpdate="{ item }">
@@ -176,6 +179,25 @@
                             }}
                         </template>
                         <template v-slot:item.actions="{ item }">
+                            <v-edit-dialog
+                                v-if="item.status === 'H'"
+                                v-on:save="assignOrderToCook(item)"
+                                v-on:open="loadAvailableCooks">
+                                <v-btn icon>
+                                    <v-icon>person_add</v-icon>
+                                </v-btn>
+                                <template v-slot:input>
+                                    <v-autocomplete
+                                        v-model="assignCookInput[item.id]"
+                                        label="Available cooks to assign to order"
+                                        :items="availableCooks.names"
+                                        hint="Press enter to assign order"
+                                        clearable
+                                        :rules="[rules.required]"
+                                        prepend-inner-icon="person"
+                                    ></v-autocomplete>
+                                </template>
+                            </v-edit-dialog>
                             <view-order
                                 v-bind:order-prop="item"
                                 v-bind:manager="true"
@@ -278,10 +300,30 @@ export default {
                 },
             ],
         },
+        availableCooks: {
+            list: [],
+            names: []
+        },
+        assignCookInput: [],
+        rules: {
+            required: value => !!value || "Required",
+        }
     }),
+    sockets: {
+        order_created() {
+            this.getOrders();
+        },
+        order_updated() {
+            this.getOrders();
+        }
+    },
     methods: {
         getEmployees() {
             this.employees.loading = true;
+            this.employees.list = [];
+            this.availableCooks.list = [];
+            this.availableCooks.names = [];
+            this.assignCookInput = [];
 
             axios
                 .get("api/employees")
@@ -297,6 +339,7 @@ export default {
         },
         getOrders() {
             this.orders.loading = true;
+            this.orders.list = [];
 
             axios
                 .get("api/orders/open")
@@ -382,10 +425,57 @@ export default {
                     );
                     this.orders.loading = false;
                 });
+        },
+        getUserFirstAndLastName(userFullName) {
+            let aux = userFullName.split(" ");
+            return aux[0] + " " + aux[aux.length - 1];
+        },
+        loadAvailableCooks() {
+            if (this.availableCooks.list.length > 0)
+                return;
+
+            this.employees.list.forEach((value) => {
+                if (value.type === 'EC' &&
+                    value.logged_at && value.available_at) {
+                    this.availableCooks.list.push(value);
+                    this.availableCooks.names.push(this.getUserFirstAndLastName(value.name));
+                }
+            });
+        },
+        assignOrderToCook(order) {
+            this.orders.loading = true;
+
+            const assignment = {
+                orderId: order.id,
+                cookId: this.availableCooks.list[this.availableCooks.names.indexOf(this.assignCookInput[order.id])].id
+            };
+
+            axios.patch('api/orders/cook/assign', assignment).then(response => {
+                console.log(response);
+                this.orders.loading = false;
+                this.$emit(
+                    "show-notification",
+                    "success",
+                    "Order assigned to cook"
+                );
+                this.$socket.emit("assign_order", {
+                    user: {id: this.getUser.id, type: this.getUser.type},
+                    cookID: assignment.cookId
+                });
+                this.getOrders();
+            }).catch(e => {
+                console.log(e);
+                this.$emit(
+                    "show-notification",
+                    "error",
+                    "Failed to assign order"
+                );
+                this.orders.loading = false;
+            })
         }
     },
     computed: {
-        ...mapGetters(["isUserManager", "isAuthLoading"]),
+        ...mapGetters(["isUserManager", "isAuthLoading", "getUser"]),
     },
     async mounted() {
         while (this.isAuthLoading)

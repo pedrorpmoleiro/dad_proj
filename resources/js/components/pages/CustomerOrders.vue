@@ -135,6 +135,14 @@ export default {
             }
         ]
     }),
+    sockets: {
+        order_updated() {
+            let aux = this.open.orders.length;
+            this.getOpenOrders();
+            if (this.open.orders.length !== aux)
+                this.getHistoryOrders();
+        }
+    },
     methods: {
         getAllOrders() {
             this.history.loading = true;

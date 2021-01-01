@@ -1,9 +1,9 @@
 <template>
     <v-dialog v-model="dialog" scrollable width="750">
         <template v-slot:activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on">
+            <v-btn depressed color="green" dark v-bind="attrs" v-on="on">
                 <v-icon>add</v-icon>
-                Create User
+                Create Employee
             </v-btn>
         </template>
 
@@ -53,6 +53,7 @@
                                     required
                                     v-model="input.type"
                                     label="Type *"
+                                    :rules="[rules.required]"
                                     placeholder="Choose user type"
                                     :items="userTypes"
                                 ></v-autocomplete>
@@ -77,7 +78,7 @@ export default {
         isFormValid: false,
         loading: false,
         dialog: false,
-        userTypes: ["Customer", "Manager", "Cook", "Delivery Man"],
+        userTypes: ["Manager", "Cook", "Delivery Man"],
         input: {
             id: 0,
             name: '',
@@ -102,8 +103,6 @@ export default {
     methods: {
         getTypeName(item) {
             switch (item) {
-                case "Customer":
-                    return "C";
                 case "Manager":
                     return "EM";
                 case "Cook":

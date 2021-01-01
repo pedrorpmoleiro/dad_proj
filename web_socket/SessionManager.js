@@ -11,7 +11,8 @@ class SessionManager {
         let usersType = [];
 
         for (const i in this.users) {
-            const userSession = this.users[i];
+            const userSession = this.users.get(i);
+            console.log(userSession);
             if (userSession.user.type === userType.toUpperCase())
                 usersType.push(userSession);
         }
