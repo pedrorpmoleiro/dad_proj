@@ -1,5 +1,5 @@
 const SSL_CRT = "";
-const SSL_PEM = "";
+const SSL_KEY = "";
 
 let httpServer;
 if (SSL_CRT !== "" && SSL_PEM !== "") {
@@ -8,7 +8,7 @@ if (SSL_CRT !== "" && SSL_PEM !== "") {
     let options;
     try {
         options = {
-            key: fs.readFileSync(SSL_PEM),
+            key: fs.readFileSync(SSL_KEY),
             cert: fs.readFileSync(SSL_CRT),
         };
         console.log("Loaded SSL Certificate");
