@@ -16,8 +16,6 @@ class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
-        // if (Auth::attempt(['email' => $email, 'password' => $password, 'active' => 1]))
-
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
@@ -29,7 +27,14 @@ class AuthController extends Controller
 
             $user->save();
 
-            return response()->json($user);
+            $response = $user->toStdClass();
+
+            if ($user->type == 'C') {
+                $customer = Customer::find($user->id);
+                $response = $customer->addToStdClass($response, false);
+            }
+
+            return response()->json($response);
         } else {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
