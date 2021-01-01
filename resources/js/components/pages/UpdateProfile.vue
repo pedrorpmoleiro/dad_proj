@@ -150,7 +150,7 @@
                             </v-container>
                         </v-form>
                         <small class="red--text"
-                            >* indicates required field</small
+                        >* indicates required field</small
                         >
                     </v-card-text>
 
@@ -251,7 +251,7 @@
                             </v-container>
                         </v-form>
                         <small class="red--text"
-                            >* indicates required field</small
+                        >* indicates required field</small
                         >
                     </v-card-text>
                     <v-divider></v-divider>
@@ -273,7 +273,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import {mapGetters, mapActions} from "vuex";
 
 export default {
     data: () => ({
@@ -341,7 +341,8 @@ export default {
     }),
     methods: {
         ...mapActions(["setUser"]),
-        submitPhoto() {},
+        submitPhoto() {
+        },
         submitPassword() {
             if (
                 this.updatePassword.input.password !==

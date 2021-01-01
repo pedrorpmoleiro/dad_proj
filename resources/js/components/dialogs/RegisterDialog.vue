@@ -135,7 +135,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     data: () => ({
@@ -231,11 +231,18 @@ export default {
                 .catch(e => {
                     this.loading = false;
                     // console.log(e);
-                    this.$emit(
-                        "show-notification",
-                        "error",
-                        "Failed to register new Customer"
-                    );
+                    if (e.response.data.errors.email)
+                        this.$emit(
+                            "show-notification",
+                            "error",
+                            e.response.data.errors.email[0]
+                        );
+                    else
+                        this.$emit(
+                            "show-notification",
+                            "error",
+                            "Failed to create new user"
+                        );
                 });
         }
     }

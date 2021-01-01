@@ -81,7 +81,9 @@ class UserController extends Controller
         $user = Auth::user();
 
         $data = $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id), 'regex:/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/'],
+            'email' => ['required', 'string', 'email', 'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+                'regex:/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/'],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/'],
             'address' => ['required', 'string'],
             'phone' => ['required', 'string', 'regex:/^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/'],
@@ -201,7 +203,8 @@ class UserController extends Controller
         $user = User::findOrFail($request->id);
 
         $data = $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'email' => ['required', 'string', 'email', 'max:255',
+                Rule::unique('users', 'email')->ignore($user->id)],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/'],
             'type' => ['required', 'string', Rule::in(['EC', 'C', 'EM', 'ED'])],
         ]);
