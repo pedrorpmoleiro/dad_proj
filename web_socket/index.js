@@ -1,15 +1,17 @@
 const SSL_CRT = "";
 const SSL_KEY = "";
+const SSL_CA = "";
 
 let httpServer;
-if (SSL_CRT !== "" && SSL_PEM !== "") {
+if (SSL_CRT !== "" && SSL_PEM !== "" && SSL_CA !== "") {
     console.log("Found SSL Files Path");
     const fs = require("fs");
     let options;
     try {
         options = {
-            key: fs.readFileSync(SSL_KEY),
-            cert: fs.readFileSync(SSL_CRT),
+            key: fs.readFileSync(SSL_KEY, "utf8"),
+            cert: fs.readFileSync(SSL_CRT, "utf8"),
+            ca: fs.readFileSync(SSL_CA, "utf8"),
         };
         console.log("Loaded SSL Certificate");
 
