@@ -59,8 +59,21 @@
                                 ></v-autocomplete>
                             </v-col>
                         </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-text-field
+                                    v-model="input.password"
+                                    label="Password *"
+                                    :rules="[rules.required]"
+                                    clearable
+                                    required
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
                     </v-container>
+                    <small class="red--text">* indicates required field</small>
                 </v-card-text>
+                <v-divider></v-divider>
                 <v-card-actions>
                     <v-btn color="green darken-1" text v-on:click.prevent="submit" :disabled="!isFormValid">Save</v-btn>
                     <v-spacer></v-spacer>
@@ -84,8 +97,7 @@ export default {
             name: '',
             email: '',
             password: '123',
-            type: '',
-            photo: ''
+            type: ''
         },
         rules: {
             required: value => !!value || "Required",
@@ -117,8 +129,7 @@ export default {
                 name: this.input.name,
                 email: this.input.email,
                 password: this.input.password,
-                type: this.getTypeName(this.input.type),
-                photo_url: this.input.photo
+                type: this.getTypeName(this.input.type)
             };
 
             this.loading = true;

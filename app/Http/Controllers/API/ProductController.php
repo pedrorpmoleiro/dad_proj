@@ -53,7 +53,7 @@ class ProductController extends Controller
             'type' => ['required', 'string', Rule::in(['drink', 'dessert', 'cold dish', 'hot dish'])],
             'description' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0.01', 'max:999.99'],
-            'photo_url' => ['nullable', 'string'],
+            "photo" => ["file", "mimetypes:image/png,image/jpeg"]
         ]);
 
         // Find product
@@ -66,8 +66,13 @@ class ProductController extends Controller
         $product->price = $data['price'];
 
         try {
-            if ($data['photo_url'])
-                $product->photo_url = $data['photo_url'];
+            if ($data['photo']) {
+                $photo = $request->file("photo");
+                $photoName = uniqid() . '.' . $photo->extension();
+                $photo->storePubliclyAs("public/products", $photoName);
+
+                $product->photo_url = $photoName;
+            }
         } catch (\Exception $e) {
         }
 
@@ -84,12 +89,18 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', Rule::in(['drink', 'dessert', 'cold dish', 'hot dish'])],
             'description' => ['required', 'string', 'max:255'],
-            'photo_url' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0.01', 'max:999.99'],
+            "photo" => ["required", "file", "mimetypes:image/png,image/jpeg"]
         ]);
 
         try {
-            $data['photo_url'];
+            if ($data['photo']) {
+                $photo = $request->file("photo");
+                $photoName = uniqid() . '.' . $photo->extension();
+                $photo->storePubliclyAs("public/products", $photoName);
+
+                $data['photo_url'] = $photoName;
+            }
         } catch (\Exception $e) {
             $data['photo_url'] = "";
         }

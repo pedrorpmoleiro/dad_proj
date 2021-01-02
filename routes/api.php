@@ -54,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Update User Password
         Route::patch('update/password', [UserController::class, 'updatePassword'])->name("user.update_auth_user_password");
+
+        // Upload User Photo
+        Route::post('upload/photo', [UserController::class, 'uploadPhoto'])->name("user.upload_photo");
     });
 
     Route::middleware('manager')->group(function () {
@@ -62,7 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('new', [ProductController::class, 'create'])->name("product.create_new");
 
             // Update a Product
-            Route::put('update', [ProductController::class, 'update'])->name("product.update");
+            Route::post('update', [ProductController::class, 'update'])->name("product.update");
 
             Route::delete('delete/{id}', [UserController::class, 'delete'])->name("user.delete");
 

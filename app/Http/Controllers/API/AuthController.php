@@ -83,21 +83,37 @@ class AuthController extends Controller
 
     public function registerCustomer(Request $request): JsonResponse
     {
+        $response = [];
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:3'],
             'phone' => ['required', 'integer', 'regex:/^([\+]|[0]{2})?[1-9]\d{0,3}?[\s]?[1-9]\d{1,8}$/'],
             'address' => ['required', 'string', 'max:255'],
-            'nif' => ['integer', 'min:1', 'max:999999999']
+            'nif' => ['integer', 'min:1', 'max:999999999'],
+            "photo" => ["file", "mimetypes:image/png,image/jpeg"]
         ]);
 
         $data['password'] = Hash::make($data['password']);
         $data['type'] = 'C';
 
-        $user = User::create($data);
+        try {
+            if ($data['photo']) {
+                $photo = $request->file("photo");
+                $photoName = uniqid() . '.' . $photo->extension();
+                $photo->storePubliclyAs("public/fotos", $photoName);
 
-        $response = [];
+                $data['photo_url'] = $photoName;
+            }
+        } catch (\Exception $e) {
+            $response["errors"] = [
+                "msg" => "Unable to save user photo",
+                "error" => $e->getMessage()
+            ];
+        }
+
+        $user = User::create($data);
 
         try {
             $user->sendEmailVerificationNotification();

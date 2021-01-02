@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 use stdClass;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class UserController extends Controller
 {
@@ -123,8 +124,10 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:3'],
-            'type' => ['required', 'string', Rule::in(['c', 'C', 'ec', 'EC', 'ed', 'ED', 'em', 'EM'])],
+            'type' => ['required', 'string', Rule::in(['ec', 'EC', 'ed', 'ED', 'em', 'EM'])],
         ]);
+
+        $data['type'] = strtoupper($data['type']);
 
         // Hash password
         $data['password'] = Hash::make($data['password']);
@@ -142,7 +145,7 @@ class UserController extends Controller
             ];
         }
 
-        return response()->json(null, 201);
+        return response()->json($response, 201);
     }
 
     public function delete(Request $request): JsonResponse
@@ -220,5 +223,36 @@ class UserController extends Controller
 
         // Return OK
         return response()->json(null);
+    }
+
+    public function uploadPhoto(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            "id" => ["required", "integer"],
+            "photo" => ["required", "file", "mimetypes:image/png,image/jpeg"]
+        ]);
+
+        $authUser = Auth::user();
+
+        if ($authUser->id != $data["id"] && $authUser->type != 'EM')
+            throw new AccessDeniedException("Unauthorized");
+
+        $user = User::findOrFail($data["id"]);
+
+        $photo = $request->file("photo");
+        $photoName = uniqid() . '.' . $photo->extension();
+        $photo->storePubliclyAs("public/fotos", $photoName);
+
+        $user->photo_url = $photoName;
+        $user->save();
+
+        $response = $user->toStdClass();
+
+        if ($user->type == 'C') {
+            $customer = Customer::find($user->id);
+            $response = $customer->addToStdClass($response, false);
+        }
+
+        return response()->json($response);
     }
 }
