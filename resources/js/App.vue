@@ -264,6 +264,10 @@ export default {
     sockets: {
         global_message(payload) {
             this.openNotification(payload.color, payload.message, 20000);
+        },
+        user_blocked() {
+            this.logoutUser(true, false);
+            this.openNotification("error", "Your account has been blocked");
         }
     },
     methods: {
@@ -276,7 +280,7 @@ export default {
             if (this.$router.currentRoute.path !== "/home")
                 this.$router.push("/home");
         },
-        logoutUser(socket = true) {
+        logoutUser(socket = true, notification = true) {
             if (!this.isLoggedIn) return;
 
             axios
@@ -284,7 +288,8 @@ export default {
                 .then(response => {
                     // console.log(response);
                     axios.defaults.withCredentials = false;
-                    this.openNotification("success", "Logout Success");
+                    if (notification)
+                        this.openNotification("success", "Logout Success");
                     this.goHome();
                     if (socket)
                         this.$socket.emit("user_logged_out", {type: this.getUser.type, id: this.getUser.id});
@@ -293,7 +298,8 @@ export default {
                 .catch(e => {
                     // console.log("Error");
                     // console.log(e);
-                    this.openNotification("error", "Logout Error");
+                    if (notification)
+                        this.openNotification("error", "Logout Error");
                 });
         },
         getUserFirstAndLastName(userFullName) {
