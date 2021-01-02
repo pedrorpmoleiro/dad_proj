@@ -175,6 +175,10 @@ export default {
                         "success",
                         "User blocked/unblocked successfully"
                     );
+                    this.$socket.emit("user_blocked", {
+                        user: {id: this.getUser.id, type: this.getUser.type},
+                        userBlockedId: item.id
+                    })
                     this.getUsers();
                 })
                 .catch(e => {

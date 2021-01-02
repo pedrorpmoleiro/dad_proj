@@ -414,6 +414,29 @@ io.on("connection", (socket) => {
         }
     });
 
+    // US 28
+    socket.on("user_blocked", (payload) => {
+        if (
+            payload.user &&
+            payload.user.id &&
+            payload.user.type &&
+            payload.userBlockedId
+        ) {
+            const userSession = sessionManager.getUserSession(
+                payload.userBlockedId
+            );
+            if (userSession) {
+                io.to(userSession.socketID).emit("user_blocked");
+                console.log(
+                    "Sending Message 'user_blocked' to UserID= " +
+                        userSession.user.id +
+                        ", SocketID= " +
+                        userSession.socketID
+                );
+            }
+        }
+    });
+
     // EXTRA
     socket.on("global_message", (payload) => {
         if (
