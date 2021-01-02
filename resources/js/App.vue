@@ -291,8 +291,8 @@ export default {
                     this.logOut();
                 })
                 .catch(e => {
-                    console.log("Error");
-                    console.log(e);
+                    // console.log("Error");
+                    // console.log(e);
                     this.openNotification("error", "Logout Error");
                 });
         },

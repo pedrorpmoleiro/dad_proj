@@ -109,6 +109,20 @@
                                 ></v-text-field>
                             </v-col>
                         </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-file-input
+                                    chips
+                                    show-size
+                                    v-model="input.photo"
+                                    label="Profile Picture"
+                                    accept="images/png, images/jpeg"
+                                    prepend-icon=""
+                                    prepend-inner-icon="face"
+                                    clearable
+                                ></v-file-input>
+                            </v-col>
+                        </v-row>
                     </v-container>
                 </v-form>
                 <small class="red--text">* indicates required field</small>
@@ -151,7 +165,8 @@ export default {
             passwordConfirm: "",
             address: "",
             phone: "",
-            nif: ""
+            nif: "",
+            photo: null
         },
         rules: {
             required: value => !!value || "Required",
@@ -201,23 +216,29 @@ export default {
 
             this.loading = true;
 
-            let user = {
-                name: this.input.name,
-                email: this.input.email,
-                password: this.input.password,
-                address: this.input.address,
-                phone: this.input.phone
-            };
+            let user = new FormData();
+            user.append("name", this.input.name)
+            user.append("email", this.input.email)
+            user.append("password", this.input.password)
+            user.append("address", this.input.address)
+            user.append("phone", this.input.phone)
 
             if (
                 typeof this.input.nif !== typeof undefined &&
                 this.input.nif != null &&
                 this.input.nif !== ""
             )
-                user.nif = Number(this.input.nif);
+                user.append("nif", Number(this.input.nif));
+
+            if (
+                typeof this.input.photo !== typeof undefined &&
+                this.input.photo != null &&
+                this.input.photo !== ""
+            )
+                user.append("photo", this.input.photo);
 
             axios
-                .post("api/customers/register", user)
+                .post("api/customers/register", user, {headers: {"Content-Type": "multipart/form-data"}})
                 .then(response => {
                     this.loading = false;
                     // console.log(response);

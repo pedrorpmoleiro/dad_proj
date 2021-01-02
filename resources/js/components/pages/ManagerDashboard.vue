@@ -472,7 +472,7 @@ export default {
             };
 
             axios.patch('api/orders/cook/assign', assignment).then(response => {
-                console.log(response);
+                // console.log(response);
                 this.orders.loading = false;
                 this.$emit(
                     "show-notification",
@@ -488,7 +488,7 @@ export default {
 
                 this.getOrders();
             }).catch(e => {
-                console.log(e);
+                // console.log(e);
                 this.$emit(
                     "show-notification",
                     "error",

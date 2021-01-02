@@ -57,9 +57,14 @@
                         <v-row>
                             <v-col>
                                 <v-file-input
-                                    v-model="input.photo_url"
+                                    chips
+                                    show-size
+                                    v-model="input.photo"
                                     accept="image/jpeg, image/png"
                                     label="Product Photo"
+                                    prepend-icon=""
+                                    prepend-inner-icon="add_a_photo"
+                                    clearable
                                 ></v-file-input>
                             </v-col>
                         </v-row>
@@ -112,7 +117,7 @@ export default {
             name: "",
             type: "",
             description: "",
-            photo_url: null,
+            photo: null,
             price: ""
         },
         rules: {
@@ -129,21 +134,18 @@ export default {
         updateProduct() {
             this.loading = true;
 
-            let product = {
-                id: this.product.id,
-                name: this.input.name,
-                type: this.input.type.toLowerCase(),
-                description: this.input.description,
-                price: this.input.price
-            };
+            let product = new FormData();
+            product.append("id", this.product.id);
+            product.append("name", this.input.name);
+            product.append("type", this.input.type.toLowerCase());
+            product.append("description", this.input.description);
+            product.append("price", this.input.price);
 
-            if (this.input.photo_url)
-                product.photo_url = this.input.photo_url;
-            else
-                product.photo_url = this.product.photo_url;
+            if (this.input.photo)
+                product.append("photo", this.input.photo);
 
             axios
-                .put("/api/products/update", product)
+                .post("/api/products/update", product, {headers: {"Content-Type": "multipart/form-data"}})
                 .then(response => {
                     // console.log(response);
                     this.loading = false;

@@ -24,13 +24,14 @@
                                             show-size
                                             clearable
                                             accept="image/jpeg, image/png"
-                                            prepend-icon="add_a_photo"
+                                            prepend-icon=""
+                                            prepend-inner-icon="face"
                                             label="Profile Picture"
+                                            :rules="[rules.required]"
                                             v-model="
                                                 updateUserPhoto.input.photo
                                             "
                                         ></v-file-input>
-                                        <!-- ! TODO -->
                                     </v-col>
                                 </v-row>
                             </v-container>
@@ -342,6 +343,34 @@ export default {
     methods: {
         ...mapActions(["setUser"]),
         submitPhoto() {
+            this.updateUserPhoto.loading = true;
+
+            let data = new FormData();
+            data.append("id", this.getUser.id);
+            data.append("photo", this.updateUserPhoto.input.photo);
+
+            axios
+                .post("api/users/upload/photo", data, {headers: {"Content-Type": "multipart/form-data"}})
+                .then(response => {
+                    // console.log(response);
+                    this.updateUserPhoto.loading = false;
+                    this.setUser(response.data);
+                    this.mounted();
+                    this.$emit(
+                        "show-notification",
+                        "success",
+                        "Profile Picture Updated"
+                    );
+                })
+                .catch(e => {
+                    // console.log(e);
+                    this.updateUserPhoto.loading = false;
+                    this.$emit(
+                        "show-notification",
+                        "error",
+                        "Failed to upload new profile picture"
+                    );
+                });
         },
         submitPassword() {
             if (
@@ -427,6 +456,7 @@ export default {
                     // console.log(response);
 
                     this.setUser(response.data);
+                    this.mounted();
 
                     this.$emit(
                         "show-notification",

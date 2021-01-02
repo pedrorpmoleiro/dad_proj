@@ -238,7 +238,7 @@ export default {
                     this.loading = false;
                 })
                 .catch(e => {
-                    console.log(e.response);
+                    // console.log(e.response);
                     this.loading = false;
                     this.$emit(
                         "show-notification",
@@ -266,7 +266,7 @@ export default {
             axios
                 .delete(`api/products/delete/${product.id}`)
                 .then(response => {
-                    console.log(response);
+                    // console.log(response);
                     this.$emit(
                         "show-notification",
                         "success",
@@ -275,7 +275,7 @@ export default {
                     this.getProducts();
                 })
                 .catch(e => {
-                    console.log(e);
+                    // console.log(e);
                     this.$emit(
                         "show-notification",
                         "error",
